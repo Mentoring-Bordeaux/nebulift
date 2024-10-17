@@ -1,2 +1,4 @@
 config:
   azure-native:location: westeurope
+  nebulift:AppServiceSkuName: F1
+  nebulift:StaticWebAppSkuName: Free

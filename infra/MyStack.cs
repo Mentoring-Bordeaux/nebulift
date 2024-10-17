@@ -7,14 +7,12 @@ using Pulumi.AzureNative.Web.Inputs;
 
 class MyStack : Stack
 {
-    const string repoUrl = "https://github.com/Mentoring-Bordeaux/nebulift";
-    const string sitePath = "src/front"; // TODO : change the sitePath
-    const string apiPath = "src/back"; // TODO : change the apiPath
-
     public MyStack()
     {
-        // Retrieve the current stack name
-        var stackName = Pulumi.Deployment.Instance.StackName;
+        // Retrieve configuration and set config variables
+        var config = new Config(); 
+        var appServiceSkuName = config.Require("AppServiceSkuName");
+        var staticWebAppSkuName = config.Require("StaticWebAppSkuName");
 
         // Create an Azure Resource Group
         var resourceGroup = new ResourceGroup("rg-nebulift-dev-westeurope-");
@@ -26,8 +24,7 @@ class MyStack : Stack
             Location = resourceGroup.Location,
             Sku = new SkuDescriptionArgs
             {
-                Name = stackName == "prod" ? "B1" : "F1",
-                Tier = stackName == "prod" ? "Basic" : "Free"
+                Name = appServiceSkuName
             }
         });
 
@@ -39,29 +36,37 @@ class MyStack : Stack
             ServerFarmId = appServicePlan.Id
         });
 
-        // Export the App Service URL
-        this.Endpoint = Output.Format($"https://{appService.DefaultHostName}");
-
         // Create a Static Web App
         var staticWebApp = new StaticSite("stapp-nebulift-dev-westeurope-", new StaticSiteArgs
         {
             ResourceGroupName = resourceGroup.Name,
             Location = resourceGroup.Location,
-            RepositoryUrl = repoUrl,
-            Branch = "main",
-            BuildProperties = new StaticSiteBuildPropertiesArgs
-            {
-                AppLocation = sitePath,
-                ApiLocation = apiPath,
-                OutputLocation = "build"
-            },
             Sku = new SkuDescriptionArgs
             {
-                Name = "Free"
+                Name = staticWebAppSkuName
+            },
+            BuildProperties = new StaticSiteBuildPropertiesArgs
+            {
+                // No build properties : CI/CD will build
             }
         });
 
+        // Link front-end to back-end
+        // Only possible on paid plan
+        // TODO : replace if condition with better practice
+        if (staticWebAppSkuName == "Standard" || staticWebAppSkuName == "Dedicated") {
+            var backendLink = new StaticSiteLinkedBackend("backlink-nebulift-dev-westeurope-", new()
+            {
+                Name = staticWebApp.Name,
+                BackendResourceId = appService.Id,
+                LinkedBackendName = appService.Name,
+                Region = resourceGroup.Location,
+                ResourceGroupName = resourceGroup.Name,
+            });
+        }
+
         // Export the variable dictionary
+        this.Endpoint = Output.Format($"https://{appService.DefaultHostName}");
         this.ResourceGroupName = resourceGroup.Name;
         this.AppServicePlanName = appServicePlan.Name;
         this.StaticWebAppName = staticWebApp.Name;
@@ -78,4 +83,5 @@ class MyStack : Stack
 
     [Output]
     public Output<string> StaticWebAppName { get; set; }
+
 }
