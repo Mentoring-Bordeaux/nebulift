@@ -1,27 +1,32 @@
 <script setup lang="ts">
-const text = ref('Loading...')
+const { data, status, error, refresh, clear } = await useFetch('http://localhost:5041/weatherforecast')
 
-function fetchText() {
-	setTimeout(() => {
-		text.value = 'Hello, world!'
-	}, 2000)
+const clearAndRefresh = () => {
+	clear()
+	refresh()
 }
-
-onMounted(() => fetchText())
 
 </script>
 <template>
 	<div>
-		<p>{{ text }}</p>
+		<p v-if="status === 'pending'">Loading...</p>
+		<p v-else-if="status === 'success'">{{ data }}</p>
+		<p v-else-if="status === 'error'">{{ error }}</p>
+		<UButton @click="clearAndRefresh">Refresh</UButton>
 	</div>
 </template>
 <style scoped>
 p {
+	text-align: center;
 	font-size: 2em;
+	padding-bottom: 1em;
 }
 
-#id {
-	font-size: 1em;
-	color: #101418;
+div {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	height: 100vh;
 }
 </style>
