@@ -1,2 +1,1 @@
-export default defineAppConfig({
-});
+export default defineAppConfig({});

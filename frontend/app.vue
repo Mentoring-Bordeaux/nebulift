@@ -1,5 +1,5 @@
 <script setup lang="ts">
-console.log('Hello from the frontend!')
+console.log('Hello from the frontend!');
 </script>
 
 <template>

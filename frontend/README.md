@@ -34,7 +34,6 @@ pnpm run preview
 
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
 
-
 ## Additional information
 
 Check out the [directory structure](https://nuxt.com/docs/guide/directory-structure/).

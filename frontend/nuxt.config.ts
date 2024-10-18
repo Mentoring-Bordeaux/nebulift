@@ -1,27 +1,35 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: '2024-04-03',
+  modules: ['@nuxt/ui', '@nuxt/eslint'],
+  ssr: true,
+  devtools: { enabled: true },
+  css: ['@/assets/main.css'],
   alias: {
-    assets: "/<rootDir>/assets",
+    assets: '/<rootDir>/assets',
   },
+  routeRules: {
+    '/api': {
+      proxy: 'http://localhost:5041',
+    },
+  },
+  compatibilityDate: '2024-04-03',
   nitro: {
     devProxy: {
-      "/api": {
-        target: "http://localhost:5041",
+      '/api': {
+        target: 'http://localhost:5041',
       },
     },
   },
-  routeRules: {
-    "/api": {
-      proxy: "http://localhost:5041",
-    },
-  },
-
-  modules: ["@nuxt/ui"],
-  css: ["@/assets/main.css"],
-  devtools: { enabled: true },
-  ssr: true,
   typescript: {
     typeCheck: true,
-  }
-})
+  },
+  eslint: {
+    config: {
+      stylistic: {
+        indent: 2,
+        quotes: 'single',
+        semi: true,
+      },
+    },
+  },
+});
