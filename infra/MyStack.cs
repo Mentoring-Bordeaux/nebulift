@@ -21,10 +21,10 @@ class MyStack : Stack
         var staticWebAppSkuName = config.Require("StaticWebAppSkuName");
 
         // Create an Azure Resource Group
-        var resourceGroup = new ResourceGroup($"rg-{projectName}-{stackName}");
+        var resourceGroup = new ResourceGroup($"rg-{projectName}-{stackName}-");
 
         // Create an App Service Plan
-        var appServicePlan = new AppServicePlan($"wapp-plan-{projectName}-{stackName}", new AppServicePlanArgs
+        var appServicePlan = new AppServicePlan($"wapp-plan-{projectName}-{stackName}-", new AppServicePlanArgs
         {
             ResourceGroupName = resourceGroup.Name,
             Sku = new SkuDescriptionArgs
@@ -34,14 +34,14 @@ class MyStack : Stack
         });
 
         // Create an App Service
-        var appService = new WebApp($"wapp-{projectName}-{stackName}", new WebAppArgs
+        var appService = new WebApp($"wapp-{projectName}-{stackName}-", new WebAppArgs
         {
             ResourceGroupName = resourceGroup.Name,
             ServerFarmId = appServicePlan.Id
         });
 
         // Create a Static Web App
-        var staticWebApp = new StaticSite($"stapp-{projectName}-{stackName}", new StaticSiteArgs
+        var staticWebApp = new StaticSite($"stapp-{projectName}-{stackName}-", new StaticSiteArgs
         {
             ResourceGroupName = resourceGroup.Name,
             Sku = new SkuDescriptionArgs
@@ -56,7 +56,7 @@ class MyStack : Stack
 
         // Link front-end to back-end
         // Only possible on paid plan
-        var backendLink = new StaticSiteLinkedBackend($"backlink-{projectName}-{stackName}", new()
+        var backendLink = new StaticSiteLinkedBackend($"backlink-{projectName}-{stackName}-", new()
         {
             Name = staticWebApp.Name,
             BackendResourceId = appService.Id,
