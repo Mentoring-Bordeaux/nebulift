@@ -1,5 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 
+/// <summary>
+/// Controller to handle weather forecast related requests.
+/// </summary>
 [ApiController]
 [Route("[controller]")]
 public class WeatherForecastController : ControllerBase
@@ -9,6 +12,10 @@ public class WeatherForecastController : ControllerBase
         "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
     };
 
+    /// <summary>
+    /// Gets the weather forecast for the next 5 days.
+    /// </summary>
+    /// <returns>An enumerable of <see cref="WeatherForecast"/> objects.</returns>
     [HttpGet]
     public IEnumerable<WeatherForecast> Get()
     {
