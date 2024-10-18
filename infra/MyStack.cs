@@ -27,7 +27,6 @@ class MyStack : Stack
         var appServicePlan = new AppServicePlan($"wapp-plan-{projectName}-{stackName}", new AppServicePlanArgs
         {
             ResourceGroupName = resourceGroup.Name,
-            Location = resourceGroup.Location,
             Sku = new SkuDescriptionArgs
             {
                 Name = appServiceSkuName
@@ -38,7 +37,6 @@ class MyStack : Stack
         var appService = new WebApp($"wapp-{projectName}-{stackName}", new WebAppArgs
         {
             ResourceGroupName = resourceGroup.Name,
-            Location = resourceGroup.Location,
             ServerFarmId = appServicePlan.Id
         });
 
@@ -46,7 +44,6 @@ class MyStack : Stack
         var staticWebApp = new StaticSite($"stapp-{projectName}-{stackName}", new StaticSiteArgs
         {
             ResourceGroupName = resourceGroup.Name,
-            Location = resourceGroup.Location,
             Sku = new SkuDescriptionArgs
             {
                 Name = staticWebAppSkuName
@@ -64,7 +61,6 @@ class MyStack : Stack
             Name = staticWebApp.Name,
             BackendResourceId = appService.Id,
             LinkedBackendName = appService.Name,
-            Region = resourceGroup.Location,
             ResourceGroupName = resourceGroup.Name,
         });
 
