@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const { data, status, error, refresh, clear } = await useFetch(
-  '/api/weatherforecast',
+  '/api/weatherforecast'
 );
 
 const clearAndRefresh = () => {
@@ -11,18 +11,14 @@ const clearAndRefresh = () => {
 
 <template>
   <div>
-    <p v-if="status === 'pending'">
-      Loading...
-    </p>
+    <p v-if="status === 'pending'">Loading...</p>
     <p v-else-if="status === 'success'">
       {{ data }}
     </p>
     <p v-else-if="status === 'error'">
       {{ error }}
     </p>
-    <UButton @click="clearAndRefresh">
-      Refresh
-    </UButton>
+    <UButton @click="clearAndRefresh"> Refresh </UButton>
   </div>
 </template>
 
