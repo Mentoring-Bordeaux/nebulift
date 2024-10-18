@@ -54,15 +54,14 @@ class MyStack : Stack
             }
         });
 
-        // Link front-end to back-end
-        // Only possible on paid plan
-        var backendLink = new StaticSiteLinkedBackend($"backlink-{projectName}-{stackName}-", new()
-        {
-            Name = staticWebApp.Name,
-            BackendResourceId = appService.Id,
-            LinkedBackendName = appService.Name,
-            ResourceGroupName = resourceGroup.Name,
-        });
+        // // Link front-end to back-end
+        // // Only possible on paid plan
+        // var backendLink = new StaticSiteLinkedBackend($"backlink-{projectName}-{stackName}-", new()
+        // {
+        //     Name = staticWebApp.Name,
+        //     BackendResourceId = appService.Id,
+        //     ResourceGroupName = resourceGroup.Name,
+        // });
 
         // Export the variable dictionary
         this.Endpoint = Output.Format($"https://{appService.DefaultHostName}");
