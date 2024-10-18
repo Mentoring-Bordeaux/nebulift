@@ -7,14 +7,6 @@ using Pulumi.AzureNative.Web.Inputs;
 
 class MyStack : Stack
 {
-    private string CreateResourceName(params string[] args){
-        string name = "";
-        foreach (string item in args)
-        {
-            name += item + "-";
-        }
-        return name;
-    }
 
     public MyStack()
     {
@@ -29,10 +21,10 @@ class MyStack : Stack
         var staticWebAppSkuName = config.Require("StaticWebAppSkuName");
 
         // Create an Azure Resource Group
-        var resourceGroup = new ResourceGroup(CreateResourceName("rg", projectName, stackName));
+        var resourceGroup = new ResourceGroup($"rg-{projectName}-{stackName}");
 
         // Create an App Service Plan
-        var appServicePlan = new AppServicePlan(CreateResourceName("wapp-plan", projectName, stackName), new AppServicePlanArgs
+        var appServicePlan = new AppServicePlan($"wapp-plan-{projectName}-{stackName}", new AppServicePlanArgs
         {
             ResourceGroupName = resourceGroup.Name,
             Location = resourceGroup.Location,
@@ -43,7 +35,7 @@ class MyStack : Stack
         });
 
         // Create an App Service
-        var appService = new WebApp(CreateResourceName("wapp", projectName, stackName), new WebAppArgs
+        var appService = new WebApp($"wapp-{projectName}-{stackName}", new WebAppArgs
         {
             ResourceGroupName = resourceGroup.Name,
             Location = resourceGroup.Location,
@@ -51,7 +43,7 @@ class MyStack : Stack
         });
 
         // Create a Static Web App
-        var staticWebApp = new StaticSite(CreateResourceName("stapp", projectName, stackName), new StaticSiteArgs
+        var staticWebApp = new StaticSite($"stapp-{projectName}-{stackName}", new StaticSiteArgs
         {
             ResourceGroupName = resourceGroup.Name,
             Location = resourceGroup.Location,
@@ -69,7 +61,7 @@ class MyStack : Stack
         // Only possible on paid plan
         // TODO : replace if condition with better practice
         if (staticWebAppSkuName == "Standard" || staticWebAppSkuName == "Dedicated") {
-            var backendLink = new StaticSiteLinkedBackend(CreateResourceName("backlink", projectName, stackName), new()
+            var backendLink = new StaticSiteLinkedBackend($"backlink-{projectName}-{stackName}", new()
             {
                 Name = staticWebApp.Name,
                 BackendResourceId = appService.Id,
