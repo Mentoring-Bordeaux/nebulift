@@ -4,10 +4,23 @@ export default defineNuxtConfig({
   alias: {
     assets: "/<rootDir>/assets",
   },
+  nitro: {
+    devProxy: {
+      "/api": {
+        target: "http://localhost:5041",
+      },
+    },
+  },
+  routeRules: {
+    "/api": {
+      proxy: "http://localhost:5041",
+    },
+  },
+
   modules: ["@nuxt/ui"],
   css: ["@/assets/main.css"],
   devtools: { enabled: true },
-  ssr: false,
+  ssr: true,
   typescript: {
     typeCheck: true,
   }

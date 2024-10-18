@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { data, status, error, refresh, clear } = await useFetch('http://localhost:5041/weatherforecast')
+const { data, status, error, refresh, clear } = await useFetch('/api/weatherforecast')
 
 const clearAndRefresh = () => {
 	clear()
