@@ -7,18 +7,32 @@ using Pulumi.AzureNative.Web.Inputs;
 
 class MyStack : Stack
 {
+    private string CreateResourceName(params string[] args){
+        string name = "";
+        foreach (string item in args)
+        {
+            name += item + "-";
+        }
+        return name;
+    }
+
     public MyStack()
     {
         // Retrieve configuration and set config variables
         var config = new Config(); 
+        var location = config.Get("azure-native:location");
+
+        var stackName = Pulumi.Deployment.Instance.StackName;
+        var projectName = Pulumi.Deployment.Instance.ProjectName;
+
         var appServiceSkuName = config.Require("AppServiceSkuName");
         var staticWebAppSkuName = config.Require("StaticWebAppSkuName");
 
         // Create an Azure Resource Group
-        var resourceGroup = new ResourceGroup("rg-nebulift-dev-westeurope-");
+        var resourceGroup = new ResourceGroup(CreateResourceName("rg", projectName, stackName));
 
         // Create an App Service Plan
-        var appServicePlan = new AppServicePlan("wapp-plan-nebulift-dev-westeurope-", new AppServicePlanArgs
+        var appServicePlan = new AppServicePlan(CreateResourceName("wapp-plan", projectName, stackName), new AppServicePlanArgs
         {
             ResourceGroupName = resourceGroup.Name,
             Location = resourceGroup.Location,
@@ -29,7 +43,7 @@ class MyStack : Stack
         });
 
         // Create an App Service
-        var appService = new WebApp("wapp-nebulift-dev-westeurope-", new WebAppArgs
+        var appService = new WebApp(CreateResourceName("wapp", projectName, stackName), new WebAppArgs
         {
             ResourceGroupName = resourceGroup.Name,
             Location = resourceGroup.Location,
@@ -37,7 +51,7 @@ class MyStack : Stack
         });
 
         // Create a Static Web App
-        var staticWebApp = new StaticSite("stapp-nebulift-dev-westeurope-", new StaticSiteArgs
+        var staticWebApp = new StaticSite(CreateResourceName("stapp", projectName, stackName), new StaticSiteArgs
         {
             ResourceGroupName = resourceGroup.Name,
             Location = resourceGroup.Location,
@@ -55,7 +69,7 @@ class MyStack : Stack
         // Only possible on paid plan
         // TODO : replace if condition with better practice
         if (staticWebAppSkuName == "Standard" || staticWebAppSkuName == "Dedicated") {
-            var backendLink = new StaticSiteLinkedBackend("backlink-nebulift-dev-westeurope-", new()
+            var backendLink = new StaticSiteLinkedBackend(CreateResourceName("backlink", projectName, stackName), new()
             {
                 Name = staticWebApp.Name,
                 BackendResourceId = appService.Id,
