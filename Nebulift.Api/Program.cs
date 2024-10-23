@@ -1,9 +1,14 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+namespace Nebulift.Api;
 
-public class Program
+/// <summary>
+/// The main program class.
+/// </summary>
+public static class Program
 {
+    /// <summary>
+    /// The main entry point for the application.
+    /// </summary>
+    /// <param name="args">The command-line arguments.</param>
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
@@ -24,14 +29,13 @@ public class Program
 
         app.UseHttpsRedirection();
         app.UseAuthorization();
-
         app.MapControllers();
 
         app.Run();
     }
 }
 
-public record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
+public record WeatherForecast(DateOnly date, int temperatureC, string? summary)
 {
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    public int TemperatureF => 32 + (int)(temperatureC / 0.5556);
 }
