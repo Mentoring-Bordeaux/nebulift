@@ -1,4 +1,4 @@
-namespace Nebulift.Api.Models;
+namespace Nebulift.Models;
 
 public record WeatherForecast(DateOnly date, int temperatureC, string? summary)
 {

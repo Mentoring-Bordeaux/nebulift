@@ -4,7 +4,7 @@
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-        <RootNamespace>Nebulift.Api</RootNamespace>
+        <RootNamespace>Nebulift</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

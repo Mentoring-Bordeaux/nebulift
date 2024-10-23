@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nebulift.Api", "Nebulift.Api.csproj", "{563C6650-745E-4AEA-814A-2684932E1A71}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nebulift", "Nebulift.csproj", "{563C6650-745E-4AEA-814A-2684932E1A71}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

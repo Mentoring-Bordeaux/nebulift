@@ -1,7 +1,7 @@
-namespace Nebulift.Api.Controllers;
+namespace Nebulift.Controllers;
 
 using Microsoft.AspNetCore.Mvc;
-using Nebulift.Api.Models;
+using Nebulift.Models;
 
 /// <summary>
 /// Controller to handle weather forecast related requests.
