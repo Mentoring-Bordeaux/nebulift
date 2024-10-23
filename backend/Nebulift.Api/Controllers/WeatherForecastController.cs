@@ -1,6 +1,7 @@
 namespace Nebulift.Api.Controllers;
 
 using Microsoft.AspNetCore.Mvc;
+using Nebulift.Api.Models;
 
 /// <summary>
 /// Controller to handle weather forecast related requests.
@@ -9,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 [Route("[controller]")]
 public class WeatherForecastController : ControllerBase
 {
-    private static readonly string[] Summaries = new[]
+    private static readonly string[] _summaries = new[]
     {
         "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching",
     };
@@ -24,7 +25,7 @@ public class WeatherForecastController : ControllerBase
         return Enumerable.Range(1, 5).Select(index => new WeatherForecast(
                 DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
                 Random.Shared.Next(-20, 55),
-                Summaries[Random.Shared.Next(Summaries.Length)]))
+                _summaries[Random.Shared.Next(_summaries.Length)]))
             .ToArray();
     }
 }
