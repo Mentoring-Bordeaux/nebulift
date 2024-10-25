@@ -9,14 +9,14 @@ export default defineNuxtConfig({
   },
   routeRules: {
     '/api': {
-      proxy: 'http://localhost:5041',
+      proxy: 'http://localhost:5052',
     },
   },
   compatibilityDate: '2024-04-03',
   nitro: {
     devProxy: {
       '/api': {
-        target: 'http://localhost:5041',
+        target: 'http://localhost:5052',
       },
     },
   },
