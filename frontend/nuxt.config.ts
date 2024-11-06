@@ -1,4 +1,4 @@
-// nuxt.config.ts
+// https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   modules: ['@nuxt/ui', '@nuxt/eslint'],
   ssr: true,
@@ -8,11 +8,18 @@ export default defineNuxtConfig({
     assets: '/<rootDir>/assets',
   },
   routeRules: {
-    '/api/**': {
-      proxy: 'http://backend:80/**',
+    '/api': {
+      proxy: 'http://localhost:5052',
     },
   },
   compatibilityDate: '2024-04-03',
+  nitro: {
+    devProxy: {
+      '/api': {
+        target: 'http://localhost:5052',
+      },
+    },
+  },
   typescript: {
     typeCheck: true,
   },
