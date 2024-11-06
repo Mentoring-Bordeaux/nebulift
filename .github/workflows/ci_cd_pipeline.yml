@@ -10,7 +10,6 @@ on:
       - main
       - feature/github-workflows
 
-
 jobs:
   build_and_test:
     runs-on: ubuntu-latest
@@ -41,11 +40,14 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20.11.x'
+          cache: 'pnpm'
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: latest
+        run: npm install -g pnpm
+
+      # Nettoyer le cache pnpm (optionnel)
+      - name: Clean pnpm cache
+        run: pnpm store prune
 
       # Validation du build backend
       - name: Build Backend
@@ -54,14 +56,19 @@ jobs:
           dotnet restore
           dotnet build --configuration Release
           
-      # Validation du build frontend
-      - name: Build Frontend
+      # Installation des dépendances frontend
+      - name: Install Frontend Dependencies
         run: |
           cd frontend
           pnpm install
+
+      # Construction du frontend
+      - name: Build Frontend
+        run: |
+          cd frontend
           pnpm run build
 
-      # Build et test avec Docker Compose
+      # Build avec Docker Compose
       - name: Build with Docker Compose
         run: docker compose build
 
