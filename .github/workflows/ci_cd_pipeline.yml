@@ -40,12 +40,16 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20.11.x'
+          cache: 'pnpm'
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
         with:
           version: 8
 
+      # Nettoyer le cache pnpm (optionnel)
+      - name: Clean pnpm cache
+        run: pnpm store prune
 
       # Validation du build backend
       - name: Build Backend
