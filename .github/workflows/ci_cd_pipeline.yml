@@ -41,12 +41,13 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20.11.x'
-
+          
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
           version: latest
-
+      - name: Nettoyer le cache pnpm
+        run: pnpm store prune
       # Validation du build backend
       - name: Build Backend
         run: |
