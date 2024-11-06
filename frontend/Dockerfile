@@ -7,7 +7,7 @@ RUN npm install -g pnpm
 
 # Copie des fichiers de configuration uniquement d'abord
 COPY package.json pnpm-lock.yaml ./
-COPY tailwind.config.js postcss.config.js ./
+COPY  postcss.config.js ./
 COPY nuxt.config.ts ./
 
 # Installation des dépendances avec des versions spécifiques
