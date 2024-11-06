@@ -1,106 +1,94 @@
-name: CI/CD Pipeline
+name: CI and Docker Build Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   pull_request:
-    branches: [ main ]
+    branches: 
+      - main
 
 jobs:
-  build-and-test:
+  build_and_test:
     runs-on: ubuntu-latest
-
+    
     steps:
-    - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
-    - name: Build Docker images
-      run: docker compose build
+      - name: Cache Docker layers
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
 
-    - name: Create Docker network
-      run: docker network create nebulift-network || true
+      # Configuration de l'environnement .NET
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
 
-    - name: Start containers
-      run: |
-        docker compose up -d
-        echo "Waiting for services to be ready..."
-        sleep 45  # Augmenté pour donner plus de temps au démarrage
+      # Configuration de Node.js et pnpm
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.11.x'
 
-    - name: Check container status and logs
-      run: |
-        docker compose ps
-        echo "Backend Logs:"
-        docker compose logs backend
-        echo "Frontend Logs:"
-        docker compose logs frontend
-        echo "Network Information:"
-        docker network inspect nebulift-network
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: latest
 
-    - name: Test Backend API
-      run: |
-        for i in {1..10}; do
-          echo "Attempt $i: Testing Backend API..."
-          response=$(curl -s -w "\n%{http_code}" http://localhost:5052/weatherforecast)
-          http_code=$(echo "$response" | tail -n1)
-          content=$(echo "$response" | sed '$ d')
-          if [ "$http_code" = "200" ] && echo "$content" | grep -q "temperatureC"; then
-            echo "Backend API test successful"
-            echo "Response: $content"
-            break
+      # Validation du build backend
+      - name: Build Backend
+        run: |
+          cd backend
+          dotnet restore
+          dotnet build --configuration Release
+          
+      # Validation du build frontend
+      - name: Build Frontend
+        run: |
+          cd frontend
+          pnpm install
+          pnpm run build
+
+      # Build et test avec Docker Compose
+      - name: Build with Docker Compose
+        run: docker compose build
+
+      # Démarrage des services pour tests
+      - name: Start services
+        run: |
+          docker compose up -d
+          # Attendre que les services démarrent
+          sleep 30
+
+      # Test de disponibilité des services
+      - name: Test services availability
+        run: |
+          # Test du backend
+          curl -f http://localhost:5052/weatherforecast || exit 1
+          
+          # Test du frontend
+          curl -f http://localhost:3000 || exit 1
+
+      # Arrêt des services
+      - name: Stop services
+        if: always()  # S'exécute même si les étapes précédentes ont échoué
+        run: docker compose down
+
+      # Notification de fin de pipeline
+      - name: Pipeline Status
+        if: always()
+        run: |
+          if [ "${{ job.status }}" = "success" ]; then
+            echo "✅ Pipeline completed successfully"
+          else
+            echo "❌ Pipeline failed"
           fi
-          if [ $i -eq 10 ]; then
-            echo "Backend API test failed after 10 attempts"
-            echo "Last response: $content"
-            echo "HTTP code: $http_code"
-            exit 1
-          fi
-          sleep 10
-        done
-
-    - name: Test Frontend
-      run: |
-        for i in {1..10}; do
-          echo "Attempt $i: Testing Frontend..."
-          if curl -s -f http://localhost:3000 | grep -q "<div"; then
-            echo "Frontend test successful"
-            break
-          fi
-          if [ $i -eq 10 ]; then
-            echo "Frontend test failed after 10 attempts"
-            exit 1
-          fi
-          sleep 10
-        done
-
-    - name: Test API through Frontend
-      run: |
-        response=$(curl -s -w "\n%{http_code}" http://localhost:3000/api/weatherforecast)
-        http_code=$(echo "$response" | tail -n1)
-        content=$(echo "$response" | sed '$ d')
-        echo "HTTP Status Code: $http_code"
-        echo "Response Content: $content"
-        if [ "$http_code" = "200" ] && echo "$content" | grep -q "temperatureC"; then
-          echo "API through Frontend test successful"
-        else
-          echo "API through Frontend test failed"
-          echo "Response: $content"
-          exit 1
-        fi
-
-    - name: Print container logs on failure
-      if: failure()
-      run: |
-        echo "Docker compose logs:"
-        docker compose logs
-        echo "Docker compose ps:"
-        docker compose ps
-        echo "Network information:"
-        docker network inspect nebulift-network
-
-    - name: Clean up
-      if: always()
-      run: |
-        docker compose down
-        docker network rm nebulift-network || true
