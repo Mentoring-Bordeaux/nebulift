@@ -4,9 +4,12 @@ on:
   push:
     branches:
       - main
+      - feature/github-workflows
   pull_request:
     branches: 
       - main
+      - feature/github-workflows
+
 
 jobs:
   build_and_test:
