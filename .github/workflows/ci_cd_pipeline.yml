@@ -4,11 +4,9 @@ on:
   push:
     branches:
       - main
-      - feature/github-workflows
   pull_request:
     branches: 
       - main
-      - feature/github-workflows
 
 jobs:
   build_and_test:
@@ -35,26 +33,16 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      # Configuration de Node.js
+      # Configuration de Node.js et pnpm
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '20.11.x'
 
-      # Installation de pnpm et ajout au PATH
       - name: Install pnpm
-        run: |
-          npm install -g pnpm
-          echo "Adding $(npm bin -g) to PATH"
-          echo "$(npm bin -g)" >> $GITHUB_PATH
-
-      # Vérification de l'installation de pnpm
-      - name: Verify pnpm Installation
-        run: pnpm --version
-
-      # Nettoyer le cache pnpm (optionnel)
-      - name: Clean pnpm cache
-        run: pnpm store prune
+        uses: pnpm/action-setup@v2
+        with:
+          version: latest
 
       # Validation du build backend
       - name: Build Backend
@@ -63,19 +51,14 @@ jobs:
           dotnet restore
           dotnet build --configuration Release
           
-      # Installation des dépendances frontend
-      - name: Install Frontend Dependencies
-        run: |
-          cd frontend
-          pnpm install
-
-      # Construction du frontend
+      # Validation du build frontend
       - name: Build Frontend
         run: |
           cd frontend
+          pnpm install
           pnpm run build
 
-      # Build avec Docker Compose
+      # Build et test avec Docker Compose
       - name: Build with Docker Compose
         run: docker compose build
 
