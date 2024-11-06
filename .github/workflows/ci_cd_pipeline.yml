@@ -67,7 +67,7 @@ jobs:
       - name: Install Frontend Dependencies
         run: |
           cd frontend
-          pnpm install
+          pnpm install --no-frozen-lockfile
 
       # Construction du frontend
       - name: Build Frontend
