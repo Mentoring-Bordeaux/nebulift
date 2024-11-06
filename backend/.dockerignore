@@ -1,0 +1,11 @@
+**/bin/
+**/obj/
+**/out/
+**/.vs/
+**/.vscode/
+**/TestResults/
+**/*.user
+.git
+.gitignore
+*.md
+tests/
