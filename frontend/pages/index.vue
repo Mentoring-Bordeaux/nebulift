@@ -1,7 +1,15 @@
 <script setup lang="ts">
-const { data, status, error, refresh, clear } = await useFetch(
-  '/api/weatherforecast'
-);
+const { data, status, error, refresh, clear } = await useFetch('/api/weatherforecast', {
+  onRequest({ request, options }) {
+    console.log('Making request to:', request);
+  },
+  onResponse({ request, response }) {
+    console.log('Response:', response._data);
+  },
+  onRequestError(error) {
+    console.error('Request error:', error);
+  }
+});
 
 const clearAndRefresh = () => {
   clear();

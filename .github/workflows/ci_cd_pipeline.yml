@@ -2,75 +2,105 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  setup:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
-    - name: Set up .NET Core
-      uses: actions/setup-dotnet@v2
-      with:
-        dotnet-version: '8.0.x' 
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '20.11.x'
+    - name: Build Docker images
+      run: docker compose build
 
-    - name: Install pnpm
-      run: npm install -g pnpm
+    - name: Create Docker network
+      run: docker network create nebulift-network || true
 
-  backend:
-    runs-on: ubuntu-latest
-    needs: setup
+    - name: Start containers
+      run: |
+        docker compose up -d
+        echo "Waiting for services to be ready..."
+        sleep 45  # Augmenté pour donner plus de temps au démarrage
 
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+    - name: Check container status and logs
+      run: |
+        docker compose ps
+        echo "Backend Logs:"
+        docker compose logs backend
+        echo "Frontend Logs:"
+        docker compose logs frontend
+        echo "Network Information:"
+        docker network inspect nebulift-network
 
-    - name: Build .NET project
-      run: dotnet run
-      working-directory: ./backend
+    - name: Test Backend API
+      run: |
+        for i in {1..10}; do
+          echo "Attempt $i: Testing Backend API..."
+          response=$(curl -s -w "\n%{http_code}" http://localhost:5052/weatherforecast)
+          http_code=$(echo "$response" | tail -n1)
+          content=$(echo "$response" | sed '$ d')
+          if [ "$http_code" = "200" ] && echo "$content" | grep -q "temperatureC"; then
+            echo "Backend API test successful"
+            echo "Response: $content"
+            break
+          fi
+          if [ $i -eq 10 ]; then
+            echo "Backend API test failed after 10 attempts"
+            echo "Last response: $content"
+            echo "HTTP code: $http_code"
+            exit 1
+          fi
+          sleep 10
+        done
 
-  frontend:
-    runs-on: ubuntu-latest
-    needs: setup
+    - name: Test Frontend
+      run: |
+        for i in {1..10}; do
+          echo "Attempt $i: Testing Frontend..."
+          if curl -s -f http://localhost:3000 | grep -q "<div"; then
+            echo "Frontend test successful"
+            break
+          fi
+          if [ $i -eq 10 ]; then
+            echo "Frontend test failed after 10 attempts"
+            exit 1
+          fi
+          sleep 10
+        done
 
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+    - name: Test API through Frontend
+      run: |
+        response=$(curl -s -w "\n%{http_code}" http://localhost:3000/api/weatherforecast)
+        http_code=$(echo "$response" | tail -n1)
+        content=$(echo "$response" | sed '$ d')
+        echo "HTTP Status Code: $http_code"
+        echo "Response Content: $content"
+        if [ "$http_code" = "200" ] && echo "$content" | grep -q "temperatureC"; then
+          echo "API through Frontend test successful"
+        else
+          echo "API through Frontend test failed"
+          echo "Response: $content"
+          exit 1
+        fi
 
-    - name: Install Node.js dependencies
-      run: pnpm install
-      working-directory: ./frontend
+    - name: Print container logs on failure
+      if: failure()
+      run: |
+        echo "Docker compose logs:"
+        docker compose logs
+        echo "Docker compose ps:"
+        docker compose ps
+        echo "Network information:"
+        docker network inspect nebulift-network
 
-    - name: Build Nuxt project
-      run: pnpm run build
-      working-directory: ./frontend
-
-    - name: Start Nuxt project
-      run: pnpm run preview
-      working-directory: ./frontend
-    
-  build_docker:
-    runs-on: ubuntu-latest
-    needs: [backend, frontend]
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Build backend Docker image
-      run: docker build -t user/backend-app:latest .
-      working-directory: ./backend
-
-    - name: Build frontend Docker image
-      run: docker build -t user/frontend-app:latest .
-      working-directory: ./frontend
-      
+    - name: Clean up
+      if: always()
+      run: |
+        docker compose down
+        docker network rm nebulift-network || true

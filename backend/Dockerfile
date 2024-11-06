@@ -1,19 +1,21 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-COPY ["Nebulift.csproj", "./"]
+# Copier le fichier projet de l'API
+COPY ["src/Nebulift.Api/Nebulift.Api.csproj", "src/Nebulift.Api/"]
+RUN dotnet restore "src/Nebulift.Api/Nebulift.Api.csproj"
 
-RUN dotnet restore "Nebulift.csproj"
-
+# Copier tous les fichiers source
 COPY . .
-WORKDIR "/src/"
-RUN dotnet build "Nebulift.csproj" -c Release -o /app/build
 
-FROM build AS publish
-RUN dotnet publish "Nebulift.csproj" -c Release -o /app/publish
+# Build le projet
+RUN dotnet publish "src/Nebulift.Api/Nebulift.Api.csproj" -c Release -o /app/publish
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
-COPY --from=publish /app/publish .
+COPY --from=build /app/publish .
+
 EXPOSE 80
-ENTRYPOINT ["dotnet", "Nebulift.dll"]
+ENV ASPNETCORE_URLS=http://+:80
+
+ENTRYPOINT ["dotnet", "Nebulift.Api.dll"]

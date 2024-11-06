@@ -1,15 +1,33 @@
-FROM node:20 AS build
+FROM node:20-alpine AS build
+
 WORKDIR /app
-COPY package.json ./
-COPY pnpm-lock.yaml ./
+
+# Installation de pnpm
 RUN npm install -g pnpm
+
+
+# Copie des fichiers de dépendances
+COPY package.json pnpm-lock.yaml ./
 RUN pnpm install
-COPY . ./
+
+# Copie du reste des fichiers
+COPY . .
+
+# Build
 RUN pnpm run build
 
-# Utiliser une image allégée pour servir les fichiers statiques
-FROM node:20-alpine AS production
+FROM node:20-alpine
+
 WORKDIR /app
-COPY --from=build /app/.output ./
+
+# Copie des fichiers de build
+COPY --from=build /app/.output .
+
+# Configuration d'environnement
+ENV HOST=0.0.0.0
+ENV PORT=3000
+
 EXPOSE 3000
+
+# Démarrage de l'application
 CMD ["node", "./server/index.mjs"]

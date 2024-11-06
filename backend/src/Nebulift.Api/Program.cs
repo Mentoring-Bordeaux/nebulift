@@ -13,6 +13,18 @@ public static class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+
+        //Configure CORS for the frontend
+        builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.SetIsOriginAllowed(_ => true)
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
         // Add services to the container.
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
@@ -27,10 +39,15 @@ public static class Program
             app.UseSwaggerUI();
         }
 
-        app.UseHttpsRedirection();
+        app.UseCors();
         app.UseAuthorization();
         app.MapControllers();
 
         app.Run();
     }
+}
+
+public record WeatherForecast(DateOnly date, int temperatureC, string? summary)
+{
+    public int TemperatureF => 32 + (int)(temperatureC / 0.5556);
 }
