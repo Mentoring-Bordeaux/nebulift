@@ -5,13 +5,20 @@ WORKDIR /app
 # Installation de pnpm
 RUN npm install -g pnpm
 
-
 # Copie des fichiers de dépendances
 COPY package.json pnpm-lock.yaml ./
+
+# Installation des dépendances explicites de Tailwind
+RUN pnpm add -D tailwindcss@latest postcss@latest autoprefixer@latest
+
+# Installation normale des dépendances
 RUN pnpm install
 
 # Copie du reste des fichiers
 COPY . .
+
+# Génération du fichier de configuration Tailwind si nécessaire
+RUN npx tailwindcss init -p
 
 # Build
 RUN pnpm run build
