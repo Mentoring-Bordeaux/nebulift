@@ -19,6 +19,7 @@
     "vue-router": "latest"
   },
   "devDependencies": {
+    "@tailwindcss/aspect-ratio": "^0.4.0",
     "@tailwindcss/forms": "^0.5.3"  ,
     "@nuxt/eslint": "^0.6.0",
     "eslint-config-prettier": "^9.1.0",
