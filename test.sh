@@ -4,6 +4,11 @@ echo "🧹 Nettoyage de l'environnement Docker..."
 docker compose down
 docker system prune -f
 
+echo "🧹 Nettoyage des ports 5052 et 3000..."
+lsof -ti:5052 | xargs kill
+lsof -ti:3000 | xargs kill
+
+
 echo "🏗️  Construction des images Docker..."
 docker compose build --no-cache
 
