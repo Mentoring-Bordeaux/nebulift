@@ -17,12 +17,13 @@ ENV PATH="/root/.local/share/pnpm:$PATH"
 # Copier uniquement les fichiers de configuration d'abord
 COPY package.json pnpm-lock.yaml ./
 COPY nuxt.config.ts ./
-RUN ls -la
-# Installer les dépendances
-RUN pnpm install
 
 # Copier le reste des fichiers
 COPY . .
+
+# Installer les dépendances
+RUN pnpm install
+
 # Build
 RUN pnpm run build
 
