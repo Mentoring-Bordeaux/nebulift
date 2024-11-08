@@ -3,7 +3,8 @@ FROM node:20-alpine AS build
 WORKDIR /app
 
 # Installation de pnpm
-RUN npm install -g pnpm
+RUN wget -qO- https://get.pnpm.io/install.sh | ENV="$HOME/.bashrc" SHELL="$(which bash)" bash -
+
 
 # Copie des fichiers de configuration uniquement d'abord
 COPY package.json pnpm-lock.yaml ./
