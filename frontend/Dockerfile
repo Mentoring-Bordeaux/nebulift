@@ -11,15 +11,10 @@ COPY nuxt.config.ts ./
 
 # Installation des dépendances avec des versions spécifiques
 RUN pnpm install
-RUN pnpm add -D tailwindcss@3.3.5 postcss@8.4.31 autoprefixer@10.4.16 @nuxtjs/tailwindcss@6.10.0
 
 # Copie du reste des fichiers
 COPY . .
 
-# Vérification de la structure
-RUN ls -la
-RUN cat tailwind.config.js
-RUN cat nuxt.config.ts
 
 # Build
 RUN pnpm run build
