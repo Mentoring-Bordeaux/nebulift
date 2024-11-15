@@ -1,4 +1,5 @@
 namespace Nebulift.Api;
+using Nebulift.Api.Templates;
 
 /// <summary>
 /// The main program class.
@@ -32,5 +33,7 @@ public static class Program
         app.MapControllers();
 
         app.Run();
+      // var generator = new PulumiConfigGenerator("src/Nebulift/Api/Template/Pulumi.template.yaml");
+      // generator.generateConfig("testUser", "testRepo", "src/Nebulift/Api/Template/Pulumi.yaml");
     }
 }
