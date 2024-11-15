@@ -1,6 +1,0 @@
-name: github-configuration
-runtime: dotnet
-config:
-  github:username: ""
-  github:token: ""
-  github:repository_name: ""
