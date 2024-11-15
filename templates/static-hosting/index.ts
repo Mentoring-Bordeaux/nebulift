@@ -4,7 +4,7 @@ import * as azure from "@pulumi/azure-native";
 import * as fs from "fs";
 
 // Define the repository and branch where the file will be uploaded
-const repositoryName = "first-repo-hw";
+const repositoryName = "static-hosting";
 
 // Create a new GitHub repository
 const repo = new github.Repository("repo", {
