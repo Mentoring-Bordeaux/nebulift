@@ -2,6 +2,7 @@ namespace Nebulift.Api.Controllers;
 
 using Microsoft.AspNetCore.Mvc;
 using Nebulift.Api.Templates;
+using System.Text.Json.Serialization;
 
 /// <summary>
 /// Controller to handle Nebulift template requests
@@ -45,4 +46,11 @@ public class TemplateController : ControllerBase
         var updatedTemplate = new { Id = id, Data = templateData };
         return Ok(updatedTemplate);
     }
+}
+
+
+public class ApiKeyRequest
+{
+   [JsonPropertyName("apiKey")]
+   public string ApiKey { get; set; }
 }
