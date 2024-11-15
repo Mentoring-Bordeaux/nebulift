@@ -1,5 +1,5 @@
 {
-    "name": "test-helloworld",
+    "name": "static-hosting",
     "main": "index.ts",
     "devDependencies": {
         "@types/node": "^18",

@@ -1,5 +1,5 @@
-name: test-helloworld
-description: A minimal TypeScript Pulumi program
+name: static-hosting
+description: Basic static hosting for one file
 runtime:
   name: nodejs
   options:
