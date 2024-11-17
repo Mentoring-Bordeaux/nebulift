@@ -1,4 +1,8 @@
 namespace Nebulift.Api.Types;
 
-public struct TOutputs {
+/// <summary>
+/// Represents the outputs of a template.
+/// </summary>
+public struct TOutputs
+{
 }

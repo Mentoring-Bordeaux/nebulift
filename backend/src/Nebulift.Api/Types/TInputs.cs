@@ -1,4 +1,8 @@
 namespace Nebulift.Api.Types;
 
-public struct TInputs {
+/// <summary>
+/// Represents the inputs of a template.
+/// </summary>
+public struct TInputs
+{
 }
