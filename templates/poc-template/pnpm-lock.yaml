@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@pulumi/azure-native':
-        specifier: ^2.71.0
-        version: 2.71.0(typescript@5.6.3)
       '@pulumi/github':
         specifier: ^6.3.2
         version: 6.3.2(typescript@5.6.3)
@@ -217,9 +214,6 @@ packages:
 
   '@protobufjs/utf8@1.1.0':
     resolution: {integrity: sha512-Vvn3zZrhQZkkBE8LSuW3em98c0FwgO4nxzv6OdSxPKJIEKY2bGbHn+mhGIPerzI4twdxaP8/0+06HBpwf345Lw==}
-
-  '@pulumi/azure-native@2.71.0':
-    resolution: {integrity: sha512-VSDnsLN3kONnrxdVLy9XbPWeKEiZsWoU4czqUHihx6F7MU82H3Gt8Pq6EtJOlMjdK0B991L+g5IPYMd4qLZpcg==}
 
   '@pulumi/github@6.3.2':
     resolution: {integrity: sha512-t3dWU0X+2F5/e8R3Kp7AnOKgX7OQ9Qc2uYbhOTem2MJXN9ZUx8ywFSZuJzdk1vb8CxaAgkUiMyBAH3B6zfOPYA==}
@@ -1363,15 +1357,6 @@ snapshots:
   '@protobufjs/pool@1.1.0': {}
 
   '@protobufjs/utf8@1.1.0': {}
-
-  '@pulumi/azure-native@2.71.0(typescript@5.6.3)':
-    dependencies:
-      '@pulumi/pulumi': 3.138.0(typescript@5.6.3)
-    transitivePeerDependencies:
-      - bluebird
-      - supports-color
-      - ts-node
-      - typescript
 
   '@pulumi/github@6.3.2(typescript@5.6.3)':
     dependencies:
