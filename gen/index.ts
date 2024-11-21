@@ -6,7 +6,7 @@ import {
 (async () => {
   try {
     const stackName = fullyQualifiedStackName(
-      <user / or organization>,
+      <user / organization>,
       "poc-template",
       "dev"
     );
