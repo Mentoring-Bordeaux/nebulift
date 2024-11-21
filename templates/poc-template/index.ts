@@ -24,15 +24,6 @@ const helloWorldFile = new github.RepositoryFile("helloWorldFile", {
     commitMessage: "Add helloworld.txt",
 });
 
-
-// Create a new file in the GitHub repository from a local file
-const indexHtmlFile = new github.RepositoryFile("indexHtmlFile", {
-    repository: repo.name,
-    file: "index.html",
-    commitMessage: "Add index.html",
-    content: fs.readFileSync("./index.html", "utf-8"),
-});
-
 // Export the repository name and file path
 export const repoName = repo.name;
 export const filePath = helloWorldFile.file;
