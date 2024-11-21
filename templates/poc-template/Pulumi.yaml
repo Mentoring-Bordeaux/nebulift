@@ -1,4 +1,4 @@
-name: static-hosting
+name: poc-template
 description: Basic static hosting for one file
 runtime:
   name: nodejs

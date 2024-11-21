@@ -3,7 +3,7 @@ import * as github from "@pulumi/github";
 import * as fs from "fs";
 
 // Define the repository and branch where the file will be uploaded
-const repositoryName = "static-hosting";
+const repositoryName = "poc-template";
 
 // Create a new GitHub repository
 const repo = new github.Repository("repo", {
