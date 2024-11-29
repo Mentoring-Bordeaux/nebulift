@@ -1,4 +1,5 @@
 namespace Nebulift.Api;
+using Nebulift.Api.Templates;
 
 /// <summary>
 /// The main program class.
@@ -32,5 +33,5 @@ public static class Program
         app.MapControllers();
 
         app.Run();
-    }
+   }
 }
