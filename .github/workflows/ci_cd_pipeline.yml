@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Build and Deploy
     # Définit l'environnement en fonction du contexte d'exécution
-    environment: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'development' }}
+    environment: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'production' }}
     
     steps:
       - uses: actions/checkout@v4
@@ -48,6 +48,7 @@ jobs:
           api_location: "api"
           output_location: ".output/public"
           app_build_command: |
-            export NODE_ENV=${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'development' }}
+            export NODE_ENV=${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'production
+            ' }}
             pnpm install
             pnpm run build
