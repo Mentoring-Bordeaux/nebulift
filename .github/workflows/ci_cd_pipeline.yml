@@ -53,14 +53,16 @@ jobs:
           api_location: "api"
           output_location: ".output/public"
           app_build_command: |
-            # Nettoyage des dossiers pouvant causer des problèmes
-            rm -rf node_modules .nuxt .output
+              # Nettoyage des dossiers pouvant causer des problèmes
+              rm -rf node_modules .nuxt .output
 
-            # Configuration de l'environnement
-            export NODE_ENV=${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'production' }}
-            
-            # Installation des dépendances
-            npm ci
+              # Configuration de l'environnement
+              export NODE_ENV=${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'production' }}
+              export VOLAR_PATCH_TYPESCRIPT=0
+              export NUXT_TYPESCRIPT_DISABLE_TS_PLUGIN=1
 
-            # Build de l'application
-            npm run build
+              # Installation des dépendances
+              npm ci
+
+              # Build de l'application
+              npm run build
