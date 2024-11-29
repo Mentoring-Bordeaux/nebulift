@@ -1,111 +1,47 @@
-name: CI and Docker Build Pipeline
+# .github/workflows/azure-pipeline.yml
+name: Build and Deploy Nebulift
 
 on:
   push:
     branches:
       - main
-      - feature/github-workflows
+      - feature/*
   pull_request:
     branches: 
       - main
-      - feature/github-workflows
+  workflow_dispatch:
 
 jobs:
-  build_and_test:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    
+    name: Build and Deploy
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Cache Docker layers
-        uses: actions/cache@v3
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-
-      # Configuration de l'environnement .NET
+      # Configuration .NET
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '8.0.x'
 
-      # Configuration de Node.js
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20.11.x'
-
-      # Installation de pnpm et ajout au PATH
-      - name: Install pnpm
-        run: |
-          npm install -g pnpm
-          echo "Adding $(npm bin -g) to PATH"
-          echo "$(npm bin -g)" >> $GITHUB_PATH
-
-      # Vérification de l'installation de pnpm
-      - name: Verify pnpm Installation
-        run: pnpm --version
-
-      # Nettoyer le cache pnpm (optionnel)
-      - name: Clean pnpm cache
-        run: pnpm store prune
-
-      # Validation du build backend
+      # Build Backend
       - name: Build Backend
         run: |
           cd backend
-          dotnet restore
-          dotnet build --configuration Release
-          
-      # Installation des dépendances frontend
-      - name: Install Frontend Dependencies
-        run: |
-          cd frontend
-          pnpm install --no-frozen-lockfile
+          dotnet publish src/Nebulift.Api/Nebulift.Api.csproj -c Release -o ../api
 
-      # Construction du frontend
-      - name: Build Frontend
-        run: |
-          cd frontend
-          pnpm run build
-
-      # Build avec Docker Compose
-      - name: Build with Docker Compose
-        run: docker compose build
-
-      # Démarrage des services pour tests
-      - name: Start services
-        run: |
-          docker compose up -d
-          # Attendre que les services démarrent
-          sleep 30
-
-      # Test de disponibilité des services
-      - name: Test services availability
-        run: |
-          # Test du backend
-          curl -f http://localhost:5052/weatherforecast || exit 1
-          
-          # Test du frontend
-          curl -f http://localhost:3000 || exit 1
-
-      # Arrêt des services
-      - name: Stop services
-        if: always()  # S'exécute même si les étapes précédentes ont échoué
-        run: docker compose down
-
-      # Notification de fin de pipeline
-      - name: Pipeline Status
-        if: always()
-        run: |
-          if [ "${{ job.status }}" = "success" ]; then
-            echo "✅ Pipeline completed successfully"
-          else
-            echo "❌ Pipeline failed"
-          fi
+      # Déploiement via Static Web Apps
+      - name: Build and Deploy
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: "upload"
+          app_location: "frontend"
+          api_location: "api"
+          output_location: ".output/public"
+          app_build_command: |
+            export NODE_ENV=production
+            pnpm install
+            pnpm run build
