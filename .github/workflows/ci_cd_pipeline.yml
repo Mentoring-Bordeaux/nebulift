@@ -32,13 +32,13 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      # Build Backend avec configuration d'environnement
+      # Build Backend
       - name: Build Backend
         run: |
           cd backend
           dotnet publish src/Nebulift.Api/Nebulift.Api.csproj -c Release -o ../api
 
-      # Déploiement via Static Web Apps avec gestion améliorée de l'environnement
+      # Déploiement via Static Web Apps
       - name: Build and Deploy
         uses: Azure/static-web-apps-deploy@v1
         with:
@@ -49,16 +49,14 @@ jobs:
           api_location: "api"
           output_location: ".output/public"
           app_build_command: |
+            # Nettoyage des fichiers qui peuvent causer des problèmes
+            rm -rf node_modules package-lock.json .nuxt .output
+
             # Configuration de l'environnement
             export NODE_ENV=${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'production' }}
-            export NUXT_TYPECHECK=false
             
-            # Installation des dépendances avec les options optimisées pour la production
-            if [ "$NODE_ENV" = "production" ]; then
-              npm install --no-optional --omit=dev
-            else
-              npm install
-            fi
-            
-            # Build avec options spécifiques à l'environnement
+            # Installation des dépendances avec une architecture spécifique
+            npm install --platform=linux --arch=x64 --no-optional
+
+            # Build de l'application
             npm run build
