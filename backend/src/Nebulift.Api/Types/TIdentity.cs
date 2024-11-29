@@ -3,6 +3,7 @@ namespace Nebulift.Api.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 /// <summary>
 /// Represents the identity of a template, including its name and associated technologies.
@@ -12,11 +13,13 @@ public struct TIdentity : IEquatable<TIdentity>
     /// <summary>
     /// Gets or sets the name of the identity.
     /// </summary>
+    [JsonPropertyName("name")]
     public string Name { get; set; }
 
     /// <summary>
     /// Gets or sets the list of technologies associated with the identity.
     /// </summary>
+    [JsonPropertyName("technologies")]
     public List<string> Technologies { get; set; }
 
     /// <summary>
@@ -79,5 +82,18 @@ public struct TIdentity : IEquatable<TIdentity>
         }
 
         return hash;
+    }
+
+    /// <summary>
+    /// Returns a string representation of the current <see cref="TIdentity"/>.
+    /// </summary>
+    /// <returns>A string representation of the <see cref="TIdentity"/>.</returns>
+    public override string ToString()
+    {
+        var technologies = Technologies != null && Technologies.Any()
+            ? string.Join(", ", Technologies)
+            : string.Empty;
+
+        return $"Name: {Name}, Technologies: [{technologies}]";
     }
 }
