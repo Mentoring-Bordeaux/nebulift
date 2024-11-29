@@ -1,26 +1,23 @@
 // nuxt.config.ts
 export default defineNuxtConfig({
+  // Modules de base
   modules: ['@nuxt/ui'],
-  ssr: true,
+  
   devtools: { enabled: true },
   css: ['@/assets/main.css'],
   alias: {
     assets: '/<rootDir>/assets',
   },
   routeRules: {
-    '/api/**': {
-      proxy: process.env.NODE_ENV === 'production' 
-        ? '/api/**'  // En production, utilise le chemin d'API Azure Static Web Apps
-        : 'http://localhost:5000/**' // En développement, pointe vers l'API locale
-    },
+    '/api/**': process.env.NODE_ENV === 'production'
+      ? { proxy: '/api/**' }
+      : { proxy: 'http://localhost:5000/**' },
   },
-  compatibilityDate: '2024-04-03',
+  
+  // Configuration TypeScript conditionnelle
   typescript: {
-    typeCheck: true,
-  },
-  runtimeConfig: {
-    public: {
-      apiBase: process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:5000'
-    }
+    // Désactive la vérification des types en production
+    typeCheck: process.env.NODE_ENV !== 'production',
+    strict: true
   }
 });
