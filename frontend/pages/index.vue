@@ -1,46 +1,47 @@
+<script setup lang="ts">
+import Header from "@/components/Header.vue";
+import ProjectGrid from "@/components/ProjectGrid.vue";
+import { ref, watchEffect } from 'vue';
+
+interface Project {
+  title: string;
+  features: string[];
+}
+
+const { data, error } = await useFetch<{ name: string; technologies: string[] }[]>('http://localhost:5052/api/templates');
+const projects = ref<Project[]>([]);
+
+// Use watchEffect to reactively watch the data
+watchEffect(() => {
+  console.log("Fetched data:", data.value);
+  if (data.value && data.value.length) {
+    projects.value = data.value.map(item => ({
+      title: item.name,
+      features: item.technologies
+    }));
+  }
+});
+
+console.log("Initial project value:", projects.value);
+</script>
+
 <template>
   <div class="page-container">
     <Header />
     <main class="main-container">
       <h1 class="title">Create a project</h1>
-      <ProjectGrid :projects="projects" />
+      <div v-if="error">
+        <p>Error fetching projects: {{ error.message }}</p>
+      </div>
+      <div v-else-if="!projects.length">
+        <p>Loading...</p>
+      </div>
+      <div v-else>
+        <ProjectGrid :projects="projects" />
+      </div>
     </main>
   </div>
 </template>
-
-<script>
-import Header from "@/components/Header.vue";
-import ProjectGrid from "@/components/ProjectGrid.vue";
-
-export default {
-  components: {
-    Header,
-    ProjectGrid,
-  },
-  data() {
-    return {
-      projects: [
-        {
-          title: "SaaS project",
-          features: ["GitHub", ".NET Backend", "React Frontend", "Stateless"],
-        },
-        {
-          title: "Big Data project",
-          features: ["GitLab", "Python Backend", "Redis DB"],
-        },
-        {
-          title: "REST API",
-          features: ["Gitea", "Spring backend", "Jenkins"],
-        },
-        {
-          title: "Browser videogame",
-          features: ["GitHub", "C++ Backend", "Vue Frontend"],
-        },
-      ],
-    };
-  },
-};
-</script>
 
 <style scoped>
 html, body {
