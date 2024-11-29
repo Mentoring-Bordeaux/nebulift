@@ -14,10 +14,19 @@ public static class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+        // Register the string (templates folder path) in DI
+        builder.Services.AddSingleton("../../../templates/");
+
+        // Register the TemplateLocalRepository as the implementation of ITemplateRepository
+        builder.Services.AddScoped<ITemplateRepository, TemplateLocalRepository>();
+
         // Add services to the container.
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
+
+        // Add logging services (ILogger)
+        builder.Services.AddLogging();
 
         var app = builder.Build();
 
