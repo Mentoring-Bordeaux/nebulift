@@ -1,4 +1,3 @@
-# .github/workflows/azure-pipeline.yml
 name: Build and Deploy Nebulift
 
 on:
@@ -10,12 +9,19 @@ on:
     branches: 
       - main
   workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment'
+        type: environment
+        required: true
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     name: Build and Deploy
-
+    # Définit l'environnement en fonction du contexte d'exécution
+    environment: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'development' }}
+    
     steps:
       - uses: actions/checkout@v4
 
@@ -42,6 +48,6 @@ jobs:
           api_location: "api"
           output_location: ".output/public"
           app_build_command: |
-            export NODE_ENV=production
+            export NODE_ENV=${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'development' }}
             pnpm install
             pnpm run build
