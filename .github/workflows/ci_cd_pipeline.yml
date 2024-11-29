@@ -15,16 +15,20 @@ on:
         description: 'Environment'
         type: environment
         required: true
-
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     name: Build and Deploy
-    # Définit l'environnement en fonction du contexte d'exécution
     environment: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'production' }}
     
     steps:
       - uses: actions/checkout@v4
+
+      # Configuration Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
 
       # Configuration .NET
       - name: Setup .NET
@@ -49,14 +53,14 @@ jobs:
           api_location: "api"
           output_location: ".output/public"
           app_build_command: |
-            # Nettoyage des fichiers qui peuvent causer des problèmes
-            rm -rf node_modules package-lock.json .nuxt .output
+            # Nettoyage des dossiers pouvant causer des problèmes
+            rm -rf node_modules .nuxt .output
 
             # Configuration de l'environnement
             export NODE_ENV=${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'production' }}
             
-            # Installation des dépendances avec une architecture spécifique
-            npm install --platform=linux --arch=x64 --no-optional
+            # Installation des dépendances
+            npm ci
 
             # Build de l'application
             npm run build
