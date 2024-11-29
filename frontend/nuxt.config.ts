@@ -1,6 +1,6 @@
 // nuxt.config.ts
 export default defineNuxtConfig({
-  modules: ['@nuxt/ui', '@nuxt/eslint'],
+  modules: ['@nuxt/ui'],
   ssr: true,
   devtools: { enabled: true },
   css: ['@/assets/main.css'],
