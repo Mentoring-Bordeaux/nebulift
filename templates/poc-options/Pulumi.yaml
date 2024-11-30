@@ -1,0 +1,10 @@
+name: poc-options
+description: Configurable template, generating a GitHub repository with multiple files.
+runtime:
+  name: nodejs
+  options:
+    packagemanager: pnpm
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: typescript
