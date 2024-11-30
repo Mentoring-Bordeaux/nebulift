@@ -1,5 +1,5 @@
 name: poc-template
-description: Basic static hosting for one file
+description: Basic template for a GitHub repository with a single file
 runtime:
   name: nodejs
   options:

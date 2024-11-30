@@ -1,17 +1,8 @@
 import * as github from "@pulumi/github";
 
-// Get data from the environment variables
-const data = process.env.DATA;
-if (!data) {
-    throw new Error("DATA env var is required");
-}
-const parsedData = JSON.parse(data);
-
-const repositoryName = parsedData.repositoryName;
-
 // Create a new GitHub repository
 const repo = new github.Repository("repo", {
-    name: repositoryName,
+    name: "PocTemplate",
     description: "A new repository created with Pulumi",
     visibility: "public",
     autoInit: true,
