@@ -2,23 +2,24 @@
 import Header from "@/components/Header.vue";
 import ProjectGrid from "@/components/ProjectGrid.vue";
 import { ref, watchEffect } from 'vue';
+import { api } from '@/services/api';
+import type { Project } from '@/services/api'; // Use type-only import
 
-interface Project {
-  title: string;
-  features: string[];
-}
-
-const { data, error } = await useFetch<{ name: string; technologies: string[] }[]>('http://localhost:5052/api/templates');
 const projects = ref<Project[]>([]);
+const error = ref<string | null>(null);
 
-// Use watchEffect to reactively watch the data
-watchEffect(() => {
-  console.log("Fetched data:", data.value);
-  if (data.value && data.value.length) {
-    projects.value = data.value.map(item => ({
-      title: item.name,
-      features: item.technologies
+// Use watchEffect to fetch the data
+watchEffect(async () => {
+  try {
+    const fetchedProjects = await api.project.getAll();
+    projects.value = fetchedProjects.map(item => ({
+      id: item.id,
+      name: item.name,
+      technologies: item.technologies
     }));
+  } catch (err) {
+    error.value = 'Error fetching projects';
+    console.error(err);
   }
 });
 
@@ -30,8 +31,9 @@ console.log("Initial project value:", projects.value);
     <Header />
     <main class="main-container">
       <h1 class="title">Create a project</h1>
+      <div class="title-underline"></div>
       <div v-if="error">
-        <p>Error fetching projects: {{ error.message }}</p>
+        <p>Error fetching projects: {{ error }}</p>
       </div>
       <div v-else-if="!projects.length">
         <p>Loading...</p>
@@ -44,13 +46,7 @@ console.log("Initial project value:", projects.value);
 </template>
 
 <style scoped>
-html, body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  background-color: white; /* Set background to white */
-}
+
 
 .page-container {
   display: flex;
