@@ -5,7 +5,6 @@
       :key="index"
       :name="project.name"
       :technologies="project.technologies"
-      :id="project.id"
       @click="handleCardClick(project)"
     />
   </div>
@@ -32,9 +31,8 @@ export default {
     const handleCardClick = (project) => {
       console.log("Project techno:", project.technologies);
       router.push({
-        path: `/projects/${project.id}`,
+        path: `/projects/${project.name}`,
         query: {
-          name: project.name,
           technologies: JSON.stringify(project.technologies),
         },
       });

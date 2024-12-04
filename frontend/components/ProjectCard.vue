@@ -23,14 +23,10 @@ export default {
       type: Array,
       required: true,
     },
-    id: {
-      type: String,
-      required: true,
-    },
   },
   methods: {
     handleClick() {
-      this.$emit('click', { id: this.id, name: this.name, technologies: this.technologies });
+      this.$emit('click', { name: this.name, technologies: this.technologies });
     },
   },
 };

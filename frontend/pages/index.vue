@@ -13,7 +13,6 @@ watchEffect(async () => {
   try {
     const fetchedProjects = await api.project.getAll();
     projects.value = fetchedProjects.map(item => ({
-      id: item.id,
       name: item.name,
       technologies: item.technologies
     }));

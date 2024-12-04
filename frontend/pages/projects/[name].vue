@@ -25,12 +25,11 @@ const route = useRoute();
 const project = ref<Project | null>(null);
 
 onMounted(() => {
-  const id = route.params.id as string;
-  const name = route.query.name as string;
+  const name = route.params.name as string;
   const technologies = route.query.technologies ? JSON.parse(route.query.technologies as string) : [];
 
   if (name && technologies) {
-    project.value = { id, name, technologies };
+    project.value = { name, technologies };
   } else {
     console.error('Invalid project data');
   }
