@@ -4,6 +4,8 @@ import Inputs from "./nebulift.inputs";
 
 export { Inputs };
 
+const firstCommitMessage = "Add source code";
+
 let inputs: Inputs | null = null;
 
 export function init(): Inputs {
@@ -39,6 +41,7 @@ export function addSourceCode(
       repository: repositoryName,
       file: filePath.slice(sourcePath.length + 1),
       content: readAndReplace(filePath),
+      commitMessage: firstCommitMessage
     });
   }
 
