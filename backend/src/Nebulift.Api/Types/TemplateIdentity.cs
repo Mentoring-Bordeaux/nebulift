@@ -8,19 +8,30 @@ using System.Text.Json.Serialization;
 /// <summary>
 /// Represents the identity of a template, including its name and associated technologies.
 /// </summary>
-public struct TemplateIdentity : IEquatable<TemplateIdentity>
+public readonly struct TemplateIdentity : IEquatable<TemplateIdentity>
 {
     /// <summary>
-    /// Gets or sets the name of the identity.
+    /// Initializes a new instance of the <see cref="TemplateIdentity"/> struct.
     /// </summary>
-    [JsonPropertyName("name")]
-    public string Name { get; set; }
+    /// <param name="name">The name of the template identity.</param>
+    /// <param name="technologies">The list of technologies associated with the identity.</param>
+    public TemplateIdentity(string name, IEnumerable<string> technologies)
+    {
+        Name = name ?? throw new ArgumentNullException(nameof(name));
+        Technologies = technologies ?? throw new ArgumentNullException(nameof(technologies));
+    }
 
     /// <summary>
-    /// Gets or sets the list of technologies associated with the identity.
+    /// Gets the name of the identity.
+    /// </summary>
+    [JsonPropertyName("name")]
+    public string Name { get; }
+
+    /// <summary>
+    /// Gets the list of technologies associated with the identity.
     /// </summary>
     [JsonPropertyName("technologies")]
-    public List<string> Technologies { get; set; }
+    public IEnumerable<string> Technologies { get; }
 
     /// <summary>
     /// Determines whether two <see cref="TemplateIdentity"/> instances are equal.
@@ -49,10 +60,7 @@ public struct TemplateIdentity : IEquatable<TemplateIdentity>
         bool nameEquals = string.Equals(Name, other.Name, StringComparison.Ordinal);
 
         // Compare the Technologies lists
-        bool technologiesEquals = Technologies != null && other.Technologies != null
-            ? Technologies.Count == other.Technologies.Count &&
-              !Technologies.Except(other.Technologies).Any()
-            : Technologies == other.Technologies;
+        bool technologiesEquals = Enumerable.SequenceEqual(Technologies, other.Technologies);
 
         return nameEquals && technologiesEquals;
     }
