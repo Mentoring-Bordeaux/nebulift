@@ -1,15 +1,14 @@
 <template>
-  <div>
+  <div class="default-layout">
     <slot />
   </div>
 </template>
 
 <style scoped>
-div {
+.default-layout {
   width: 100%;
-  height: 100vh;
+  height: 100%; /* Full height of the container */
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-direction: column; /* Arrange children in a column */
 }
 </style>
