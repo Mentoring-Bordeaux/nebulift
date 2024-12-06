@@ -3,12 +3,11 @@ import Header from "@/components/Header.vue";
 import ProjectGrid from "@/components/ProjectGrid.vue";
 import { ref, watchEffect } from 'vue';
 import { api } from '@/services/api';
-import type { Project } from '@/services/api'; // Use type-only import
+import type { Project } from '@/services/api';
 
 const projects = ref<Project[]>([]);
 const error = ref<string | null>(null);
 
-// Use watchEffect to fetch the data
 watchEffect(async () => {
   try {
     const fetchedProjects = await api.project.getAll();
@@ -50,17 +49,17 @@ console.log("Initial project value:", projects.value);
 .page-container {
   display: flex;
   flex-direction: column;
-  height: 100vh; /* Full viewport height */
+  height: 100vh;
 }
 
 .main-container {
   flex: 1;
   padding: 2rem;
   background-color: #FAFAFA;
-  width: 100%; /* Ensure it takes the full width */
-  box-sizing: border-box; /* Include padding in the element's total width and height */
-  margin-top: 80px; /* Add margin to account for fixed header */
-  overflow: auto; /* Enable scrolling if content overflows */
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 80px;
+  overflow: auto;
 }
 
 .title-underline {

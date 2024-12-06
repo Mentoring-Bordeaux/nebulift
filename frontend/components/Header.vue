@@ -25,18 +25,14 @@ export default {
   z-index: 1000;
   overflow: hidden;
   height: 80px;
-  /* Hauteur du header */
 }
 
 .header-content {
   display: flex;
   align-items: center;
-  /* Center vertically */
   position: relative;
   z-index: 10;
-  /* Assure que le contenu est devant la forme */
   height: 100%;
-  /* Ensure it takes the full height of the header */
 }
 
 .logo {
@@ -53,7 +49,6 @@ export default {
   height: 100%;
   width: 200px;
   background: #ff7a00;
-  /* Lighter orange color */
   clip-path: ellipse(100% 100% at 100% 100%);
 }
 </style>

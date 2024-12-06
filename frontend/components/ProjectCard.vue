@@ -1,7 +1,7 @@
 <template>
   <div class="project-card" @click="handleClick">
     <div class="project-name">
-      <span class="icon">🚀</span> <!-- Example character icon -->
+      <span class="icon">🚀</span>
       {{ name }}
     </div>
     <div class="name-underline"></div>
@@ -41,18 +41,13 @@ export default {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   margin-bottom: 1rem;
   color: black;
-  /* Set text color to black */
   cursor: pointer;
-  /* Change cursor to pointer on hover */
   transition: transform 0.3s, box-shadow 0.3s;
-  /* Smooth transition for hover effect */
 }
 
 .project-card:hover {
   transform: translateY(-5px);
-  /* Slightly lift the card */
   box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
-  /* Increase shadow for hover effect */
 }
 
 .project-name {
@@ -66,7 +61,6 @@ export default {
 .icon {
   margin-right: 0.5rem;
   font-size: 1.25rem;
-  /* Adjust the size as needed */
 }
 
 .name-underline {
@@ -76,6 +70,5 @@ export default {
 
 .technology-item {
   padding-left: 1rem;
-  /* Add padding to the left of the list items */
 }
 </style>

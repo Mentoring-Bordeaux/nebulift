@@ -56,6 +56,5 @@ onMounted(() => {
 .technology-item {
   color: black;
   padding-left: 1rem;
-  /* Add padding to the left of the list items */
 }
 </style>
