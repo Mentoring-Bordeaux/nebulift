@@ -25,13 +25,13 @@ console.log("Initial project value:", projects.value);
 </script>
 
 <template>
-  <div class="page-container">
+  <div class="page-container flex flex-col h-screen">
     <Header />
-    <main class="main-container">
-      <h1 class="title">Create a project</h1>
-      <div class="title-underline"></div>
+    <main class="main-container flex-1 p-8 bg-gray-100 mt-20 overflow-auto">
+      <h1 class="title text-2xl font-bold mb-4 text-black">Create a project</h1>
+      <div class="title-underline border-b-4 mb-4"></div>
       <div v-if="error">
-        <p>Error fetching projects: {{ error }}</p>
+        <p class="text-red-500">Error fetching projects: {{ error }}</p>
       </div>
       <div v-else-if="!projects.length">
         <p>Loading...</p>
@@ -45,38 +45,6 @@ console.log("Initial project value:", projects.value);
 
 <style scoped>
 html, body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  background-color: white; /* Set background to white */
-}
-
-.page-container {
-  display: flex;
-  flex-direction: column;
-  height: 100vh; /* Full viewport height */
-}
-
-.main-container {
-  flex: 1;
-  padding: 2rem;
-  background-color: #FAFAFA;
-  width: 100%; /* Ensure it takes the full width */
-  box-sizing: border-box; /* Include padding in the element's total width and height */
-  margin-top: 80px; /* Add margin to account for fixed header */
-  overflow: auto; /* Enable scrolling if content overflows */
-}
-
-.title {
-  color: black;
-  font-size: 2rem;
-  font-weight: bold;
-  margin-bottom: 1rem;
-}
-
-.title-underline {
-  border-bottom: 3px solid #eaeaea;
-  margin-bottom: 1rem;
+  @apply m-0 p-0 w-full h-full bg-white;
 }
 </style>

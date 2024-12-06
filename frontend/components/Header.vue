@@ -1,9 +1,9 @@
 <template>
-  <header class="header">
-    <div class="header-content">
-      <h1 class="logo">Nebulift</h1>
+  <header class="header fixed top-0 left-0 w-full z-50 bg-orange-600 text-white h-20 flex items-center">
+    <div class="header-content flex items-center h-full relative z-10">
+      <h1 class="logo text-4xl font-bold pl-6">Nebulift</h1>
     </div>
-    <div class="header-shape"></div>
+    <div class="header-shape absolute bottom-0 right-0 h-full w-52 bg-orange-500 clip-path-s-shape"></div>
   </header>
 </template>
 
@@ -14,41 +14,7 @@ export default {
 </script>
 
 <style scoped>
-.header {
-  background-color: #FB6028;
-  padding: 1rem;
-  color: white;
-  width: 100%;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 1000;
-  overflow: hidden;
-  height: 80px;
-}
-
-.header-content {
-  display: flex;
-  align-items: center;
-  position: relative;
-  z-index: 10;
-  height: 100%;
-}
-
-.logo {
-  font-size: 2.5rem;
-  font-weight: bold;
-  align-content: center;
-  padding-left: 1.5rem;
-}
-
 .header-shape {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  height: 100%;
-  width: 200px;
-  background: #ff7a00;
-  clip-path: ellipse(100% 100% at 100% 100%);
+  clip-path: path('M 0 100 C 50 50, 100 50, 150 0');
 }
 </style>

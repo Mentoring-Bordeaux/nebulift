@@ -1,12 +1,12 @@
 <template>
-  <div class="project-card" @click="handleClick">
-    <div class="project-name">
-      <span class="icon">🚀</span>
+  <div class="border border-gray-300 rounded-lg p-4 bg-white shadow mb-4 cursor-pointer transition-transform duration-300 ease-in-out" @click="handleClick">
+    <div class="project-name flex items-center font-bold text-xl mb-2 text-black">
+      <span class="icon mr-2 text-xl">🚀</span>
       {{ name }}
     </div>
-    <div class="name-underline"></div>
+    <div class="name-underline border-b mb-4"></div>
     <ul>
-      <li v-for="technology in technologies" :key="technology" class="technology-item">{{ "• " + technology }}</li>
+      <li v-for="technology in technologies" :key="technology" class="pl-4 text-black">{{ "• " + technology }}</li>
     </ul>
   </div>
 </template>
@@ -33,42 +33,9 @@ const handleClick = () => {
 </script>
 
 <style scoped>
-.project-card {
-  border: 1px solid #eaeaea;
-  border-radius: 8px;
-  padding: 1rem;
-  background: #ffffff;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin-bottom: 1rem;
-  color: black;
-  cursor: pointer;
-  transition: transform 0.3s, box-shadow 0.3s;
-}
 
 .project-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+  @apply transform -translate-y-1 shadow-lg;
 }
 
-.project-name {
-  font-size: 1.25rem;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-  display: flex;
-  align-items: center;
-}
-
-.icon {
-  margin-right: 0.5rem;
-  font-size: 1.25rem;
-}
-
-.name-underline {
-  border-bottom: 1px solid #eaeaea;
-  margin-bottom: 1rem;
-}
-
-.technology-item {
-  padding-left: 1rem;
-}
 </style>
