@@ -1,13 +1,8 @@
-import * as pulumi from "@pulumi/pulumi";
 import * as github from "@pulumi/github";
-import * as fs from "fs";
-
-// Define the repository and branch where the file will be uploaded
-const repositoryName = "poc-template";
 
 // Create a new GitHub repository
 const repo = new github.Repository("repo", {
-    name: repositoryName,
+    name: "PocTemplate",
     description: "A new repository created with Pulumi",
     visibility: "public",
     autoInit: true,

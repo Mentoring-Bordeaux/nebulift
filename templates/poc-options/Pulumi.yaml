@@ -1,5 +1,5 @@
-name: poc-template
-description: Basic template for a GitHub repository with a single file
+name: poc-options
+description: Configurable template, generating a GitHub repository with multiple files.
 runtime:
   name: nodejs
   options:
