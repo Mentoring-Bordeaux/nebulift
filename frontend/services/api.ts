@@ -1,11 +1,4 @@
-import axios from 'axios';
-
-const apiClient = axios.create({
-    baseURL: 'http://localhost:5052/api',
-    headers: {
-        'Content-Type': 'application/json',
-    },
-});
+import { useFetch } from '#app';
 
 export interface Project {
     name: string;
@@ -20,7 +13,7 @@ const projectApi = {
      * 
      * @example
      * import { api } from '@/services/api';
-     * 
+     *  
      * async function fetchProjects() {
      *     try {
      *         const projects = await api.project.getAll();
@@ -31,13 +24,12 @@ const projectApi = {
      * }
      */
     getAll: async (): Promise<Project[]> => {
-        try {
-            const response = await apiClient.get<Project[]>('/templates');
-            return response.data;
-        } catch (error) {
-            console.error('Error fetching projects:', error);
-            throw error;
+        const { data, error } = await useFetch<Project[]>('http://localhost:5052/api/templates');
+        if (error.value) {
+            console.error('Error fetching projects:', error.value);
+            throw error.value;
         }
+        return data.value || [];
     }
 };
 

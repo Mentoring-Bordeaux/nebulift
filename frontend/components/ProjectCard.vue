@@ -11,24 +11,24 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "ProjectCard",
-  props: {
-    name: {
-      type: String,
-      required: true,
-    },
-    technologies: {
-      type: Array,
-      required: true,
-    },
+<script setup lang="ts">
+import { defineProps, defineEmits } from 'vue';
+
+const props = defineProps({
+  name: {
+    type: String,
+    required: true,
   },
-  methods: {
-    handleClick() {
-      this.$emit('click', { name: this.name, technologies: this.technologies });
-    },
+  technologies: {
+    type: Array as () => string[],
+    required: true,
   },
+});
+
+const emit = defineEmits(['click']);
+
+const handleClick = () => {
+  emit('click', { name: props.name, technologies: props.technologies });
 };
 </script>
 

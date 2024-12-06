@@ -8,7 +8,7 @@ using System.Text.Json.Serialization;
 /// <summary>
 /// Represents the identity of a template, including its name and associated technologies.
 /// </summary>
-public struct TIdentity : IEquatable<TIdentity>
+public struct Identity : IEquatable<Identity>
 {
     /// <summary>
     /// Gets or sets the name of the identity.
@@ -23,27 +23,27 @@ public struct TIdentity : IEquatable<TIdentity>
     public List<string> Technologies { get; set; }
 
     /// <summary>
-    /// Determines whether two <see cref="TIdentity"/> instances are equal.
+    /// Determines whether two <see cref="Identity"/> instances are equal.
     /// </summary>
-    /// <param name="left">The first <see cref="TIdentity"/> instance.</param>
-    /// <param name="right">The second <see cref="TIdentity"/> instance.</param>
+    /// <param name="left">The first <see cref="Identity"/> instance.</param>
+    /// <param name="right">The second <see cref="Identity"/> instance.</param>
     /// <returns><c>true</c> if the instances are equal; otherwise, <c>false</c>.</returns>
-    public static bool operator ==(TIdentity left, TIdentity right) => left.Equals(right);
+    public static bool operator ==(Identity left, Identity right) => left.Equals(right);
 
     /// <summary>
-    /// Determines whether two <see cref="TIdentity"/> instances are not equal.
+    /// Determines whether two <see cref="Identity"/> instances are not equal.
     /// </summary>
-    /// <param name="left">The first <see cref="TIdentity"/> instance.</param>
-    /// <param name="right">The second <see cref="TIdentity"/> instance.</param>
+    /// <param name="left">The first <see cref="Identity"/> instance.</param>
+    /// <param name="right">The second <see cref="Identity"/> instance.</param>
     /// <returns><c>true</c> if the instances are not equal; otherwise, <c>false</c>.</returns>
-    public static bool operator !=(TIdentity left, TIdentity right) => !left.Equals(right);
+    public static bool operator !=(Identity left, Identity right) => !left.Equals(right);
 
     /// <summary>
-    /// Determines whether the current <see cref="TIdentity"/> is equal to another <see cref="TIdentity"/>.
+    /// Determines whether the current <see cref="Identity"/> is equal to another <see cref="Identity"/>.
     /// </summary>
-    /// <param name="other">The other <see cref="TIdentity"/> to compare to.</param>
+    /// <param name="other">The other <see cref="Identity"/> to compare to.</param>
     /// <returns><c>true</c> if the current instance is equal to the <paramref name="other"/>; otherwise, <c>false</c>.</returns>
-    public bool Equals(TIdentity other)
+    public bool Equals(Identity other)
     {
         // Compare the Name properties
         bool nameEquals = string.Equals(Name, other.Name, StringComparison.Ordinal);
@@ -58,16 +58,16 @@ public struct TIdentity : IEquatable<TIdentity>
     }
 
     /// <summary>
-    /// Determines whether the specified object is equal to the current <see cref="TIdentity"/>.
+    /// Determines whether the specified object is equal to the current <see cref="Identity"/>.
     /// </summary>
-    /// <param name="obj">The object to compare with the current <see cref="TIdentity"/>.</param>
-    /// <returns><c>true</c> if the specified object is equal to the current <see cref="TIdentity"/>; otherwise, <c>false</c>.</returns>
-    public override bool Equals(object? obj) => obj is TIdentity other && Equals(other);
+    /// <param name="obj">The object to compare with the current <see cref="Identity"/>.</param>
+    /// <returns><c>true</c> if the specified object is equal to the current <see cref="Identity"/>; otherwise, <c>false</c>.</returns>
+    public override bool Equals(object? obj) => obj is Identity other && Equals(other);
 
     /// <summary>
-    /// Returns a hash code for the current <see cref="TIdentity"/>.
+    /// Returns a hash code for the current <see cref="Identity"/>.
     /// </summary>
-    /// <returns>A hash code for the current <see cref="TIdentity"/>.</returns>
+    /// <returns>A hash code for the current <see cref="Identity"/>.</returns>
     public override int GetHashCode()
     {
         // Use StringComparison.Ordinal for clarity and better performance
@@ -85,9 +85,9 @@ public struct TIdentity : IEquatable<TIdentity>
     }
 
     /// <summary>
-    /// Returns a string representation of the current <see cref="TIdentity"/>.
+    /// Returns a string representation of the current <see cref="Identity"/>.
     /// </summary>
-    /// <returns>A string representation of the <see cref="TIdentity"/>.</returns>
+    /// <returns>A string representation of the <see cref="Identity"/>.</returns>
     public override string ToString()
     {
         var technologies = Technologies != null && Technologies.Any()

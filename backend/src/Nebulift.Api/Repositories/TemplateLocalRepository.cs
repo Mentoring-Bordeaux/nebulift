@@ -1,7 +1,9 @@
 namespace Nebulift.Api.Templates;
 
 using Types;
+using Nebulift.Api.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.IO;
 using System.Text.Json;
 
@@ -10,35 +12,35 @@ using System.Text.Json;
 /// </summary>
 public class TemplateLocalRepository : ITemplateRepository
 {
-    private readonly string templatesFolder;
+    private readonly string _templatesFolderPath;
     private readonly ILogger<TemplateLocalRepository> _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TemplateLocalRepository"/> class with a specified templates folder.
     /// </summary>
-    /// <param name="templatesFolder">The folder path where template data is stored.</param>
+    /// <param name="options">The options containing the folder path where template data is stored.</param>
     /// <param name="logger">An instance of <see cref="ILogger{TemplateLocalRepository}"/> for logging.</param>
-    public TemplateLocalRepository(string templatesFolder, ILogger<TemplateLocalRepository> logger)
+    public TemplateLocalRepository(IOptions<TemplateOptions> options, ILogger<TemplateLocalRepository> logger)
     {
-        this.templatesFolder = templatesFolder ?? throw new ArgumentNullException(nameof(templatesFolder), "Templates folder cannot be null.");
+        _templatesFolderPath = options.Value.TemplatesFolderPath;
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     /// <summary>
     /// Retrieves the identities of all templates.
     /// </summary>
-    /// <returns>The identities of the templates as a list of <see cref="TIdentity"/>.</returns>
+    /// <returns>The identities of the templates as a list of <see cref="Identity"/>.</returns>
     /// <exception cref="FileNotFoundException">
     /// Thrown if any of the identity files are not found at the expected paths.
     /// </exception>
-    public List<TIdentity> GetAllTemplateIdentities()
+    public List<Identity> GetAllTemplateIdentities()
     {
-        var templateIdentities = new List<TIdentity>();
-        _logger.LogInformation("Fetching all template identities from folder: {TemplatesFolder}", templatesFolder);
+        var templateIdentities = new List<Identity>();
+        _logger.LogInformation("Fetching all template identities from folder: {TemplatesFolder}", _templatesFolderPath);
 
         try
         {
-            var templateDirs = Directory.GetDirectories(templatesFolder);
+            var templateDirs = Directory.GetDirectories(_templatesFolderPath);
             foreach (var templateDir in templateDirs)
             {
                 var identityFilePath = Path.Combine(templateDir, "identity.json");
@@ -51,7 +53,7 @@ public class TemplateLocalRepository : ITemplateRepository
 
                 var jsonContent = File.ReadAllText(identityFilePath);
                 _logger.LogInformation("Successfully retrieved identity {Identity}", jsonContent);
-                var identity = JsonSerializer.Deserialize<TIdentity>(jsonContent);
+                var identity = JsonSerializer.Deserialize<Identity>(jsonContent);
                 templateIdentities.Add(identity);
                 _logger.LogInformation("Successfully serialized identity into {Identity}", identity);
             }
@@ -69,13 +71,13 @@ public class TemplateLocalRepository : ITemplateRepository
     /// Retrieves the identity of a template by its ID.
     /// </summary>
     /// <param name="id">The ID of the template.</param>
-    /// <returns>The identity of the template as a <see cref="TIdentity"/>.</returns>
+    /// <returns>The identity of the template as a <see cref="Identity"/>.</returns>
     /// <exception cref="FileNotFoundException">
     /// Thrown if the identity file is not found at the expected path.
     /// </exception>
-    public TIdentity GetTemplateIdentity(string id)
+    public Identity GetTemplateIdentity(string id)
     {
-        var identityFilePath = Path.Combine(templatesFolder, id, "identity.json");
+        var identityFilePath = Path.Combine(_templatesFolderPath, id, "identity.json");
         _logger.LogInformation("Fetching template identity for template ID: {TemplateId} from path: {IdentityFilePath}", id, identityFilePath);
 
         try
@@ -87,7 +89,7 @@ public class TemplateLocalRepository : ITemplateRepository
             }
 
             var jsonContent = File.ReadAllText(identityFilePath);
-            var identity = JsonSerializer.Deserialize<TIdentity>(jsonContent);
+            var identity = JsonSerializer.Deserialize<Identity>(jsonContent);
             _logger.LogInformation("Successfully retrieved identity {Identity}", identity);
             return identity;
         }
@@ -102,8 +104,8 @@ public class TemplateLocalRepository : ITemplateRepository
     /// Retrieves the inputs of a template by its ID.
     /// </summary>
     /// <param name="id">The ID of the template.</param>
-    /// <returns>The inputs of the template as a <see cref="TInputs"/>.</returns>
-    public TInputs GetTemplateInputs(string id)
+    /// <returns>The inputs of the template as a <see cref="Inputs"/>.</returns>
+    public Inputs GetTemplateInputs(string id)
     {
         _logger.LogInformation("Fetching template inputs for template ID: {TemplateId}", id);
 
@@ -115,8 +117,8 @@ public class TemplateLocalRepository : ITemplateRepository
     /// Retrieves the outputs of a template by its ID.
     /// </summary>
     /// <param name="id">The ID of the template.</param>
-    /// <returns>The outputs of the template as a <see cref="TOutputs"/>.</returns>
-    public TOutputs GetTemplateOutputs(string id)
+    /// <returns>The outputs of the template as a <see cref="Outputs"/>.</returns>
+    public Outputs GetTemplateOutputs(string id)
     {
         _logger.LogInformation("Fetching template outputs for template ID: {TemplateId}", id);
 

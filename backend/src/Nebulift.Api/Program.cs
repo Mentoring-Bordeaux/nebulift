@@ -1,5 +1,6 @@
 namespace Nebulift.Api;
 using Nebulift.Api.Templates;
+using Nebulift.Api.Configuration;
 using EnvironmentName = Microsoft.Extensions.Hosting.EnvironmentName;
 
 public static class Program
@@ -7,11 +8,7 @@ public static class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-
-        // Register the string (templates folder path) in DI
-        builder.Services.AddSingleton("../../../templates/");
-
-        // Register the TemplateLocalRepository as the implementation of ITemplateRepository
+        builder.Services.Configure<TemplateOptions>(builder.Configuration.GetSection("TemplateOptions"));
         builder.Services.AddScoped<ITemplateRepository, TemplateLocalRepository>();
 
         // Add services to the container.
@@ -30,6 +27,7 @@ public static class Program
                     .AllowAnyHeader()
                     .AllowAnyMethod());
         });
+
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
