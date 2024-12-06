@@ -29,13 +29,13 @@ public class TemplateLocalRepository : ITemplateRepository
     /// <summary>
     /// Retrieves the identities of all templates.
     /// </summary>
-    /// <returns>The identities of the templates as a list of <see cref="Identity"/>.</returns>
+    /// <returns>The identities of the templates as a list of <see cref="TemplateIdentity"/>.</returns>
     /// <exception cref="FileNotFoundException">
     /// Thrown if any of the identity files are not found at the expected paths.
     /// </exception>
-    public List<Identity> GetAllTemplateIdentities()
+    public List<TemplateIdentity> GetAllTemplateIdentities()
     {
-        var templateIdentities = new List<Identity>();
+        var templateIdentities = new List<TemplateIdentity>();
         _logger.LogInformation("Fetching all template identities from folder: {TemplatesFolder}", _templatesFolderPath);
 
         try
@@ -53,7 +53,7 @@ public class TemplateLocalRepository : ITemplateRepository
 
                 var jsonContent = File.ReadAllText(identityFilePath);
                 _logger.LogInformation("Successfully retrieved identity {Identity}", jsonContent);
-                var identity = JsonSerializer.Deserialize<Identity>(jsonContent);
+                var identity = JsonSerializer.Deserialize<TemplateIdentity>(jsonContent);
                 templateIdentities.Add(identity);
                 _logger.LogInformation("Successfully serialized identity into {Identity}", identity);
             }
@@ -71,11 +71,11 @@ public class TemplateLocalRepository : ITemplateRepository
     /// Retrieves the identity of a template by its ID.
     /// </summary>
     /// <param name="id">The ID of the template.</param>
-    /// <returns>The identity of the template as a <see cref="Identity"/>.</returns>
+    /// <returns>The identity of the template as a <see cref="TemplateIdentity"/>.</returns>
     /// <exception cref="FileNotFoundException">
     /// Thrown if the identity file is not found at the expected path.
     /// </exception>
-    public Identity GetTemplateIdentity(string id)
+    public TemplateIdentity GetTemplateIdentity(string id)
     {
         var identityFilePath = Path.Combine(_templatesFolderPath, id, "identity.json");
         _logger.LogInformation("Fetching template identity for template ID: {TemplateId} from path: {IdentityFilePath}", id, identityFilePath);
@@ -89,7 +89,7 @@ public class TemplateLocalRepository : ITemplateRepository
             }
 
             var jsonContent = File.ReadAllText(identityFilePath);
-            var identity = JsonSerializer.Deserialize<Identity>(jsonContent);
+            var identity = JsonSerializer.Deserialize<TemplateIdentity>(jsonContent);
             _logger.LogInformation("Successfully retrieved identity {Identity}", identity);
             return identity;
         }
@@ -104,8 +104,8 @@ public class TemplateLocalRepository : ITemplateRepository
     /// Retrieves the inputs of a template by its ID.
     /// </summary>
     /// <param name="id">The ID of the template.</param>
-    /// <returns>The inputs of the template as a <see cref="Inputs"/>.</returns>
-    public Inputs GetTemplateInputs(string id)
+    /// <returns>The inputs of the template as a <see cref="TemplateInputs"/>.</returns>
+    public TemplateInputs GetTemplateInputs(string id)
     {
         _logger.LogInformation("Fetching template inputs for template ID: {TemplateId}", id);
 
@@ -117,8 +117,8 @@ public class TemplateLocalRepository : ITemplateRepository
     /// Retrieves the outputs of a template by its ID.
     /// </summary>
     /// <param name="id">The ID of the template.</param>
-    /// <returns>The outputs of the template as a <see cref="Outputs"/>.</returns>
-    public Outputs GetTemplateOutputs(string id)
+    /// <returns>The outputs of the template as a <see cref="TemplateOutputs"/>.</returns>
+    public TemplateOutputs GetTemplateOutputs(string id)
     {
         _logger.LogInformation("Fetching template outputs for template ID: {TemplateId}", id);
 
