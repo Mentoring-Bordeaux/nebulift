@@ -71,14 +71,14 @@ class Program
             Console.WriteLine("Running preview ...");
             var previewResult = await stack.PreviewAsync();
             Console.WriteLine("End of preview");
-            Console.WriteLine("Preview result: " + Newtonsoft.Json.JsonConvert.SerializeObject(previewResult, Newtonsoft.Json.Formatting.Indented));
+            Console.WriteLine("Preview result: " + JsonSerializer.Serialize(previewResult));
             // Console.WriteLine("Preview result: " + previewResult);
 
             // Apply the changes
             Console.WriteLine("Running update ...");
             var upResult = await stack.UpAsync();
             Console.WriteLine("End of preview");
-            Console.WriteLine("Update result: " + Newtonsoft.Json.JsonConvert.SerializeObject(upResult, Newtonsoft.Json.Formatting.Indented));
+            Console.WriteLine("Update result: " + JsonSerializer.Serialize(upResult));
 
             // Optionally, destroy the stack
             // await stack.DestroyAsync();
