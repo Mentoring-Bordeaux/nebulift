@@ -8,21 +8,21 @@ using System.IO;
 using System.Text.Json;
 
 /// <summary>
-/// A local repository implementation for accessing template-related data stored in the file system.
+/// A local template service implementation for accessing and running templates stored in the Nebulift project repository.
 /// </summary>
-public class TemplateLocalRepository : ITemplateRepository
+public class LocalTemplateService : ITemplateService
 {
     private readonly string _templatesFolderPath;
-    private readonly ILogger<TemplateLocalRepository> _logger;
+    private readonly ILogger<LocalTemplateService> _logger;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="TemplateLocalRepository"/> class with a specified templates folder.
+    /// Initializes a new instance of the <see cref="LocalTemplateService"/> class with a specified templates folder.
     /// </summary>
     /// <param name="options">The options containing the folder path where template data is stored.</param>
-    /// <param name="logger">An instance of <see cref="ILogger{TemplateLocalRepository}"/> for logging.</param>
-    public TemplateLocalRepository(IOptions<TemplateOptions> options, ILogger<TemplateLocalRepository> logger)
+    /// <param name="logger">An instance of <see cref="ILogger{LocalTemplateService}"/> for logging.</param>
+    public LocalTemplateService(IOptions<LocalTemplateServiceOptions> options, ILogger<LocalTemplateService> logger)
     {
-        _templatesFolderPath = options.Value.TemplatesFolderPath;
+        _templatesFolderPath = options.Value.TemplatesFolderPath ?? throw new ArgumentNullException(nameof(logger));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -118,9 +118,9 @@ public class TemplateLocalRepository : ITemplateRepository
     /// </summary>
     /// <param name="id">The ID of the template.</param>
     /// <returns>The outputs of the template as a <see cref="TemplateOutputs"/>.</returns>
-    public TemplateOutputs GetTemplateOutputs(string id)
+    public TemplateOutputs ExecuteTemplate(string id, TemplateInputs inputs)
     {
-        _logger.LogInformation("Fetching template outputs for template ID: {TemplateId}", id);
+        _logger.LogInformation("Executing template {TemplateId} with parameters {TemplateInputs}", id, inputs);
 
         // Placeholder implementation
         throw new NotImplementedException();

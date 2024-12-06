@@ -13,17 +13,17 @@ namespace Nebulift.Api.Controllers
     [Route("api/templates")]
     public class TemplateController : ControllerBase
     {
-        private readonly ITemplateRepository _templateRepository;
+        private readonly ITemplateService _templateService;
         private readonly ILogger<TemplateController> _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TemplateController"/> class.
         /// </summary>
-        /// <param name="templateRepository">An instance of <see cref="ITemplateRepository"/> to handle template data retrieval.</param>
+        /// <param name="_templateService">An instance of <see cref="ITemplateService"/> to handle template data retrieval.</param>
         /// <param name="logger">An instance of <see cref="ILogger{TemplateController}"/> for logging.</param>
-        public TemplateController(ITemplateRepository templateRepository, ILogger<TemplateController> logger)
+        public TemplateController(ITemplateService _templateService, ILogger<TemplateController> logger)
         {
-            _templateRepository = templateRepository ?? throw new ArgumentNullException(nameof(templateRepository));
+            _templateService = _templateService ?? throw new ArgumentNullException(nameof(_templateService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -36,23 +36,25 @@ namespace Nebulift.Api.Controllers
         [HttpGet]
         public IActionResult GetAllTemplates()
         {
-            var templates = _templateRepository.GetAllTemplateIdentities();
+            var templates = _templateService.GetAllTemplateIdentities();
             _logger.LogInformation("Retrieving all template identities ({TemplateCount})", templates.Count);
             return Ok(templates);
         }
 
         /// <summary>
-        /// Retrieves a specific template by ID.
+        /// Retrieves a specific template inputs schema by ID.
         /// </summary>
         /// <param name="id">The ID of the template.</param>
         /// <returns>
-        /// The template object, containing its ID and Name.
+        /// The template input schema, as a JSON.
         /// If the template with the specified ID is not found, returns a NotFound result.
         /// </returns>
         [HttpGet("{id}")]
-        public IActionResult GetTemplateById(string id)
+        public IActionResult GetTemplateInputsSchemaById(string id)
         {
-            throw new NotImplementedException();
+            var templateInputsSchema = _templateService.GetTemplateInputs(id);
+            _logger.LogInformation("Retrieving template {TemplateId} input schema : {InputSchema}", id, templateInputsSchema);
+            return Ok(templateInputsSchema);
         }
 
         /// <summary>
@@ -66,7 +68,9 @@ namespace Nebulift.Api.Controllers
         [HttpPost("{id}")]
         public IActionResult ExecuteTemplateById(string id, [FromBody] object templateData)
         {
-            throw new NotImplementedException();
+            string errorMessage = "Template execution not implemented yet";
+            _logger.LogError(errorMessage);
+            return Problem(errorMessage);
         }
     }
 }
