@@ -1,9 +1,7 @@
-name: gen
+name: gen_csharp
 description: A minimal Azure Native C# Pulumi program
 runtime:
   name: dotnet
-  options:
-    packagemanager: dotnet
 config:
   pulumi:tags:
     value:
