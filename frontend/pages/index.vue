@@ -63,6 +63,11 @@ console.log("Initial project value:", projects.value);
   overflow: auto; /* Enable scrolling if content overflows */
 }
 
+.title-underline {
+  border-bottom: 3px solid #eaeaea;
+  margin-bottom: 1rem;
+}
+
 .title {
   color: black;
   font-size: 2rem;
