@@ -12,9 +12,3 @@ export default {
   name: "Header",
 };
 </script>
-
-<style scoped>
-.header-shape {
-  clip-path: path('M 0 100 C 50 50, 100 50, 150 0');
-}
-</style>

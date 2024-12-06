@@ -1,5 +1,5 @@
 <template>
-  <div class="border border-gray-300 rounded-lg p-4 bg-white shadow mb-4 cursor-pointer transition-transform duration-300 ease-in-out" @click="handleClick">
+  <div class="border border-gray-300 rounded-lg p-4 bg-white shadow mb-4 cursor-pointer transition-transform duration-300 ease-in-out hover:shadow-lg hover:scale-105" @click="handleClick">
     <div class="project-name flex items-center font-bold text-xl mb-2 text-black">
       <span class="icon mr-2 text-xl">🚀</span>
       {{ name }}
@@ -31,11 +31,3 @@ const handleClick = () => {
   emit('click', { name: props.name, technologies: props.technologies });
 };
 </script>
-
-<style scoped>
-
-.project-card:hover {
-  @apply transform -translate-y-1 shadow-lg;
-}
-
-</style>

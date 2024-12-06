@@ -42,9 +42,3 @@ console.log("Initial project value:", projects.value);
     </main>
   </div>
 </template>
-
-<style scoped>
-html, body {
-  @apply m-0 p-0 w-full h-full bg-white;
-}
-</style>
