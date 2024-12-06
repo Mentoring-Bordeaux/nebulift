@@ -19,11 +19,11 @@ namespace Nebulift.Api.Controllers
         /// <summary>
         /// Initializes a new instance of the <see cref="TemplateController"/> class.
         /// </summary>
-        /// <param name="_templateService">An instance of <see cref="ITemplateService"/> to handle template data retrieval.</param>
+        /// <param name="templateService">An instance of <see cref="ITemplateService"/> to handle template data retrieval.</param>
         /// <param name="logger">An instance of <see cref="ILogger{TemplateController}"/> for logging.</param>
-        public TemplateController(ITemplateService _templateService, ILogger<TemplateController> logger)
+        public TemplateController(ITemplateService templateService, ILogger<TemplateController> logger)
         {
-            _templateService = _templateService ?? throw new ArgumentNullException(nameof(_templateService));
+            _templateService = templateService ?? throw new ArgumentNullException(nameof(templateService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -58,19 +58,18 @@ namespace Nebulift.Api.Controllers
         }
 
         /// <summary>
-        /// Executes a specific template by ID and updates its data.
+        /// Executes a specific template with parameters.
         /// </summary>
-        /// <param name="id">The ID of the template.</param>
-        /// <param name="templateData">The template data to update.</param>
+        /// <param name="id">The ID of the template to execute.</param>
+        /// <param name="templateData">The template inputs.</param>
         /// <returns>
         /// The updated template object with the provided data.
         /// </returns>
         [HttpPost("{id}")]
         public IActionResult ExecuteTemplateById(string id, [FromBody] object templateData)
         {
-            string errorMessage = "Template execution not implemented yet";
-            _logger.LogError(errorMessage);
-            return Problem(errorMessage);
+            _logger.LogError("Template execution not implemented yet");
+            return Problem("Template execution not implemented yet");
         }
     }
 }

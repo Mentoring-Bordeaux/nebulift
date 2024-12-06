@@ -4,13 +4,14 @@ using Nebulift.Api.Configuration;
 using EnvironmentName = Microsoft.Extensions.Hosting.EnvironmentName;
 
 /// <summary>
-/// Main program for Nebulift backend
+/// Main program for Nebulift backend.
 /// </summary>
 public static class Program
 {
     /// <summary>
-    /// Main program for Nebulift backend
+    /// Main program for Nebulift backend.
     /// </summary>
+    /// <param name="args">Arguments of the main program.</param>
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
@@ -28,7 +29,8 @@ public static class Program
         // Add CORS services
         builder.Services.AddCors(options =>
         {
-            options.AddPolicy("AllowSpecificOrigin",
+            options.AddPolicy(
+                "AllowSpecificOrigin",
                 builder => builder.WithOrigins("http://localhost:3000")
                     .AllowAnyHeader()
                     .AllowAnyMethod());

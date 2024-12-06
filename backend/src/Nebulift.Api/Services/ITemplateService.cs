@@ -7,5 +7,4 @@ using Types;
 /// </summary>
 public interface ITemplateService : ITemplateStorage, ITemplateExecutor
 {
-    
 }

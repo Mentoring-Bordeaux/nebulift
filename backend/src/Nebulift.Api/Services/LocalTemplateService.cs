@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.IO;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 
 /// <summary>
 /// A local template service implementation for accessing and running templates stored in the Nebulift project repository.
@@ -22,7 +23,7 @@ public class LocalTemplateService : ITemplateService
     /// <param name="logger">An instance of <see cref="ILogger{LocalTemplateService}"/> for logging.</param>
     public LocalTemplateService(IOptions<LocalTemplateServiceOptions> options, ILogger<LocalTemplateService> logger)
     {
-        _templatesFolderPath = options.Value.TemplatesFolderPath ?? throw new ArgumentNullException(nameof(logger));
+        _templatesFolderPath = options.Value.TemplatesFolderPath ?? throw new ArgumentNullException(nameof(options));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -107,16 +108,39 @@ public class LocalTemplateService : ITemplateService
     /// <returns>The inputs of the template as a <see cref="TemplateInputs"/>.</returns>
     public TemplateInputs GetTemplateInputs(string id)
     {
-        _logger.LogInformation("Fetching template inputs for template ID: {TemplateId}", id);
+        var inputsFilePath = Path.Combine(_templatesFolderPath, id, "inputs.json");
+        _logger.LogInformation("Fetching template inputs for template ID: {TemplateId} from path: {InputsFilePath}", id, inputsFilePath);
 
-        // Placeholder implementation
-        throw new NotImplementedException();
+        try
+        {
+            if (!File.Exists(inputsFilePath))
+            {
+                _logger.LogWarning("Inputs file not found for template ID {TemplateId} at path: {InputsFilePath}", id, inputsFilePath);
+                throw new FileNotFoundException($"Inputs file not found at path: {inputsFilePath}");
+            }
+
+            var jsonContent = JsonNode.Parse(File.ReadAllText(inputsFilePath));
+            if (jsonContent == null)
+            {
+                throw new IOException($"An error occurred while parsing {jsonContent} to input schema");
+            }
+
+            var inputs = new TemplateInputs(jsonContent.AsObject());
+            _logger.LogInformation("Successfully retrieved inputs {Inputs}", inputs);
+            return inputs;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while fetching template inputs for template ID: {TemplateId}", id);
+            throw new IOException($"An error occurred while fetching template inputs for template ID: {id}.", ex);
+        }
     }
 
     /// <summary>
-    /// Retrieves the outputs of a template by its ID.
+    /// Executes a specific template with parameters.
     /// </summary>
-    /// <param name="id">The ID of the template.</param>
+    /// <param name="id">The ID of the template to execute.</param>
+    /// <param name="inputs">The template inputs.</param>
     /// <returns>The outputs of the template as a <see cref="TemplateOutputs"/>.</returns>
     public TemplateOutputs ExecuteTemplate(string id, TemplateInputs inputs)
     {
