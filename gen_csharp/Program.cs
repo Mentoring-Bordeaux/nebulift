@@ -30,12 +30,12 @@ class Program
             {
                macros = new Macros
                {
-                   projectName = "Poc options C#",
+                   projectName = "Generation C#",
                    projectDescription = "A configurable template for Nebulift executed with C#"
                },
                constants = new Constants
                {
-                   repositoryName = "Nebulift_Template",
+                   repositoryName = "Nebulift_Template_4",
                    privateRepository = false
                },
                env = new Dictionary<string, object>()
@@ -44,7 +44,7 @@ class Program
             var inputsJson = JsonSerializer.Serialize(inputs);
             Console.WriteLine("Inputs: " + inputsJson);
 
-            var stackName = $"{pulumiUser}/poc-options/dev3";
+            var stackName = $"{pulumiUser}/poc-options/dev-{Guid.NewGuid().ToString("N").Substring(0, 8)}";
             var url = "https://github.com/Mentoring-Bordeaux/nebulift.git";
             
             var gitAuth = new RemoteGitAuthArgs
@@ -71,14 +71,14 @@ class Program
             Console.WriteLine("Running preview ...");
             var previewResult = await stack.PreviewAsync();
             Console.WriteLine("End of preview");
-            Console.WriteLine("Preview result: " + JsonSerializer.Serialize(previewResult));
+            Console.WriteLine("Preview result: " + JsonSerializer.Serialize(previewResult, new JsonSerializerOptions { WriteIndented = true }));
             // Console.WriteLine("Preview result: " + previewResult);
 
             // Apply the changes
             Console.WriteLine("Running update ...");
             var upResult = await stack.UpAsync();
             Console.WriteLine("End of preview");
-            Console.WriteLine("Update result: " + JsonSerializer.Serialize(upResult));
+            Console.WriteLine("Update result: " + JsonSerializer.Serialize(upResult, new JsonSerializerOptions { WriteIndented = true }));
 
             // Optionally, destroy the stack
             // await stack.DestroyAsync();
