@@ -1,0 +1,4 @@
+{
+    "name" : "cloud-app",
+    "technologies" : ["nodejs", "GitHub", "Azure", "Pulumi"]
+}
