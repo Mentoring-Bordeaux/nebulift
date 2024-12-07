@@ -5,7 +5,7 @@ using System.Text.Json.Nodes;
 /// <summary>
 /// Represents the inputs of a template.
 /// </summary>
-public readonly struct TemplateInputs : IEquatable<TemplateInputs>
+public struct TemplateInputs : IEquatable<TemplateInputs>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="TemplateInputs"/> struct.

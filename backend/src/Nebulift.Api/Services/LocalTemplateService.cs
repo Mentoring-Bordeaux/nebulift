@@ -23,7 +23,9 @@ public class LocalTemplateService : ITemplateService
     /// <param name="logger">An instance of <see cref="ILogger{LocalTemplateService}"/> for logging.</param>
     public LocalTemplateService(IOptions<LocalTemplateServiceOptions> options, ILogger<LocalTemplateService> logger)
     {
-        _templatesFolderPath = options.Value.TemplatesFolderPath ?? throw new ArgumentNullException(nameof(options));
+        _templatesFolderPath = options == null
+                                ? throw new ArgumentNullException(nameof(options))
+                                : options.Value.TemplatesFolderPath ?? throw new ArgumentNullException(nameof(options));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -56,7 +58,7 @@ public class LocalTemplateService : ITemplateService
                 _logger.LogInformation("Successfully retrieved identity {Identity}", jsonContent);
                 var identity = JsonSerializer.Deserialize<TemplateIdentity>(jsonContent);
                 templateIdentities.Add(identity);
-                _logger.LogInformation("Successfully serialized identity into {Identity}", identity);
+                _logger.LogInformation("Successfully serialized identity into {Lbrace}{Identity}{Rbrace}", "{", identity, "}");
             }
         }
         catch (Exception ex)

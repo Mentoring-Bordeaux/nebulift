@@ -8,13 +8,14 @@ using System.Text.Json.Serialization;
 /// <summary>
 /// Represents the identity of a template, including its name and associated technologies.
 /// </summary>
-public readonly struct TemplateIdentity : IEquatable<TemplateIdentity>
+public struct TemplateIdentity : IEquatable<TemplateIdentity>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="TemplateIdentity"/> struct.
     /// </summary>
     /// <param name="name">The name of the template identity.</param>
     /// <param name="technologies">The list of technologies associated with the identity.</param>
+    [JsonConstructor]
     public TemplateIdentity(string name, IEnumerable<string> technologies)
     {
         Name = name ?? throw new ArgumentNullException(nameof(name));

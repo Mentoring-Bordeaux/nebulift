@@ -52,9 +52,9 @@ namespace Nebulift.Api.Controllers
         [HttpGet("{id}")]
         public IActionResult GetTemplateInputsSchemaById(string id)
         {
-            var templateInputsSchema = _templateService.GetTemplateInputs(id);
-            _logger.LogInformation("Retrieving template {TemplateId} input schema : {InputSchema}", id, templateInputsSchema);
-            return Ok(templateInputsSchema);
+            var templateInputsWrapped = _templateService.GetTemplateInputs(id);
+            _logger.LogInformation("Retrieving template {TemplateId} input schema : {InputSchema}", id, templateInputsWrapped);
+            return Ok(templateInputsWrapped.Content);
         }
 
         /// <summary>
