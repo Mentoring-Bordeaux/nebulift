@@ -1,10 +1,13 @@
 namespace Nebulift.Api.Controllers
 {
     using System;
-    using System.Text.Json.Serialization;
+    using System.Diagnostics;
+    using System.Text.Json;
+    using System.Text.Json.Nodes;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
     using Nebulift.Api.Templates;
+    using Nebulift.Api.Types;
 
     /// <summary>
     /// Controller to handle Nebulift template requests.
@@ -66,10 +69,75 @@ namespace Nebulift.Api.Controllers
         /// The updated template object with the provided data.
         /// </returns>
         [HttpPost("{id}")]
-        public IActionResult ExecuteTemplateById(string id, [FromBody] object templateData)
+        public async Task<IActionResult> ExecuteTemplateById(string id, [FromBody] object templateData)
         {
-            _logger.LogError("Template execution not implemented yet");
-            return Problem("Template execution not implemented yet");
+            try
+            {  
+               // TODO: select the right template based on the id
+                var contentJson = JsonSerializer.Serialize(templateData);
+
+                var contentObject = JsonSerializer.Deserialize<JsonObject>(contentJson);
+                var templateInputs = new TemplateInputs(contentObject); // ça sert à rien encore pour le moment
+                
+                var contentWithoutKey = contentObject["Content"];
+                var inputsJson = JsonSerializer.Serialize(contentWithoutKey);
+                Console.WriteLine("Inputs: " + inputsJson);
+                
+                // TODO: set the github token with a value from the inputs ?!
+                // TODO: where do we get the pulumi user from ?!
+                var envVars = new Dictionary<string, string>
+                {
+                    { "NEBULIFT_INPUTS", inputsJson },
+                    { "GITHUB_TOKEN", "" }, // Add token to test
+                    { "PULUMI_USER", "" } // Add user to test 
+                };
+
+                _logger.LogInformation("Executing template {TemplateId} with inputs: {Inputs}", id, inputsJson);
+
+                var genProgramPath = @"../Nebulift.Generation";
+
+                // Create a ProcessStartInfo to executre the dotnet run command
+                var processStartInfo = new ProcessStartInfo
+                {
+                    FileName = "dotnet",
+                    Arguments = "run",
+                    WorkingDirectory = genProgramPath,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                foreach (var envVar in envVars)
+                {
+                    processStartInfo.EnvironmentVariables[envVar.Key] = envVar.Value;
+                }
+
+                using (var process = Process.Start(processStartInfo))
+                {
+                    if (process == null)
+                    {
+                        return StatusCode(500, "Error in the generation process.");
+                    }
+
+                    string output = await process.StandardOutput.ReadToEndAsync();
+                    string error = await process.StandardError.ReadToEndAsync();
+
+                    await process.WaitForExitAsync();
+
+                    if (process.ExitCode != 0)
+                    {
+                        return StatusCode(500, $"Error in the execution of the C# pulumi program  : {error}");
+                    }
+
+                    return Ok(new { Output = output, Error = error });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Error while executing template : ", ex.Message);
+                return StatusCode(500, $"Internal error : {ex.Message}");
+            }
         }
     }
 }
