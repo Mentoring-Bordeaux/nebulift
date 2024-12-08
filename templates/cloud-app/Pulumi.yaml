@@ -1,0 +1,10 @@
+name: static-hosting
+description: Basic static hosting for one file
+runtime:
+  name: nodejs
+  options:
+    packagemanager: pnpm
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: typescript
