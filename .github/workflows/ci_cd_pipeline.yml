@@ -54,7 +54,8 @@ jobs:
         run: |
           cd frontend
           pnpm install --no-frozen-lockfile
-          pnpm run build
+          pnpm run generate
+
           
       # Déploiement via Static Web Apps, sans rebuild du frontend
       - name: Deploy to Azure Static Web Apps
@@ -64,7 +65,7 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
           # Le frontend déjà construit est dans frontend/.output/public
-          app_location: "frontend/.output/public"
+          app_location: "frontend/dist"
           # Le backend compilé est dans api/
           api_location: "api"
           skip_app_build: true
