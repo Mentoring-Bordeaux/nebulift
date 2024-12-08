@@ -9,26 +9,14 @@ on:
   pull_request:
     branches: 
       - main
-  workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Environment'
-        type: environment
-        required: true
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     name: Build and Deploy
-    environment: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'production' }}
     
     steps:
       - uses: actions/checkout@v4
-
-      # Configuration Node.js
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18.x'
 
       # Configuration .NET
       - name: Setup .NET
@@ -42,8 +30,25 @@ jobs:
           cd backend
           dotnet publish src/Nebulift.Api/Nebulift.Api.csproj -c Release -o ../api
 
+      # Configuration de Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          
+      # Installation de PNPM globalement
+      - name: Install PNPM
+        run: npm install -g pnpm
+
+      # Build Frontend
+      - name: Build Frontend
+        run: |
+          cd frontend
+          pnpm install
+          pnpm run build
+          
       # Déploiement via Static Web Apps
-      - name: Build and Deploy
+      - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
@@ -52,9 +57,4 @@ jobs:
           app_location: "frontend"
           api_location: "api"
           output_location: ".output/public"
-          app_build_command: |
-            
-            npm ci
-
-            # Build de l'application
-            npm run build
+          skip_app_build: true
