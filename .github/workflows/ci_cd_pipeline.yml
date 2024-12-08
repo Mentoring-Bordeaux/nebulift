@@ -53,7 +53,7 @@ jobs:
       - name: Build Frontend
         run: |
           cd frontend
-          pnpm install --frozen-lockfile
+          pnpm install --no-frozen-lockfile
           pnpm run build
           
       # Déploiement via Static Web Apps, sans rebuild du frontend
