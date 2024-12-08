@@ -65,7 +65,6 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
           # Le frontend déjà construit est dans frontend/.output/public
-          app_location: "frontend/dist"
-          # Le backend compilé est dans api/
+          app_location: "frontend/.output/public"
           api_location: "api"
           skip_app_build: true
