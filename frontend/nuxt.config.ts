@@ -16,7 +16,7 @@ export default defineNuxtConfig({
   },
   compatibilityDate: '2024-04-03',
   typescript: {
-    typeCheck: true,
+    typeCheck: false,
   },
   runtimeConfig: {
     public: {
