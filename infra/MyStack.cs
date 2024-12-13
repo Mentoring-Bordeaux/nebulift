@@ -1,11 +1,11 @@
-﻿using Pulumi;
+﻿namespace Nebulift.Infra;
+
+using Pulumi;
 using Pulumi.AzureNative.Resources;
 using Pulumi.AzureNative.Web;
 using Pulumi.AzureNative.Web.Inputs;
 
-// Define global variables
-
-class MyStack : Stack
+internal class MyStack : Stack
 {
 
     public MyStack()
@@ -53,15 +53,16 @@ class MyStack : Stack
                 // No build properties : CI/CD will build
             }
         });
-
-        // // Link front-end to back-end
-        // // Only possible on paid plan
-        // var backendLink = new StaticSiteLinkedBackend($"backlink-{projectName}-{stackName}-", new()
-        // {
-        //     Name = staticWebApp.Name,
-        //     BackendResourceId = appService.Id,
-        //     ResourceGroupName = resourceGroup.Name,
-        // });
+        
+        // Link front-end to back-end
+        var backendLink = new Pulumi.AzureNative.Web.V20240401.StaticSiteLinkedBackend($"backlink-{projectName}-{stackName}-", new()
+        {
+            Name = staticWebApp.Name,
+            BackendResourceId = appService.Id,
+            LinkedBackendName = appService.Name,
+            ResourceGroupName = resourceGroup.Name,
+            Region = appService.Location
+        });
 
         // Export the variable dictionary
         this.Endpoint = Output.Format($"https://{appService.DefaultHostName}");
