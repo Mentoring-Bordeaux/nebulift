@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nebulift.Api", "backend\src
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nebulift.Tests.Api", "backend\tests\Nebulift.Tests.Api\Nebulift.Tests.Api.csproj", "{3CD9C6D1-6907-407D-A368-D224BC823C00}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nebulift.Infra", "infra\Nebulift.Infra.csproj", "{B01FB97D-93F6-41A8-81EA-6C22A0613C9A}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
