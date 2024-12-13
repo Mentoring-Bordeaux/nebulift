@@ -1,7 +1,7 @@
 <template>
   <div>
     <Header />
-    <main class="main-container p-8 bg-gray-100 mt-20 overflow-auto">
+    <main class="main-container p-8 bg-gray-100 overflow-auto">
       <div v-if="project">
         <h1 class="text-2xl font-bold mb-4 text-black">{{ project.name }}</h1>
         <ul>
@@ -19,19 +19,24 @@
 import Header from "@/components/Header.vue";
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import type { Project } from '@/services/api';
+import { useProjectStore } from '@/stores/projectStore';
+import { createError, useError } from '#app';
 
 const route = useRoute();
-const project = ref<Project | null>(null);
+const projectStore = useProjectStore();
+const error = useError();
+const project = ref<{ name: string; technologies: string[] } | null>(null);
 
 onMounted(() => {
-  const name = route.query.name as string;
-  const technologies = route.query.technologies ? JSON.parse(route.query.technologies as string) : [];
+  const name = route.params.name as string;
+  console.log("Route name:", name);
+  console.log("Project Store:", projectStore.projects);
 
-  if (name && technologies.length > 0) {
-    project.value = { name, technologies };
+  const foundProject = projectStore.projects.find(p => p.name === name);
+  if (foundProject) {
+    project.value = foundProject;
   } else {
-    console.error('Invalid project data');
+    error.value = createError({ statusCode: 404, statusMessage: 'Project "' + name + '" not found' });
   }
 });
 </script>

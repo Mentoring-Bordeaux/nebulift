@@ -4,6 +4,9 @@ import ProjectGrid from "@/components/ProjectGrid.vue";
 import { ref, watchEffect } from 'vue';
 import { api } from '@/services/api';
 import type { Project } from '@/services/api';
+import { onMounted } from 'vue';
+import { useProjectStore } from '@/stores/projectStore';
+
 
 const projects = ref<Project[]>([]);
 const error = ref<string | null>(null);
@@ -21,13 +24,19 @@ watchEffect(async () => {
   }
 });
 
+const projectStore = useProjectStore();
+
+onMounted(async () => {
+  await projectStore.fetchProjects();
+});
+
 console.log("Initial project value:", projects.value);
 </script>
 
 <template>
   <div class="page-container flex flex-col h-screen">
     <Header />
-    <main class="main-container flex-1 p-8 bg-gray-100 mt-20 overflow-auto">
+    <main class="main-container flex-1 p-8 bg-gray-100 overflow-auto">
       <h1 class="title text-2xl font-bold mb-4 text-black">Create a project</h1>
       <div class="title-underline border-b-4 mb-4"></div>
       <div v-if="error">

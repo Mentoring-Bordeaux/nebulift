@@ -1,5 +1,5 @@
 <template>
-  <header class="header fixed top-0 left-0 w-full z-50 bg-orange-600 text-white h-20 flex items-center">
+  <header class="header sticky w-full z-50 bg-orange-600 text-white h-20 flex items-center">
     <div class="header-content flex items-center h-full relative z-10">
       <h1 class="logo text-4xl font-bold pl-6">Nebulift</h1>
     </div>
