@@ -23,7 +23,7 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     name: Build and Deploy
-    environment: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'production' }}
+    environment: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'devlopment' }}
     env:
       AZURE_WEBAPP_NAME: ${{ vars.AZURE_WEBAPP_NAME }}
       AZURE_WEBAPP_PACKAGE_PATH: './api'
