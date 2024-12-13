@@ -8,10 +8,8 @@ export default defineNuxtConfig({
     assets: '/<rootDir>/assets',
   },
   routeRules: {
-    '/api/**': {
-      proxy: process.env.NODE_ENV === 'production' 
-        ? '/api/**'  // En production, utilise le chemin d'API Azure Static Web Apps
-        : 'http://localhost:5052/**' // En développement, pointe vers l'API locale
+    '/api': {
+      proxy: 'http://localhost:5052',
     },
   },
   compatibilityDate: '2024-04-03',
@@ -20,7 +18,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      apiBase: process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:5000'
+      apiBase: process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:5052'
     }
   }
   
