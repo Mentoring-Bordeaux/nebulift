@@ -1,30 +1,12 @@
 <script setup lang="ts">
 import Header from "@/components/Header.vue";
 import ProjectGrid from "@/components/ProjectGrid.vue";
-import { ref, watchEffect } from 'vue';
-import { api } from '@/services/api';
-import type { Project } from '@/services/api';
-import { onMounted } from 'vue';
 import { useProjectStore } from '@/stores/projectStore';
-
-
-const projects = ref<Project[]>([]);
-const error = ref<string | null>(null);
-
-watchEffect(async () => {
-  try {
-    const fetchedProjects = await api.project.getAll();
-    projects.value = fetchedProjects.map(item => ({
-      name: item.name,
-      technologies: item.technologies
-    }));
-  } catch (err) {
-    error.value = 'Error fetching projects';
-    console.error(err);
-  }
-});
+import { storeToRefs } from 'pinia';
+import { onMounted } from 'vue';
 
 const projectStore = useProjectStore();
+const { projects, error } = storeToRefs(projectStore);
 
 onMounted(async () => {
   await projectStore.fetchProjects();
@@ -51,3 +33,9 @@ console.log("Initial project value:", projects.value);
     </main>
   </div>
 </template>
+
+<style scoped>
+html, body {
+  @apply m-0 p-0 w-full h-full bg-white;
+}
+</style>
