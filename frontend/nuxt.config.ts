@@ -11,7 +11,7 @@ export default defineNuxtConfig({
     '/api/**': {
       proxy: process.env.NODE_ENV === 'production' 
         ? '/api/**'  // En production, utilise le chemin d'API Azure Static Web Apps
-        : 'http://localhost:5000/**' // En développement, pointe vers l'API locale
+        : 'http://localhost:5052/**' // En développement, pointe vers l'API locale
     },
   },
   compatibilityDate: '2024-04-03',
