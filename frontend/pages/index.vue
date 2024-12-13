@@ -1,37 +1,28 @@
 <script setup lang="ts">
 import Header from "@/components/Header.vue";
 import ProjectGrid from "@/components/ProjectGrid.vue";
-import { ref, watchEffect } from 'vue';
-import { api } from '@/services/api';
-import type { Project } from '@/services/api';
+import { useProjectStore } from '@/stores/projectStore';
+import { storeToRefs } from 'pinia';
+import { onMounted } from 'vue';
 
-const projects = ref<Project[]>([]);
-const error = ref<string | null>(null);
+const projectStore = useProjectStore();
+const { projects, error } = storeToRefs(projectStore);
 
-watchEffect(async () => {
-  try {
-    const fetchedProjects = await api.project.getAll();
-    projects.value = fetchedProjects.map(item => ({
-      name: item.name,
-      technologies: item.technologies
-    }));
-  } catch (err) {
-    error.value = 'Error fetching projects';
-    console.error(err);
-  }
+onMounted(async () => {
+  await projectStore.fetchProjects();
 });
 
 console.log("Initial project value:", projects.value);
 </script>
 
 <template>
-  <div class="page-container">
+  <div class="page-container flex flex-col h-screen">
     <Header />
-    <main class="main-container">
-      <h1 class="title">Create a project</h1>
-      <div class="title-underline"></div>
+    <main class="main-container flex-1 p-8 bg-gray-100 overflow-auto">
+      <h1 class="title text-2xl font-bold mb-4 text-black">Create a project</h1>
+      <div class="title-underline border-b-4 mb-4"></div>
       <div v-if="error">
-        <p>Error fetching projects: {{ error }}</p>
+        <p class="text-red-500">Error fetching projects: {{ error }}</p>
       </div>
       <div v-else-if="!projects.length">
         <p>Loading...</p>
@@ -45,38 +36,6 @@ console.log("Initial project value:", projects.value);
 
 <style scoped>
 html, body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  background-color: white; /* Set background to white */
-}
-
-.page-container {
-  display: flex;
-  flex-direction: column;
-  height: 100vh; /* Full viewport height */
-}
-
-.main-container {
-  flex: 1;
-  padding: 2rem;
-  background-color: #FAFAFA;
-  width: 100%; /* Ensure it takes the full width */
-  box-sizing: border-box; /* Include padding in the element's total width and height */
-  margin-top: 80px; /* Add margin to account for fixed header */
-  overflow: auto; /* Enable scrolling if content overflows */
-}
-
-.title {
-  color: black;
-  font-size: 2rem;
-  font-weight: bold;
-  margin-bottom: 1rem;
-}
-
-.title-underline {
-  border-bottom: 3px solid #eaeaea;
-  margin-bottom: 1rem;
+  @apply m-0 p-0 w-full h-full bg-white;
 }
 </style>
