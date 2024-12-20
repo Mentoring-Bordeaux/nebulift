@@ -61,7 +61,7 @@ internal class MyStack : Stack
         });
         
         // Link front-end to back-end
-        var backendLink = new Pulumi.AzureNative.Web.StaticSiteLinkedBackend($"backlink-{projectName}-{stackName}", new()
+        var backendLink = new StaticSiteLinkedBackend($"backlink-{projectName}-{stackName}", new()
         {
             Name = staticWebApp.Name,
             BackendResourceId = appService.Id,
