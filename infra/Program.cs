@@ -1,3 +1,5 @@
+namespace Nebulift.Infra;
+
 using System.Threading.Tasks;
 using Pulumi;
 

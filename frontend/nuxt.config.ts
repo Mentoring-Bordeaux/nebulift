@@ -1,7 +1,7 @@
 // nuxt.config.ts
 export default defineNuxtConfig({
-  modules: ['@nuxt/ui'],
-  ssr: false,
+  modules: ['@nuxt/ui', '@nuxt/eslint', '@pinia/nuxt'],
+  ssr: true,
   devtools: { enabled: true },
   css: ['@/assets/main.css'],
   alias: {
@@ -16,11 +16,4 @@ export default defineNuxtConfig({
   typescript: {
     typeCheck: false,
   },
-  runtimeConfig: {
-    public: {
-      apiBase: process.env.NODE_ENV === 'production' ? '/api' : 'http://localhost:5052'
-    }
-  }
-  
-},
-);
+});
