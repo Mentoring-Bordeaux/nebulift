@@ -12,6 +12,10 @@ on:
         type: environment
         required: true
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -44,7 +48,7 @@ jobs:
         uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          images: ${{ secrets.AZURE_REGISTRY_LOGIN_SERVER }}/nebulift-backend:latest
+          images: ${{ vars.AZURE_REGISTRY_LOGIN_SERVER }}/nebulift-backend:latest
 
       # Deploys frontend on Azure Static Site
       - name: Build and deploy app
