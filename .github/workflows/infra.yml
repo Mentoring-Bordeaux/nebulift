@@ -25,11 +25,19 @@ jobs:
     steps:
       # Checkout repository
       - uses: actions/checkout@v4
+
+      # Run ls and log the output
+      - name: List files in the workspace
+        run: |
+          echo "Listing files in the workspace:"
+          ls -la
+          ls -la > ls_output.log  # Save output to a log file
+          cat ls_output.log       # Show the log file contents in the action logs
   
-      # Select Pulumi stack
+      # Pulumi up
       - uses: pulumi/actions@v3
         with:
           command: up
-          stack-name: ${{ vars.PULUMI_STACK }}
+          stack-name: teachingiac/nebulift/dev
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
