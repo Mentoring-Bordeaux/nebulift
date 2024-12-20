@@ -30,6 +30,6 @@ jobs:
       - uses: pulumi/actions@v3
         with:
           command: up
-          stack-name: dev
+          stack-name: ${{ vars.PULUMI_STACK }}
         env:
           PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
