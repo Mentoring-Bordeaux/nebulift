@@ -17,14 +17,14 @@ jobs:
     runs-on: ubuntu-latest
     name: Pulumi up
     environment: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'production' }}
-      
+
+    defaults:
+      run:
+        working-directory: infra
+
     steps:
       # Checkout repository
       - uses: actions/checkout@v4
-  
-      # Change to infra directory
-      - name: Change to infra directory
-        run: cd infra
   
       # Select Pulumi stack
       - uses: pulumi/actions@v3
