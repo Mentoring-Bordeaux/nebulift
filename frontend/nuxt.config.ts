@@ -1,7 +1,7 @@
 // nuxt.config.ts
 export default defineNuxtConfig({
   modules: ['@nuxt/ui', '@nuxt/eslint', '@pinia/nuxt'],
-  ssr: true,
+  ssr: false,
   devtools: { enabled: true },
   css: ['@/assets/main.css'],
   alias: {
