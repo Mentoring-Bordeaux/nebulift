@@ -1,10 +1,6 @@
 name: Deploy Nebulift
 
 on:
-  push:
-    branches:
-      - main
-      - feature/*
   workflow_dispatch:
     inputs:
       environment:
