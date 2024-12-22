@@ -1,10 +1,6 @@
 name: Nebulift Infra Pipeline
 
 on:
-  push:
-    branches:
-      - main
-      - feature/*
   workflow_dispatch:
     inputs:
       environment:
