@@ -1,8 +1,8 @@
 <template>
-  <div class="projects-grid">
+  <div class="projects-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
     <ProjectCard
       v-for="(project, index) in projects"
-      :key="project.name"
+      :key="index"
       :name="project.name"
       :technologies="project.technologies"
       @click="handleCardClick(project)"
@@ -31,14 +31,3 @@ const handleCardClick = (project: { name: string; technologies: string[] }) => {
   });
 };
 </script>
-
-<style scoped>
-.projects-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 1rem;
-  width: 100%;
-  box-sizing: border-box;
-  padding: 2rem;
-}
-</style>
