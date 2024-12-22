@@ -51,5 +51,5 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: 'upload'
           app_location: 'frontend/'
-          output_location: 'build'
-          app_build_command: 'pnpm run build'
+          output_location: '.output'
+          app_build_command: 'pnpm install && pnpm run build'
