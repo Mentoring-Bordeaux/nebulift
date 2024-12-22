@@ -23,6 +23,7 @@ jobs:
     environment: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'production' }}
     env:
       AZURE_WEBAPP_NAME: ${{ vars.AZURE_WEBAPP_NAME }}
+      ACTIONS_STEP_DEBUG: true
 
     steps:
       - uses: actions/checkout@v4
@@ -51,4 +52,4 @@ jobs:
           action: 'upload'
           app_location: 'frontend/'
           output_location: 'build'
-          app_build_command: 'npm run build'
+          app_build_command: 'pnpm run build'
