@@ -3,9 +3,9 @@ namespace Nebulift.Api.Templates;
 using Types;
 
 /// <summary>
-/// Repository interface for accessing template-related data.
+/// Storage interface for accessing template-related data.
 /// </summary>
-public interface ITemplateRepository
+public interface ITemplateStorage
 {
     /// <summary>
     /// Retrieves the identities of all templates.
@@ -29,11 +29,4 @@ public interface ITemplateRepository
     /// <param name="id">The ID of the template.</param>
     /// <returns>The inputs of the template as a <see cref="TemplateInputs"/>.</returns>
     public TemplateInputs GetTemplateInputs(string id);
-
-    /// <summary>
-    /// Retrieves the outputs of a template by its ID.
-    /// </summary>
-    /// <param name="id">The ID of the template.</param>
-    /// <returns>The outputs of the template as a <see cref="TemplateOutputs"/>.</returns>
-    public TemplateOutputs GetTemplateOutputs(string id);
 }
