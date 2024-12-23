@@ -19,7 +19,6 @@ jobs:
     environment: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'production' }}
     env:
       AZURE_WEBAPP_NAME: ${{ vars.AZURE_WEBAPP_NAME }}
-      ACTIONS_STEP_DEBUG: true
 
     steps:
       - uses: actions/checkout@v4
