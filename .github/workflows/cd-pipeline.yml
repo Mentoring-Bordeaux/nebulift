@@ -1,6 +1,9 @@
 name: Deploy Nebulift
 
 on:
+  push:
+    branches:
+      - feature/*
   workflow_dispatch:
     inputs:
       environment:
@@ -37,6 +40,9 @@ jobs:
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           images: ${{ vars.AZURE_REGISTRY_LOGIN_SERVER }}/nebulift-backend:latest
+        env:
+          WEBSITES_PORT: '7109'
+
 
       # Deploys frontend on Azure Static Site
       - name: Build and deploy app
