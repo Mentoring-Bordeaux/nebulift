@@ -1,6 +1,9 @@
 name: Nebulift CI Pipeline
 
 on:
+  push:
+    branches:
+      - feature/*
   workflow_dispatch:
     inputs:
       environment:
