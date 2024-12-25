@@ -17,7 +17,7 @@ jobs:
     name: Docker build and push
     environment: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'production' }}
     env:
-      AZURE_WEBAPP_PACKAGE_PATH: './backend/src/Nebulift.Api'
+      AZURE_WEBAPP_PACKAGE_PATH: './backend/'
       
     steps:
       # Checkout repository

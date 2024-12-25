@@ -70,4 +70,17 @@ public class TemplateController : ControllerBase
         _logger.LogError("Template execution not implemented yet");
         return Problem("Template execution not implemented yet");
     }
+
+    /// <summary>
+    /// Health check endpoint.
+    /// </summary>
+    /// <returns>
+    /// A simple message indicating the service is running.
+    /// </returns>
+    [HttpGet("health")]
+    public IActionResult Health()
+    {
+        _logger.LogInformation("Health check endpoint called");
+        return Ok(new { Status = "Healthy", Timestamp = DateTime.UtcNow });
+    }
 }
