@@ -8,6 +8,8 @@ const isPrivate = inputs.getConstant("privateRepository");
 console.log(`Creating repository ${repositoryName}...`);
 console.log(`Private repository: ${isPrivate}`);
 
+console.log(`Program arguments: ${process.argv}`);
+
 // Create the GitHub repository first
 const repo = new github.Repository("repo", {
   name: repositoryName,
