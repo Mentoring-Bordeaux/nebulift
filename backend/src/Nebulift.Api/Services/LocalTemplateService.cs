@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Nebulift.Api.Exceptions;
 
 /// <summary>
 /// A local template service implementation for accessing and running templates stored in the Nebulift project repository.
@@ -23,9 +24,10 @@ public class LocalTemplateService : ITemplateService
     /// <param name="logger">An instance of <see cref="ILogger{LocalTemplateService}"/> for logging.</param>
     public LocalTemplateService(IOptions<LocalTemplateServiceOptions> options, ILogger<LocalTemplateService> logger)
     {
-        _templatesFolderPath = options == null
-                                ? throw new ArgumentNullException(nameof(options))
-                                : options.Value.TemplatesFolderPath ?? throw new ArgumentNullException(nameof(options));
+        // _templatesFolderPath = options == null
+        //                         ? throw new ArgumentNullException(nameof(options))
+        //                         : options.Value.TemplatesFolderPath ?? throw new ArgumentNullException(nameof(options));
+        _templatesFolderPath = "/deadbeef/";
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -41,30 +43,22 @@ public class LocalTemplateService : ITemplateService
         var templateIdentities = new List<TemplateIdentity>();
         _logger.LogInformation("Fetching all template identities from folder: {TemplatesFolder}", _templatesFolderPath);
 
-        try
+        var templateDirs = Directory.GetDirectories(_templatesFolderPath);
+        foreach (var templateDir in templateDirs)
         {
-            var templateDirs = Directory.GetDirectories(_templatesFolderPath);
-            foreach (var templateDir in templateDirs)
+            var identityFilePath = Path.Combine(templateDir, "identity.json");
+
+            if (!File.Exists(identityFilePath))
             {
-                var identityFilePath = Path.Combine(templateDir, "identity.json");
-
-                if (!File.Exists(identityFilePath))
-                {
-                    _logger.LogWarning("Identity file not found at path: {IdentityFilePath}", identityFilePath);
-                    continue;
-                }
-
-                var jsonContent = File.ReadAllText(identityFilePath);
-                _logger.LogInformation("Successfully retrieved identity {Identity}", jsonContent);
-                var identity = JsonSerializer.Deserialize<TemplateIdentity>(jsonContent);
-                templateIdentities.Add(identity);
-                _logger.LogInformation("Successfully serialized identity into {Lbrace}{Identity}{Rbrace}", "{", identity, "}");
+                _logger.LogWarning("Identity file not found at path: {IdentityFilePath}", identityFilePath);
+                continue;
             }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "An error occurred while fetching template identities.");
-            throw new IOException("An error occurred while fetching template identities.", ex);
+
+            var jsonContent = File.ReadAllText(identityFilePath);
+            _logger.LogInformation("Successfully retrieved identity {Identity}", jsonContent);
+            var identity = JsonSerializer.Deserialize<TemplateIdentity>(jsonContent);
+            templateIdentities.Add(identity);
+            _logger.LogInformation("Successfully serialized identity into {Lbrace}{Identity}{Rbrace}", "{", identity, "}");
         }
 
         return templateIdentities;
@@ -75,7 +69,7 @@ public class LocalTemplateService : ITemplateService
     /// </summary>
     /// <param name="id">The ID of the template.</param>
     /// <returns>The identity of the template as a <see cref="TemplateIdentity"/>.</returns>
-    /// <exception cref="FileNotFoundException">
+    /// <exception cref="NotFoundException">
     /// Thrown if the identity file is not found at the expected path.
     /// </exception>
     public TemplateIdentity GetTemplateIdentity(string id)
@@ -83,24 +77,16 @@ public class LocalTemplateService : ITemplateService
         var identityFilePath = Path.Combine(_templatesFolderPath, id, "identity.json");
         _logger.LogInformation("Fetching template identity for template ID: {TemplateId} from path: {IdentityFilePath}", id, identityFilePath);
 
-        try
+        if (!File.Exists(identityFilePath))
         {
-            if (!File.Exists(identityFilePath))
-            {
-                _logger.LogWarning("Identity file not found for template ID {TemplateId} at path: {IdentityFilePath}", id, identityFilePath);
-                throw new FileNotFoundException($"Identity file not found at path: {identityFilePath}");
-            }
+            _logger.LogWarning("Identity file not found for template ID {TemplateId} at path: {IdentityFilePath}", id, identityFilePath);
+            throw new NotFoundException($"Identity file not found at path: {identityFilePath}");
+        }
 
-            var jsonContent = File.ReadAllText(identityFilePath);
-            var identity = JsonSerializer.Deserialize<TemplateIdentity>(jsonContent);
-            _logger.LogInformation("Successfully retrieved identity {Identity}", identity);
-            return identity;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "An error occurred while fetching template identity for template ID: {TemplateId}", id);
-            throw new IOException($"An error occurred while fetching template identity for template ID: {id}.", ex);
-        }
+        var jsonContent = File.ReadAllText(identityFilePath);
+        var identity = JsonSerializer.Deserialize<TemplateIdentity>(jsonContent);
+        _logger.LogInformation("Successfully retrieved identity {Identity}", identity);
+        return identity;
     }
 
     /// <summary>
@@ -113,29 +99,21 @@ public class LocalTemplateService : ITemplateService
         var inputsFilePath = Path.Combine(_templatesFolderPath, id, "inputs.json");
         _logger.LogInformation("Fetching template inputs for template ID: {TemplateId} from path: {InputsFilePath}", id, inputsFilePath);
 
-        try
+        if (!File.Exists(inputsFilePath))
         {
-            if (!File.Exists(inputsFilePath))
-            {
-                _logger.LogWarning("Inputs file not found for template ID {TemplateId} at path: {InputsFilePath}", id, inputsFilePath);
-                throw new FileNotFoundException($"Inputs file not found at path: {inputsFilePath}");
-            }
-
-            var jsonContent = JsonNode.Parse(File.ReadAllText(inputsFilePath));
-            if (jsonContent == null)
-            {
-                throw new IOException($"An error occurred while parsing {jsonContent} to input schema");
-            }
-
-            var inputs = new TemplateInputs(jsonContent.AsObject());
-            _logger.LogInformation("Successfully retrieved inputs {Inputs}", inputs);
-            return inputs;
+            _logger.LogWarning("Inputs file not found for template ID {TemplateId} at path: {InputsFilePath}", id, inputsFilePath);
+            throw new NotFoundException($"Inputs file not found at path: {inputsFilePath}");
         }
-        catch (Exception ex)
+
+        var jsonContent = JsonNode.Parse(File.ReadAllText(inputsFilePath));
+        if (jsonContent == null)
         {
-            _logger.LogError(ex, "An error occurred while fetching template inputs for template ID: {TemplateId}", id);
-            throw new IOException($"An error occurred while fetching template inputs for template ID: {id}.", ex);
+            throw new IOException($"An error occurred while parsing {jsonContent} to input schema");
         }
+
+        var inputs = new TemplateInputs(jsonContent.AsObject());
+        _logger.LogInformation("Successfully retrieved inputs {Inputs}", inputs);
+        return inputs;
     }
 
     /// <summary>
