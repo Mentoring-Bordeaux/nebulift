@@ -1,4 +1,4 @@
-name: Nebulift CI Pipeline
+name: Back CI
 
 on:
   workflow_dispatch:

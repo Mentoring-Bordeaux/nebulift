@@ -1,8 +1,11 @@
-
 name: Front CD
 
 on:
   workflow_dispatch:
+  workflow_run:
+      workflows: ["Front CI"]
+      types:
+        - completed
 
 jobs:
   deploy:
@@ -17,7 +20,7 @@ jobs:
         with:
           workflow: front-ci.yml
           workflow_conclusion: completed
-          name: artifact
+          name: build-output
 
       # Deploys frontend on Azure Static Site
       - name: Build and deploy app
