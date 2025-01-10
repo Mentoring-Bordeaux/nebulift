@@ -13,17 +13,17 @@ using System.Threading.Tasks;
 /// </summary>
 public class GitHubTemplateExecutor : ITemplateExecutor
 {
-    
-    private string serialize(JsonNode node)
+
+    private static string Serialize(object node)
     {
         return JsonSerializer.Serialize(node, new JsonSerializerOptions { WriteIndented = true });
     }
-    
+
     public async Task<TemplateOutputs> ExecuteTemplate(string id, TemplateInputs inputs)
     {
         Console.WriteLine("Executing template with ID: " + id);
         var inputNode = inputs.Content["templateData"]?["inputs"];
-        var inputString = serialize(inputNode);
+        var inputString = Serialize(inputNode);
         Console.WriteLine("Template inputs: " + inputString);
 
         var authNode = inputs.Content["templateData"]?["auth"];
@@ -60,14 +60,14 @@ public class GitHubTemplateExecutor : ITemplateExecutor
             // Preview the changes
             Console.WriteLine("Running preview ...");
             var previewResult = await stack.PreviewAsync();
-            var previewString = JsonSerializer.Serialize(previewResult, new JsonSerializerOptions { WriteIndented = true });
+            var previewString = Serialize(previewResult);
             Console.WriteLine("End of preview");
             Console.WriteLine("Preview result: " + previewString);
 
             // Apply the changes
             Console.WriteLine("Running update ...");
             var upResult = await stack.UpAsync();
-            var upString = JsonSerializer.Serialize(upResult, new JsonSerializerOptions { WriteIndented = true });
+            var upString = Serialize(upResult);
             Console.WriteLine("End of preview");
             Console.WriteLine("Update result: " + upString);
 
