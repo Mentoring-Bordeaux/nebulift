@@ -37,18 +37,20 @@ public class GitHubTemplateExecutor : ITemplateExecutor
             var stackName = $"{pulumiUser}/{id}/dev-{Guid.NewGuid().ToString("N").Substring(0, 8)}";
             const string url = "https://github.com/Mentoring-Bordeaux/nebulift.git";
 
-            var stackArgs = new RemoteGitProgramArgs(stackName, url)
-            {
-                ProjectPath = "templates/" + id,
-                Branch = "feature/template-execution",
-                Auth = new RemoteGitAuthArgs { PersonalAccessToken = githubToken },
-            };
+            // var stackArgs = new RemoteGitProgramArgs(stackName, url)
+            // {
+            //     ProjectPath = "templates/" + id,
+            //     Branch = "feature/template-execution",
+            //     Auth = new RemoteGitAuthArgs { PersonalAccessToken = githubToken },
+            // };
+
+            var stackArgs = new LocalProgramArgs(stackName, "../../../templates/" + id);
 
             var envValue = new EnvironmentVariableValue(inputString);
-            stackArgs.EnvironmentVariables = new Dictionary<string, EnvironmentVariableValue>
-                { { "NEBULIFT_INPUTS", envValue } };
+            // stackArgs.EnvironmentVariables = new Dictionary<string, EnvironmentVariableValue>
+            //     { { "NEBULIFT_INPUTS", envValue } };
 
-            var stack = await RemoteWorkspace.CreateOrSelectStackAsync(stackArgs);
+            var stack = await LocalWorkspace.CreateOrSelectStackAsync(stackArgs);
 
             // Preview the changes
             Console.WriteLine("Running preview ...");
