@@ -1,13 +1,12 @@
 namespace Nebulift.Api.Controllers
 {
     using System;
-    using System.Diagnostics;
     using System.Text.Json;
     using System.Text.Json.Nodes;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
-    using Nebulift.Api.Templates;
-    using Nebulift.Api.Types;
+    using Services;
+    using Types;
 
     /// <summary>
     /// Controller to handle Nebulift template requests.

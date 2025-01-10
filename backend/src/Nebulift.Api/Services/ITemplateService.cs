@@ -1,6 +1,4 @@
-namespace Nebulift.Api.Templates;
-
-using Types;
+namespace Nebulift.Api.Services;
 
 /// <summary>
 /// Macro interface for managing templates (data + execution).

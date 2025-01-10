@@ -1,11 +1,10 @@
-namespace Nebulift.Api.Templates;
+namespace Nebulift.Api.Services;
 
 using Types;
 using Pulumi.Automation;
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
 /// <summary>
@@ -13,12 +12,6 @@ using System.Threading.Tasks;
 /// </summary>
 public class GitHubTemplateExecutor : ITemplateExecutor
 {
-
-    private static string Serialize(object node)
-    {
-        return JsonSerializer.Serialize(node, new JsonSerializerOptions { WriteIndented = true });
-    }
-
     public async Task<TemplateOutputs> ExecuteTemplate(string id, TemplateInputs inputs)
     {
         Console.WriteLine("Executing template with ID: " + id);
@@ -82,5 +75,10 @@ public class GitHubTemplateExecutor : ITemplateExecutor
         }
 
         return new TemplateOutputs();
+    }
+
+    private static string Serialize(object node)
+    {
+        return JsonSerializer.Serialize(node, new JsonSerializerOptions { WriteIndented = true });
     }
 }

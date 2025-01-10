@@ -1,6 +1,6 @@
 namespace Nebulift.Api;
-using Nebulift.Api.Templates;
-using Nebulift.Api.Configuration;
+using Configuration;
+using Services;
 using EnvironmentName = Microsoft.Extensions.Hosting.EnvironmentName;
 
 /// <summary>
