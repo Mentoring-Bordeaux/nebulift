@@ -1,4 +1,6 @@
 namespace Nebulift.Api;
+
+using Middleware;
 using Nebulift.Api.Templates;
 using Nebulift.Api.Configuration;
 using EnvironmentName = Microsoft.Extensions.Hosting.EnvironmentName;
@@ -50,6 +52,9 @@ public static class Program
 
         // Use CORS middleware
         app.UseCors("AllowSpecificOrigin");
+        
+        // Use custom exception middleware
+        app.UseMiddleware<ExceptionMiddleware>();
 
         app.MapControllers();
 
