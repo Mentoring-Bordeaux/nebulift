@@ -5,6 +5,9 @@ const inputs: nebulift.Inputs = nebulift.init();
 const repositoryName = inputs.getConstant("repositoryName");
 const isPrivate = inputs.getConstant("privateRepository");
 
+console.log(`Creating repository ${repositoryName}...`);
+console.log(`Private repository: ${isPrivate}`);
+
 // Create the GitHub repository first
 const repo = new github.Repository("repo", {
   name: repositoryName,
