@@ -9,6 +9,10 @@ on:
       - main
   workflow_dispatch:
 
+defaults:
+  run:
+    working-directory: ./frontend
+
 jobs:
   build_and_publish:
     runs-on: ubuntu-latest
@@ -26,14 +30,12 @@ jobs:
         
     - name: Install dependencies
       run: pnpm i
-      working-directory: ./frontend
 
-    - name: Build application
-      run: pnpm run build
-      working-directory: ./frontend
+    - name: Generate application
+      run: pnpm generate
 
     - name: Upload build artifact
       uses: actions/upload-artifact@v3
       with:
         name: build-output
-        path: frontend/.output
+        path: ./frontend/.output/public
