@@ -1,3 +1,5 @@
 .idea/
 bin/
 obj/
+src/Nebulift.Api/Services/GitHubTemplateExecutor.cs
+.gitignore

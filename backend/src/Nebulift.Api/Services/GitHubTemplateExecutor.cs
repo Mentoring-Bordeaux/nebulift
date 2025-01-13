@@ -22,6 +22,10 @@ public class GitHubTemplateExecutor : ITemplateExecutor
         var authNode = inputs.Content["templateData"]?["auth"];
         var pulumiUser = authNode?["pulumiUser"]?.ToString();
         var githubToken = authNode?["githubToken"]?.ToString();
+        var azureClientId = authNode?["azureClientId"]?.ToString();
+        var azureClientSecret = authNode?["azureClientSecret"]?.ToString();
+        var azureSubscriptionId = authNode?["azureSubscriptionId"]?.ToString();
+        var azureTenantId = authNode?["azureTenantId"]?.ToString();
 
         Console.WriteLine(pulumiUser);
         Console.WriteLine(githubToken);
@@ -46,18 +50,12 @@ public class GitHubTemplateExecutor : ITemplateExecutor
 
             var stackArgs = new LocalProgramArgs(stackName, "../../../templates/" + id);
 
-            var envValue = new EnvironmentVariableValue(inputString);
-            // stackArgs.EnvironmentVariables = new Dictionary<string, EnvironmentVariableValue>
-            //     { { "NEBULIFT_INPUTS", envValue } };
-
             var stack = await LocalWorkspace.CreateOrSelectStackAsync(stackArgs);
-
-            // Preview the changes
-            Console.WriteLine("Running preview ...");
-            var previewResult = await stack.PreviewAsync();
-            var previewString = Serialize(previewResult);
-            Console.WriteLine("End of preview");
-            Console.WriteLine("Preview result: " + previewString);
+            await stack.SetConfigAsync("github:token", new ConfigValue(githubToken));
+            await stack.SetConfigAsync("azure-native:clientId", new ConfigValue(azureClientId!));
+            await stack.SetConfigAsync("azure-native:clientSecret", new ConfigValue(azureClientSecret!));
+            await stack.SetConfigAsync("azure-native:subscriptionId", new ConfigValue(azureSubscriptionId!));
+            await stack.SetConfigAsync("azure-native:tenantId", new ConfigValue(azureTenantId!));
 
             // Apply the changes
             Console.WriteLine("Running update ...");
