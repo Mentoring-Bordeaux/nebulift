@@ -5,6 +5,8 @@ const inputs: nebulift.Inputs = nebulift.init();
 const repositoryName = inputs.getConstant("repositoryName");
 const isPrivate = inputs.getConstant("privateRepository");
 
+
+
 console.log(`Creating repository ${repositoryName}...`);
 console.log(`Private repository: ${isPrivate}`);
 
@@ -19,11 +21,23 @@ const repo = new github.Repository("repo", {
   hasProjects: true,
 });
 
+
 // Create files only after the repository is created
 // and replace all the placeholders with the actual values
-const sourcePath = "code";
+const sourcePath = "./code";
+console.log(`Adding source code from ${sourcePath} to repository ${repositoryName}...`);
 repo.name.apply((name) =>
   nebulift.addSourceCode(repositoryName, sourcePath)
 );
+
+
+const users = inputs.getConstant("contributors");
+for (const user of users) {
+  new github.RepositoryCollaborator("repo_user" + user, {
+    repository: repo.name,
+    username: user,
+  });
+}
+
 
 export const repoName = repo.name;
