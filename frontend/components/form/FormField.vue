@@ -18,6 +18,20 @@ const emit = defineEmits<{
 }>();
 
 const isSelectField = Array.isArray(props.fieldConfig.value);
+
+// Base classes for inputs
+const inputBaseClasses = `
+  rounded-md 
+  p-2 
+  w-full 
+  border 
+  border-gray-300 
+  focus:ring-2 
+  focus:ring-blue-500 
+  focus:border-transparent
+  bg-white
+  text-gray-900
+`;
 </script>
 
 <template>
@@ -33,16 +47,22 @@ const isSelectField = Array.isArray(props.fieldConfig.value);
         :value="modelValue"
         @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"
         type="text"
-        class="rounded-md p-2 w-full border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        :class="inputBaseClasses"
       />
 
       <select
         v-else
         :value="modelValue"
         @change="emit('update:modelValue', ($event.target as HTMLSelectElement).value)"
-        class="rounded-md p-2 w-full border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        :class="inputBaseClasses"
       >
-        <option v-for="option in fieldConfig.value" :key="option" :value="option">
+        <option value="" disabled>Select an option</option>
+        <option 
+          v-for="option in fieldConfig.value" 
+          :key="option" 
+          :value="option"
+          class="text-gray-900"
+        >
           {{ option }}
         </option>
       </select>
