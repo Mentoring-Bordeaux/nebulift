@@ -27,14 +27,18 @@ internal class MyStack : Stack
         });
         
         // Create an App Service Plan
-        var appServicePlan = new AppServicePlan($"wapp-plan-{projectName}-{stackName}", new AppServicePlanArgs
+            var appServicePlan = new AppServicePlan($"asplan-{projectName}-{stackName}", new AppServicePlanArgs
         {
-            Name = $"wapp-plan-{projectName}-{stackName}",
+            Name = $"asplan-{projectName}-{stackName}",
             ResourceGroupName = resourceGroup.Name,
             Sku = new SkuDescriptionArgs
             {
-                Name = appServiceSkuName
-            }
+                Name = "B1",
+                Tier = "Basic",
+                Capacity = 1
+            },
+            Kind = "Linux",
+            Reserved = true
         });
 
         // Create an App Service
@@ -42,7 +46,11 @@ internal class MyStack : Stack
         {
             Name = $"wapp-{projectName}-{stackName}",
             ResourceGroupName = resourceGroup.Name,
-            ServerFarmId = appServicePlan.Id
+            ServerFarmId = appServicePlan.Id,
+            SiteConfig = new SiteConfigArgs
+            {
+                LinuxFxVersion = "DOCKER|nginx"
+            },
         });
 
         // Create a Static Web App
