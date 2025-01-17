@@ -34,19 +34,9 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      # Build the application
-      - name: Build the application
-        run: dotnet build --configuration Release
-        working-directory: backend/src/Nebulift.Api
-
-      # Publish the application
-      - name: Publish the application
-        run: dotnet publish --configuration Release --output ./publish
-        working-directory: backend/src/Nebulift.Api
-
       # Deploy to Azure Web App
       - name: Deploy backend to Azure Web App
         uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          package: ./backend/src/Nebulift.Api/publish
+          images: ${{ vars.AZURE_REGISTRY_LOGIN_SERVER }}/nebulift-backend:latest
