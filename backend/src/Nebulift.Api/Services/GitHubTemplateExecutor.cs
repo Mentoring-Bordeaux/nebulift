@@ -22,6 +22,10 @@ public class GitHubTemplateExecutor : ITemplateExecutor
         var authNode = inputs.Content["templateData"]?["auth"];
         var pulumiUser = authNode?["pulumiUser"]?.ToString();
         var githubToken = authNode?["githubToken"]?.ToString();
+        var azureClientId = authNode?["azureClientId"]?.ToString();
+        var azureClientSecret = authNode?["azureClientSecret"]?.ToString();
+        var azureSubscriptionId = authNode?["azureSubscriptionId"]?.ToString();
+        var azureTenantId = authNode?["azureTenantId"]?.ToString();
 
         Console.WriteLine(pulumiUser);
         Console.WriteLine(githubToken);
@@ -36,26 +40,25 @@ public class GitHubTemplateExecutor : ITemplateExecutor
         {
             var stackName = $"{pulumiUser}/{id}/dev-{Guid.NewGuid().ToString("N").Substring(0, 8)}";
             const string url = "https://github.com/Mentoring-Bordeaux/nebulift.git";
-
+            
             var stackArgs = new RemoteGitProgramArgs(stackName, url)
             {
                 ProjectPath = "templates/" + id,
                 Branch = "feature/template-execution",
                 Auth = new RemoteGitAuthArgs { PersonalAccessToken = githubToken },
+                EnvironmentVariables = new Dictionary<string, EnvironmentVariableValue>()
+                {
+                    { "NODE_OPTIONS", new EnvironmentVariableValue("--max-old-space-size=1000000")},
+                    { "github:token", new EnvironmentVariableValue(githubToken) },
+                    { "ARM_CLIENT_ID", new EnvironmentVariableValue(azureClientId) },
+                    { "ARM_CLIENT_SECRET", new EnvironmentVariableValue(azureClientSecret, true) },
+                    { "ARM_SUBSCRIPTION_ID", new EnvironmentVariableValue(azureSubscriptionId) },
+                    { "ARM_TENANT_ID", new EnvironmentVariableValue(azureTenantId) },
+                    { "NEBULIFT_INPUTS", new EnvironmentVariableValue(inputString) }
+                }
             };
 
-            var envValue = new EnvironmentVariableValue(inputString);
-            stackArgs.EnvironmentVariables = new Dictionary<string, EnvironmentVariableValue>
-                { { "NEBULIFT_INPUTS", envValue } };
-
             var stack = await RemoteWorkspace.CreateOrSelectStackAsync(stackArgs);
-
-            // Preview the changes
-            Console.WriteLine("Running preview ...");
-            var previewResult = await stack.PreviewAsync();
-            var previewString = Serialize(previewResult);
-            Console.WriteLine("End of preview");
-            Console.WriteLine("Preview result: " + previewString);
 
             // Apply the changes
             Console.WriteLine("Running update ...");
