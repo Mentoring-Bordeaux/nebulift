@@ -1,7 +1,7 @@
 namespace Nebulift.Api;
+
 using Nebulift.Api.Templates;
 using Nebulift.Api.Configuration;
-using EnvironmentName = Microsoft.Extensions.Hosting.EnvironmentName;
 
 /// <summary>
 /// Main program for Nebulift backend.
@@ -36,6 +36,8 @@ public static class Program
                     .AllowAnyMethod());
         });
 
+        builder.Services.AddHealthChecks();
+
         var app = builder.Build();
 
         app.UseSwagger();
@@ -45,7 +47,9 @@ public static class Program
         app.UseAuthorization();
 
         // Use CORS middleware
-        app.UseCors("AllowSpecificOrigin");
+        // app.UseCors("AllowSpecificOrigin");
+
+        app.UseHealthChecks("/api/health");
 
         app.MapControllers();
 
