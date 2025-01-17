@@ -54,8 +54,8 @@ public class RemoteTemplateExecutor : ITemplateExecutor
                     { "ARM_CLIENT_SECRET", new EnvironmentVariableValue(azureClientSecret, true) },
                     { "ARM_SUBSCRIPTION_ID", new EnvironmentVariableValue(azureSubscriptionId) },
                     { "ARM_TENANT_ID", new EnvironmentVariableValue(azureTenantId) },
-                    { "NEBULIFT_INPUTS", new EnvironmentVariableValue(inputString) }
-                }
+                    { "NEBULIFT_INPUTS", new EnvironmentVariableValue(inputString) },
+                },
             };
 
             var stack = await RemoteWorkspace.CreateOrSelectStackAsync(stackArgs);
