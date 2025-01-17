@@ -1,3 +1,6 @@
+using Nebulift.Api.Services;
+using Nebulift.Api.Types;
+
 namespace Nebulift.Api.Controllers
 {
     using System;
@@ -5,8 +8,6 @@ namespace Nebulift.Api.Controllers
     using System.Text.Json.Nodes;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Logging;
-    using Services;
-    using Types;
 
     /// <summary>
     /// Controller to handle Nebulift template requests.
@@ -55,8 +56,7 @@ namespace Nebulift.Api.Controllers
         public IActionResult GetTemplateInputsSchemaById(string id)
         {
             var templateInputsWrapped = _templateService.GetTemplateInputs(id);
-            _logger.LogInformation("Retrieving template {TemplateId} input schema : {InputSchema}", id,
-                templateInputsWrapped);
+            _logger.LogInformation("Retrieving template {TemplateId} input schema : {InputSchema}", id, templateInputsWrapped);
             return Ok(templateInputsWrapped.Content);
         }
 
@@ -74,6 +74,11 @@ namespace Nebulift.Api.Controllers
             var contentJson = JsonSerializer.Serialize(templateData);
 
             var contentObject = JsonSerializer.Deserialize<JsonObject>(contentJson);
+            if (contentObject == null)
+            {
+                return BadRequest("Invalid JSON object provided.");
+            }
+
             var templateInputs = new TemplateInputs(contentObject);
 
             await new RemoteTemplateExecutor().ExecuteTemplate(id, templateInputs);
