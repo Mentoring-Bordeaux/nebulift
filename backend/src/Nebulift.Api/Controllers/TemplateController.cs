@@ -76,8 +76,7 @@ namespace Nebulift.Api.Controllers
             var contentObject = JsonSerializer.Deserialize<JsonObject>(contentJson);
             var templateInputs = new TemplateInputs(contentObject);
 
-            // Get repositoryName, githubToken and pulumiUser from contentObject
-            await new GitHubTemplateExecutor().ExecuteTemplate(id, templateInputs);
+            await new RemoteTemplateExecutor().ExecuteTemplate(id, templateInputs);
             return Ok();
         }
     }

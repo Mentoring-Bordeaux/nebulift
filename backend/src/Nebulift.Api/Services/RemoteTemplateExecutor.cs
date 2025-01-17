@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 /// <summary>
 /// A local template service implementation for accessing and running templates stored in the Nebulift project repository.
 /// </summary>
-public class GitHubTemplateExecutor : ITemplateExecutor
+public class RemoteTemplateExecutor : ITemplateExecutor
 {
     public async Task<TemplateOutputs> ExecuteTemplate(string id, TemplateInputs inputs)
     {
@@ -40,7 +40,7 @@ public class GitHubTemplateExecutor : ITemplateExecutor
         {
             var stackName = $"{pulumiUser}/{id}/dev-{Guid.NewGuid().ToString("N").Substring(0, 8)}";
             const string url = "https://github.com/Mentoring-Bordeaux/nebulift.git";
-            
+
             var stackArgs = new RemoteGitProgramArgs(stackName, url)
             {
                 ProjectPath = "templates/" + id,
