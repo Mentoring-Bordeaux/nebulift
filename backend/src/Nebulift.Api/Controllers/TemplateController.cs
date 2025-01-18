@@ -56,7 +56,8 @@ namespace Nebulift.Api.Controllers
         public IActionResult GetTemplateInputsSchemaById(string id)
         {
             var templateInputsWrapped = _templateService.GetTemplateInputs(id);
-            _logger.LogInformation("Retrieving template {TemplateId} input schema : {InputSchema}", id, templateInputsWrapped);
+            _logger.LogInformation("Retrieving template {TemplateId} input schema : {InputSchema}", id,
+                templateInputsWrapped);
             return Ok(templateInputsWrapped.Content);
         }
 
@@ -79,10 +80,17 @@ namespace Nebulift.Api.Controllers
                 return BadRequest("Invalid JSON object provided.");
             }
 
+            var templateIdentity = _templateService.GetTemplateIdentity(id);
             var templateInputs = new TemplateInputs(contentObject);
 
-            await new RemoteTemplateExecutor().ExecuteTemplate(id, templateInputs);
-            return Ok();
+            var templateOutputs = await new RemoteTemplateExecutor().ExecuteTemplate(templateIdentity, templateInputs);
+
+            if (templateOutputs == null)
+            {
+                return BadRequest("Failed to execute template.");
+            }
+
+            return Ok(templateOutputs.ToString());
         }
     }
 }

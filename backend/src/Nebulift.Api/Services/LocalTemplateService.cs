@@ -141,12 +141,12 @@ public class LocalTemplateService : ITemplateService
     /// <summary>
     /// Executes a specific template with parameters.
     /// </summary>
-    /// <param name="id">The ID of the template to execute.</param>
+    /// <param name="identity">TemplateIdentity of the template to execute.</param>
     /// <param name="inputs">The template inputs.</param>
     /// <returns>The outputs of the template as a <see cref="TemplateOutputs"/>.</returns>
-    public Task<TemplateOutputs> ExecuteTemplate(string id, TemplateInputs inputs)
+    public Task<TemplateOutputs?> ExecuteTemplate(TemplateIdentity identity, TemplateInputs inputs)
     {
-        _logger.LogInformation("Executing template {TemplateId} with parameters {TemplateInputs}", id, inputs);
+        _logger.LogInformation("Executing template {TemplateId} with parameters {TemplateInputs}", identity, inputs);
 
         // Placeholder implementation
         throw new NotImplementedException();

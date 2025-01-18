@@ -10,8 +10,8 @@ public interface ITemplateExecutor
     /// <summary>
     /// Execute a template and returns its outputs.
     /// </summary>
-    /// <param name="id">The ID of the template to execute.</param>
+    /// <param name="identity">The TemplateIdentity of the template to execute.</param>
     /// <param name="inputs">The parameters to execute the template with (must comply to its inputs schema).</param>
     /// <returns>The outputs of the template as a <see cref="TemplateOutputs"/>.</returns>
-    public Task<TemplateOutputs> ExecuteTemplate(string id, TemplateInputs inputs);
+    public Task<TemplateOutputs?> ExecuteTemplate(TemplateIdentity identity, TemplateInputs inputs);
 }
