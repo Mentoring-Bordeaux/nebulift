@@ -35,7 +35,7 @@ new github.RepositoryFile("indexHtmlFile", {
 });
 
 // Export the repository URL
-export const repositoryUrl = repo.gitCloneUrl;
+export const repositoryUrl = repo.httpCloneUrl;
 
 // Create an Azure Resource Group
 const resourceGroup = new azure.resources.ResourceGroup("resourceGroup", {
