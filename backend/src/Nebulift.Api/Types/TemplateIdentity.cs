@@ -84,10 +84,19 @@ public readonly struct TemplateIdentity : IEquatable<TemplateIdentity>
         // Compare the Name properties
         bool nameEquals = string.Equals(Name, other.Name, StringComparison.Ordinal);
 
+        // Compare the Url properties
+        bool urlEquals = string.Equals(Url, other.Url, StringComparison.Ordinal);
+
+        // Compare the Path properties
+        bool pathEquals = string.Equals(Path, other.Path, StringComparison.Ordinal);
+
+        // Compare the Branch properties
+        bool branchEquals = string.Equals(Branch, other.Branch, StringComparison.Ordinal);
+
         // Compare the Technologies lists
         bool technologiesEquals = Enumerable.SequenceEqual(Technologies, other.Technologies);
 
-        return nameEquals && technologiesEquals;
+        return nameEquals && urlEquals && pathEquals && branchEquals && technologiesEquals;
     }
 
     /// <summary>
@@ -105,6 +114,9 @@ public readonly struct TemplateIdentity : IEquatable<TemplateIdentity>
     {
         // Use StringComparison.Ordinal for clarity and better performance
         int hash = Name?.GetHashCode(StringComparison.Ordinal) ?? 0;
+        hash = HashCode.Combine(hash, Url?.GetHashCode(StringComparison.Ordinal) ?? 0);
+        hash = HashCode.Combine(hash, Path?.GetHashCode(StringComparison.Ordinal) ?? 0);
+        hash = HashCode.Combine(hash, Branch?.GetHashCode(StringComparison.Ordinal) ?? 0);
 
         if (Technologies != null)
         {
