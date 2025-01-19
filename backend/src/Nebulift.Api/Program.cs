@@ -48,6 +48,7 @@ public static class Program
         catch (Exception e)
         {
             Console.WriteLine("Error while initializing template storage: " + e.Message);
+            return;
         }
 
         // Configure the HTTP request pipeline.
