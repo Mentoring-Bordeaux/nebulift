@@ -49,7 +49,7 @@ internal class MyStack : Stack
             ServerFarmId = appServicePlan.Id,
             SiteConfig = new SiteConfigArgs
             {
-                LinuxFxVersion = "DOCKER|nebulift-backend:latest"
+                LinuxFxVersion = "DOCKER|nebulift.azurecr.io/nebulift-backend:latest"
             },
         });
 
