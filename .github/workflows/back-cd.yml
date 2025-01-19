@@ -41,15 +41,27 @@ jobs:
         run: |
           az acr login --name ${{ env.AZURE_REGISTRY_NAME }}
 
+      # Get the latest image tag from the dev namespace
+      - name: Get Latest Image Tag
+        id: get-latest-tag
+        run: |
+          LATEST_TAG=$(az acr repository show-tags \
+            --name ${{ env.AZURE_REGISTRY_NAME }} \
+            --repository ${{ env.DEV_NAMESPACE }}/nebulift-backend \
+            --orderby time_desc \
+            --output tsv \
+            --top 1)
+          echo "LATEST_TAG=${LATEST_TAG}" >> $GITHUB_ENV
+
       # Pull the latest image from the dev namespace
       - name: Pull Latest Image from Dev
         run: |
-          docker pull ${{ vars.AZURE_REGISTRY_LOGIN_SERVER }}/${{ env.DEV_NAMESPACE }}/nebulift-backend:latest
+          docker pull ${{ vars.AZURE_REGISTRY_LOGIN_SERVER }}/${{ env.DEV_NAMESPACE }}/nebulift-backend:${{ env.LATEST_TAG }}
 
       # Tag the image for the prod namespace
       - name: Tag Image for Prod
         run: |
-          docker tag ${{ vars.AZURE_REGISTRY_LOGIN_SERVER }}/${{ env.DEV_NAMESPACE }}/nebulift-backend:latest \
+          docker tag ${{ vars.AZURE_REGISTRY_LOGIN_SERVER }}/${{ env.DEV_NAMESPACE }}/nebulift-backend:${{ env.LATEST_TAG }} \
           ${{ vars.AZURE_REGISTRY_LOGIN_SERVER }}/nebulift-backend:latest
 
       # Push the image to the prod namespace (deploys automatically)

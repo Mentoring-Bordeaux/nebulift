@@ -1,9 +1,6 @@
 name: Back CI
 
 on:
-  push:
-    branches:
-      - feature/*
   workflow_dispatch:
     inputs:
       environment:
