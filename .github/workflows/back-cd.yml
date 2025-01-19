@@ -23,6 +23,7 @@ jobs:
     env:
       AZURE_WEBAPP_NAME: ${{ vars.AZURE_WEBAPP_NAME }}
       DEV_NAMESPACE: dev
+      AZURE_REGISTRY_NAME: nebulift
 
     steps:
       - uses: actions/checkout@v4
