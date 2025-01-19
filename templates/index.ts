@@ -10,6 +10,7 @@ const resourceGroup = new azure.resources.ResourceGroup("resourceGroup", {
 // Create a Storage Account to save an index.html file
 const storageAccount = new azure.storage.StorageAccount("nebuliftstorage", {
     resourceGroupName: resourceGroup.name,
+    accountName: "nebuliftstorage",
     allowBlobPublicAccess: true,
     sku: {
         name: azure.storage.SkuName.Standard_LRS,

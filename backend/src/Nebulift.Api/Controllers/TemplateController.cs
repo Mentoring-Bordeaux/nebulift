@@ -16,17 +16,20 @@ namespace Nebulift.Api.Controllers
     [Route("api/templates")]
     public class TemplateController : ControllerBase
     {
-        private readonly ITemplateService _templateService;
+        private readonly ITemplateExecutor _executor;
+        private readonly ITemplateStorage _storage;
         private readonly ILogger<TemplateController> _logger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TemplateController"/> class.
         /// </summary>
-        /// <param name="templateService">An instance of <see cref="ITemplateService"/> to handle template data retrieval.</param>
+        /// <param name="executor">An instance of <see cref="ITemplateExecutor"/> to handle template execution.</param>
+        /// <param name="storage">An instance of <see cref="ITemplateStorage"/> to handle template data retrieval.</param>
         /// <param name="logger">An instance of <see cref="ILogger{TemplateController}"/> for logging.</param>
-        public TemplateController(ITemplateService templateService, ILogger<TemplateController> logger)
+        public TemplateController(ITemplateExecutor executor, ITemplateStorage storage, ILogger<TemplateController> logger)
         {
-            _templateService = templateService ?? throw new ArgumentNullException(nameof(templateService));
+            _executor = executor ?? throw new ArgumentNullException(nameof(executor));
+            _storage = storage ?? throw new ArgumentNullException(nameof(storage));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -39,7 +42,7 @@ namespace Nebulift.Api.Controllers
         [HttpGet]
         public IActionResult GetAllTemplates()
         {
-            var templates = _templateService.GetAllTemplateIdentities();
+            var templates = _storage.GetAllTemplateIdentities();
             _logger.LogInformation("Retrieving all template identities ({TemplateCount})", templates.Count);
             return Ok(templates);
         }
@@ -55,9 +58,8 @@ namespace Nebulift.Api.Controllers
         [HttpGet("{id}")]
         public IActionResult GetTemplateInputsSchemaById(string id)
         {
-            var templateInputsWrapped = _templateService.GetTemplateInputs(id);
-            _logger.LogInformation("Retrieving template {TemplateId} input schema : {InputSchema}", id,
-                templateInputsWrapped);
+            var templateInputsWrapped = _storage.GetTemplateInputs(id);
+            _logger.LogInformation("Retrieving template {TemplateId} input schema : {InputSchema}", id, templateInputsWrapped);
             return Ok(templateInputsWrapped.Content);
         }
 
@@ -80,10 +82,10 @@ namespace Nebulift.Api.Controllers
                 return BadRequest("Invalid JSON object provided.");
             }
 
-            var templateIdentity = _templateService.GetTemplateIdentity(id);
+            var templateIdentity = _storage.GetTemplateIdentity(id);
             var templateInputs = new TemplateInputs(contentObject);
 
-            var templateOutputs = await new RemoteTemplateExecutor().ExecuteTemplate(templateIdentity, templateInputs);
+            var templateOutputs = await _executor.ExecuteTemplate(templateIdentity, templateInputs);
 
             if (templateOutputs == null)
             {

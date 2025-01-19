@@ -11,7 +11,7 @@ using System.Text.Json.Nodes;
 /// <summary>
 /// A local template service implementation for accessing and running templates stored in the Nebulift project repository.
 /// </summary>
-public class LocalTemplateService : ITemplateService
+public class LocalTemplateService : ITemplateStorage
 {
     private readonly string _templatesFolderPath;
     private readonly ILogger<LocalTemplateService> _logger;
@@ -138,17 +138,17 @@ public class LocalTemplateService : ITemplateService
         }
     }
 
-    /// <summary>
-    /// Executes a specific template with parameters.
-    /// </summary>
-    /// <param name="identity">TemplateIdentity of the template to execute.</param>
-    /// <param name="inputs">The template inputs.</param>
-    /// <returns>The outputs of the template as a <see cref="TemplateOutputs"/>.</returns>
-    public Task<TemplateOutputs?> ExecuteTemplate(TemplateIdentity identity, TemplateInputs inputs)
-    {
-        _logger.LogInformation("Executing template {TemplateId} with parameters {TemplateInputs}", identity, inputs);
-
-        // Placeholder implementation
-        throw new NotImplementedException();
-    }
+    // /// <summary>
+    // /// Executes a specific template with parameters.
+    // /// </summary>
+    // /// <param name="identity">TemplateIdentity of the template to execute.</param>
+    // /// <param name="inputs">The template inputs.</param>
+    // /// <returns>The outputs of the template as a <see cref="TemplateOutputs"/>.</returns>
+    // public Task<TemplateOutputs?> ExecuteTemplate(TemplateIdentity identity, TemplateInputs inputs)
+    // {
+    //     _logger.LogInformation("Executing template {TemplateId} with parameters {TemplateInputs}", identity, inputs);
+    //
+    //     // Placeholder implementation
+    //     throw new NotImplementedException();
+    // }
 }
