@@ -39,7 +39,7 @@ jobs:
       # Log in to ACR
       - name: Log in to Azure Container Registry
         run: |
-          az acr login --name ${{ vars.AZURE_REGISTRY_NAME }}
+          az acr login --name ${{ env.AZURE_REGISTRY_NAME }}
 
       # Pull the latest image from the dev namespace
       - name: Pull Latest Image from Dev
