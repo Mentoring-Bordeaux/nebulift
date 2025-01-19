@@ -18,10 +18,11 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    name: Build and Deploy
+    name: Docker pull from dev to prod registry
     environment: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'production' }}
     env:
       AZURE_WEBAPP_NAME: ${{ vars.AZURE_WEBAPP_NAME }}
+      DEV_NAMESPACE: dev
 
     steps:
       - uses: actions/checkout@v4
@@ -34,9 +35,23 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      # Deploy to Azure Web App
-      - name: Deploy backend to Azure Web App
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          images: ${{ vars.AZURE_REGISTRY_LOGIN_SERVER }}/nebulift-backend:latest
+      # Log in to ACR
+      - name: Log in to Azure Container Registry
+        run: |
+          az acr login --name ${{ vars.AZURE_REGISTRY_NAME }}
+
+      # Pull the latest image from the dev namespace
+      - name: Pull Latest Image from Dev
+        run: |
+          docker pull ${{ vars.AZURE_REGISTRY_LOGIN_SERVER }}/${{ env.DEV_NAMESPACE }}/nebulift-backend:latest
+
+      # Tag the image for the prod namespace
+      - name: Tag Image for Prod
+        run: |
+          docker tag ${{ vars.AZURE_REGISTRY_LOGIN_SERVER }}/${{ env.DEV_NAMESPACE }}/nebulift-backend:latest \
+          ${{ vars.AZURE_REGISTRY_LOGIN_SERVER }}/nebulift-backend:latest
+
+      # Push the image to the prod namespace (deploys automatically)
+      - name: Push Image to Prod
+        run: |
+          docker push ${{ vars.AZURE_REGISTRY_LOGIN_SERVER }}/nebulift-backend:latest
