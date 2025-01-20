@@ -5,8 +5,6 @@ using Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.IO;
-using System.Text.Json;
-using System.Text.Json.Nodes;
 using System.Xml;
 
 /// <summary>
@@ -27,7 +25,7 @@ public sealed class RemoteTemplateStorage : ITemplateStorage, IDisposable
     /// </summary>
     /// <param name="options">The options containing the folder path where template data is stored.</param>
     /// <param name="logger">An instance of <see cref="ILogger{RemoteTemplateStorage}"/> for logging.</param>
-    public RemoteTemplateStorage(IOptions<RemoteTemplateStorageOptions> options, ILogger<RemoteTemplateStorage> logger)
+    public RemoteTemplateStorage(IOptions<RemoteTemplateServiceOptions> options, ILogger<RemoteTemplateStorage> logger)
     {
         string rootUrl = options == null
             ? throw new ArgumentNullException(nameof(options))
@@ -37,7 +35,8 @@ public sealed class RemoteTemplateStorage : ITemplateStorage, IDisposable
 
         // Fetch everything directly, avoid making multiple requests
         _logger.LogInformation("Fetching all template data from URL: {RootUrl}", _rootUrl);
-        InitData();
+
+        _ = InitData();
     }
 
     /// <summary>
@@ -98,49 +97,7 @@ public sealed class RemoteTemplateStorage : ITemplateStorage, IDisposable
         Dispose(true);
     }
 
-    private static TemplateIdentity ParseIdentity(JsonElement element)
-    {
-        var name = element.GetProperty("name").GetString() ?? throw new ArgumentNullException(nameof(element));
-        var technologies = element.GetProperty("technologies").EnumerateArray().Select(x => x.ToString()).ToList();
-
-        return new TemplateIdentity(name, technologies);
-    }
-
-    private static TemplateCodeReference ParseCodeReference(JsonElement element)
-    {
-        var url = element.GetProperty("url").GetString() ?? throw new ArgumentNullException(nameof(element));
-        var path = element.GetProperty("path").GetString() ?? throw new ArgumentNullException(nameof(element));
-        var branch = element.GetProperty("branch").GetString() ?? throw new ArgumentNullException(nameof(element));
-        return new TemplateCodeReference(new Uri(url), path, branch);
-    }
-
-    private static TemplateInputs ParseInputs(JsonElement element)
-    {
-        var jsonObject = JsonNode.Parse(element.GetRawText()) as JsonObject ??
-                         throw new ArgumentException("Invalid JSON element");
-        return new TemplateInputs(jsonObject);
-    }
-
-    private async Task<JsonElement> ParseFile(string templateName, string fileUrl)
-    {
-        var url = new Uri(_rootUrl, $"{_rootUrl.AbsolutePath.TrimEnd('/')}/{templateName}/{fileUrl}");
-        try
-        {
-            var response = await _client.GetAsync(url);
-            response.EnsureSuccessStatusCode();
-            var content = await response.Content.ReadAsStringAsync();
-
-            JsonDocument doc = JsonDocument.Parse(content);
-
-            return doc.RootElement;
-        }
-        catch (HttpRequestException)
-        {
-            throw new FileNotFoundException($"File {fileUrl} not found for template {templateName}");
-        }
-    }
-
-    private async void InitData()
+    private async Task InitData()
     {
         var listUri = new Uri(_rootUrl, $"{_rootUrl.AbsolutePath.TrimEnd('/')}/?comp=list&delimiter=/");
 
@@ -158,11 +115,11 @@ public sealed class RemoteTemplateStorage : ITemplateStorage, IDisposable
 
             try
             {
-                var identityFile = await ParseFile(templateName, "identity.json");
-                var inputsFile = await ParseFile(templateName, "inputs.json");
+                var identityFile = await BlobFileReader.ParseFile(templateName, _rootUrl, "identity.json");
+                var inputsFile = await BlobFileReader.ParseFile(templateName, _rootUrl, "inputs.json");
 
-                var identity = ParseIdentity(identityFile);
-                var inputs = ParseInputs(inputsFile);
+                var identity = BlobFileReader.ParseIdentity(identityFile);
+                var inputs = BlobFileReader.ParseInputs(inputsFile);
 
                 _templatesData.Add(identity.Name, new TemplateData(identity, inputs));
                 _logger.LogInformation("Successfully parsed template {TemplateId}", templateName);

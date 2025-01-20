@@ -6,26 +6,38 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Xml;
+using Configuration;
 using Exceptions;
+using Microsoft.Extensions.Options;
 using Templates;
 
 /// <summary>
 /// Runs templates remotely (using a GitHub repository) with Pulumi Automation.
 /// </summary>
-public class RemoteTemplateExecutor : ITemplateExecutor
+public class RemoteTemplateExecutor : ITemplateExecutor, IDisposable
 {
     private static readonly JsonSerializerOptions _serializerOptions = new () { WriteIndented = true };
-    private readonly ILogger<RemoteTemplateExecutor> _logger;
 
+    private readonly ILogger<RemoteTemplateExecutor> _logger;
     private readonly Dictionary<string, TemplateCodeReference> _templatesRefs = new ();
+    private readonly Uri _rootUrl;
+    private readonly HttpClient _client = new ();
+    private bool _disposed;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RemoteTemplateExecutor"/> class.
     /// </summary>
     /// <param name="logger"> An instance of type <see cref="ILogger{RemoteTemplateExecutor}"/> for logging.</param>
-    public RemoteTemplateExecutor(ILogger<RemoteTemplateExecutor> logger)
+    public RemoteTemplateExecutor(IOptions<RemoteTemplateServiceOptions> options, ILogger<RemoteTemplateExecutor> logger)
     {
+        string rootUrl = options == null
+            ? throw new ArgumentNullException(nameof(options))
+            : options.Value.TemplatesRootUrl ?? throw new ArgumentNullException(nameof(options));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _rootUrl = new Uri(rootUrl.TrimEnd('/'));
+
+        _ = InitData();
     }
 
     /// <summary>
@@ -86,7 +98,7 @@ public class RemoteTemplateExecutor : ITemplateExecutor
 
         if (upResult.Summary.Result != UpdateState.Succeeded)
         {
-            String errorMessage = "Error: Update failed. Full update result:\n" + Serialize(upResult);
+            string errorMessage = "Error: Update failed. Full update result:\n" + Serialize(upResult);
             throw new FailedTemplateExecutionException(errorMessage);
         }
 
@@ -100,8 +112,73 @@ public class RemoteTemplateExecutor : ITemplateExecutor
         return new TemplateOutputs(outputDict);
     }
 
+    private async Task InitData()
+    {
+        var listUri = new Uri(_rootUrl, $"{_rootUrl.AbsolutePath.TrimEnd('/')}/?comp=list&delimiter=/");
+
+        var response = await _client.GetAsync(listUri);
+        response.EnsureSuccessStatusCode();
+        var content = await response.Content.ReadAsStringAsync();
+
+        var doc = new XmlDocument();
+        doc.LoadXml(content);
+        XmlNodeList blobs = doc.GetElementsByTagName("Name");
+        foreach (XmlNode template in blobs)
+        {
+            string templateName = template.InnerText.TrimEnd('/');
+            _logger.LogInformation("Found template: {BlobName}", templateName);
+
+            try
+            {
+                var identityFile = await BlobFileReader.ParseFile(templateName, _rootUrl, "identity.json");
+                var refFile = await BlobFileReader.ParseFile(templateName, _rootUrl, "coderef.json");
+
+                var identity = BlobFileReader.ParseIdentity(identityFile);
+                var codeReference = BlobFileReader.ParseCodeReference(refFile);
+
+                _templatesRefs.Add(identity.Name, codeReference);
+                _logger.LogInformation("Successfully parsed template {TemplateId}", templateName);
+            }
+            catch (FileNotFoundException e)
+            {
+                _logger.LogWarning(e, "Template {TemplateId} does not have all required files", templateName);
+            }
+            catch (ArgumentNullException e)
+            {
+                _logger.LogError(e, "Error parsing template {TemplateId}", templateName);
+            }
+        }
+    }
+
     private static string Serialize(object node)
     {
         return JsonSerializer.Serialize(node, _serializerOptions);
+    }
+
+    /// <summary>
+    /// Necessary for implementing the <see cref="IDisposable"/> interface.
+    /// </summary>
+    /// <param name="disposing">Whether the object is being disposed.</param>
+    private void Dispose(bool disposing)
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        if (disposing)
+        {
+            _client.Dispose();
+        }
+
+        _disposed = true;
+    }
+
+    /// <summary>
+    /// Cleans up the resources used by the <see cref="RemoteTemplateStorage"/>.
+    /// </summary>
+    public void Dispose()
+    {
+        Dispose(true);
     }
 }

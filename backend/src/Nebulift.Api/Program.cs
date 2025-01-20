@@ -18,7 +18,7 @@ public static class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-        builder.Services.Configure<RemoteTemplateStorageOptions>(
+        builder.Services.Configure<RemoteTemplateServiceOptions>(
             builder.Configuration.GetSection("RemoteTemplateStorageOptions"));
         builder.Services.AddSingleton<ITemplateStorage, RemoteTemplateStorage>();
         builder.Services.AddScoped<ITemplateExecutor, RemoteTemplateExecutor>();
