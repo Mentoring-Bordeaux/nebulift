@@ -31,7 +31,7 @@ export const filesLocation = pulumi.interpolate`https://${storageAccount.name}.b
 
 
 // For every folder in current directory, if it contains a Pulumi.yaml file, upload json files to storage account
-const toUpload = ["inputs.json", "outputs.json", "identity.json"];
+const toUpload = ["inputs.json", "outputs.json", "identity.json", "coderef.json"];
 for (const folder of fs.readdirSync(".")) {
     if (!fs.lstatSync(folder).isDirectory()) continue;
     if (!fs.existsSync(`${folder}/Pulumi.yaml`)) continue;
