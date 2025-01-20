@@ -13,6 +13,16 @@ using System.Threading.Tasks;
 public class RemoteTemplateExecutor : ITemplateExecutor
 {
     private static readonly JsonSerializerOptions _serializerOptions = new () { WriteIndented = true };
+    private readonly ILogger<RemoteTemplateExecutor> _logger;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="RemoteTemplateExecutor"/> class.
+    /// </summary>
+    /// <param name="logger"> An instance of type <see cref="ILogger{RemoteTemplateExecutor}"/> for logging.</param>
+    public RemoteTemplateExecutor(ILogger<RemoteTemplateExecutor> logger)
+    {
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
 
     /// <summary>
     /// Main method to execute a template, stored in a given GitHub repository.
@@ -24,7 +34,7 @@ public class RemoteTemplateExecutor : ITemplateExecutor
     /// </returns>
     public async Task<TemplateOutputs?> ExecuteTemplate(TemplateIdentity identity, TemplateInputs inputs)
     {
-        Console.WriteLine("Executing template with ID: " + identity.Name);
+        _logger.LogInformation("Executing template with ID: {TemplateName}", identity.Name);
         var inputNode = inputs.Content["templateData"]?["inputs"];
         var inputString = Serialize(inputNode);
 
@@ -38,7 +48,7 @@ public class RemoteTemplateExecutor : ITemplateExecutor
 
         if (pulumiUser == null || githubToken == null)
         {
-            Console.WriteLine("Error: Missing required fields in the template inputs.");
+            _logger.LogWarning("Error: Missing required fields in the template inputs.");
             return null;
         }
 
@@ -62,13 +72,13 @@ public class RemoteTemplateExecutor : ITemplateExecutor
 
         var stack = await RemoteWorkspace.CreateStackAsync(stackArgs);
 
-        Console.WriteLine($"Pulumi deployment URL: https://app.pulumi.com/{stackName}/deployments/1");
+        _logger.LogInformation("Pulumi deployment URL: https://app.pulumi.com/{StackName}/deployments/1", stackName);
 
         var upResult = await stack.UpAsync();
 
         if (upResult.Summary.Result != UpdateState.Succeeded)
         {
-            Console.WriteLine("Error: Update failed. Full update result:\n" + Serialize(upResult));
+            _logger.LogError("Error: Update failed. Full update result:\n{UpdateResult}", Serialize(upResult));
             return null;
         }
 
@@ -76,7 +86,7 @@ public class RemoteTemplateExecutor : ITemplateExecutor
         foreach (var output in upResult.Outputs)
         {
             outputDict[output.Key] = $"{output.Value.Value}";
-            Console.WriteLine($"Output: {output.Key} = {output.Value.Value}");
+            _logger.LogInformation("Output: {Key} = {Value}", output.Key, output.Value.Value);
         }
 
         return new TemplateOutputs(outputDict);

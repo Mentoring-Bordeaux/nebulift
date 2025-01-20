@@ -5,29 +5,20 @@ import * as fs from "fs";
 // Create an Azure Resource Group
 const resourceGroup = new azure.resources.ResourceGroup("resourceGroup", {
     location: "WestEurope",
+    resourceGroupName: "template-rg",
 });
 
 // Create a Storage Account to save an index.html file
-const storageAccount = new azure.storage.StorageAccount("nebuliftstorage", {
+const storageAccount = new azure.storage.StorageAccount("templatestorage", {
     resourceGroupName: resourceGroup.name,
-    accountName: "nebuliftstorage",
+    accountName: "nebulifttemplatestorage",
     allowBlobPublicAccess: true,
     sku: {
         name: azure.storage.SkuName.Standard_LRS,
     },
     kind: azure.storage.Kind.StorageV2,
+    location: resourceGroup.location,
 });
-
-// Enable static website hosting on the Storage Account
-new azure.storage.StorageAccountStaticWebsite(
-    "staticWebsite",
-    {
-        accountName: storageAccount.name,
-        resourceGroupName: resourceGroup.name,
-        indexDocument: "index.html",
-        error404Document: "404.html",
-    }
-);
 
 // Create a blob container for static website files
 const blobContainer = new azure.storage.BlobContainer("template-data", {
