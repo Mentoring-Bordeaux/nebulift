@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Exceptions;
+using Templates;
 
 /// <summary>
 /// Runs templates remotely (using a GitHub repository) with Pulumi Automation.
@@ -55,8 +57,7 @@ public class RemoteTemplateExecutor : ITemplateExecutor
 
         if (pulumiUser == null || githubToken == null)
         {
-            _logger.LogWarning("Error: Missing required fields in the template inputs.");
-            return null;
+            throw new MissingInputsException("Missing required inputs: pulumiUser and/or githubToken");
         }
 
         var stackName = $"{pulumiUser}/{id}/dev-{Guid.NewGuid().ToString("N")[..8]}";
@@ -85,8 +86,8 @@ public class RemoteTemplateExecutor : ITemplateExecutor
 
         if (upResult.Summary.Result != UpdateState.Succeeded)
         {
-            _logger.LogError("Error: Update failed. Full update result:\n{UpdateResult}", Serialize(upResult));
-            return null;
+            String errorMessage = "Error: Update failed. Full update result:\n" + Serialize(upResult);
+            throw new FailedTemplateExecutionException(errorMessage);
         }
 
         var outputDict = new Dictionary<string, string>();

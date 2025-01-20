@@ -1,4 +1,4 @@
-namespace Nebulift.Api.Services;
+namespace Nebulift.Api.Templates;
 
 using Types;
 

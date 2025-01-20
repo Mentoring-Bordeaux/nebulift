@@ -1,7 +1,10 @@
 namespace Nebulift.Api;
 
+using Middleware;
+using Templates;
 using Configuration;
 using Services;
+using Services.Blob;
 
 /// <summary>
 /// Main program for Nebulift backend.
@@ -24,6 +27,7 @@ public static class Program
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
+        builder.Services.AddTransient<ExceptionMiddleware>();
 
         // Add logging services (ILogger)
         builder.Services.AddLogging();
@@ -63,6 +67,9 @@ public static class Program
 
         // Use CORS middleware
         app.UseCors("AllowSpecificOrigin");
+
+        // Use custom exception middleware
+        app.UseMiddleware<ExceptionMiddleware>();
 
         app.MapControllers();
 
