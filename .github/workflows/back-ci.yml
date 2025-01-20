@@ -1,0 +1,39 @@
+name: Back CI
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment'
+        type: string
+        required: true
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    name: Docker build and push
+    environment: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'production' }}
+    env:
+      AZURE_WEBAPP_PACKAGE_PATH: './backend/'
+      
+    steps:
+      # Checkout repository
+      - uses: actions/checkout@v4
+
+      # Log in to Azure Container Registry
+      - name: Login to Azure Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ vars.AZURE_REGISTRY_LOGIN_SERVER }}
+          username: ${{ secrets.AZURE_REGISTRY_USERNAME }}
+          password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
+
+      # Build Backend Docker Image
+      - name: Build Backend Docker Image
+        run: |
+          docker build -t ${{ vars.AZURE_REGISTRY_LOGIN_SERVER }}/nebulift-backend:${{ github.sha }} ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+
+      # Push Backend Docker Image to Azure
+      - name: Push Backend Docker Image
+        run: |
+          docker push ${{ vars.AZURE_REGISTRY_LOGIN_SERVER }}/nebulift-backend:${{ github.sha }}

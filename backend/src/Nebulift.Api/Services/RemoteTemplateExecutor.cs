@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Templates;
 
 /// <summary>
 /// Runs templates remotely (using a GitHub repository) with Pulumi Automation.
