@@ -1,4 +1,4 @@
-namespace Nebulift.Api.Services;
+namespace Nebulift.Api.Services.Blob;
 
 using Types;
 using Pulumi.Automation;

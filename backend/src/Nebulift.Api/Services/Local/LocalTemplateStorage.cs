@@ -1,4 +1,4 @@
-namespace Nebulift.Api.Services;
+namespace Nebulift.Api.Services.Local;
 
 using Types;
 using Configuration;
