@@ -14,6 +14,8 @@ using System.Xml;
 /// </summary>
 public sealed class RemoteTemplateStorage : ITemplateStorage, IDisposable
 {
+    private record TemplateData(TemplateIdentity identity, TemplateInputs inputs);
+
     private readonly ILogger<RemoteTemplateStorage> _logger;
     private readonly Dictionary<string, TemplateData> _templatesData = new ();
     private readonly Uri _rootUrl;
@@ -99,12 +101,17 @@ public sealed class RemoteTemplateStorage : ITemplateStorage, IDisposable
     private static TemplateIdentity ParseIdentity(JsonElement element)
     {
         var name = element.GetProperty("name").GetString() ?? throw new ArgumentNullException(nameof(element));
+        var technologies = element.GetProperty("technologies").EnumerateArray().Select(x => x.ToString()).ToList();
+
+        return new TemplateIdentity(name, technologies);
+    }
+
+    private static TemplateCodeReference ParseCodeReference(JsonElement element)
+    {
         var url = element.GetProperty("url").GetString() ?? throw new ArgumentNullException(nameof(element));
         var path = element.GetProperty("path").GetString() ?? throw new ArgumentNullException(nameof(element));
         var branch = element.GetProperty("branch").GetString() ?? throw new ArgumentNullException(nameof(element));
-        var technologies = element.GetProperty("technologies").EnumerateArray().Select(x => x.ToString()).ToList();
-
-        return new TemplateIdentity(name, url, path, branch, technologies);
+        return new TemplateCodeReference(new Uri(url), path, branch);
     }
 
     private static TemplateInputs ParseInputs(JsonElement element)

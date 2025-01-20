@@ -11,17 +11,17 @@ using System.Text.Json.Nodes;
 /// <summary>
 /// A local template service implementation for accessing and running templates stored in the Nebulift project repository.
 /// </summary>
-public class LocalTemplateService : ITemplateStorage
+public class LocalTemplateStorage : ITemplateStorage
 {
     private readonly string _templatesFolderPath;
-    private readonly ILogger<LocalTemplateService> _logger;
+    private readonly ILogger<LocalTemplateStorage> _logger;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="LocalTemplateService"/> class with a specified 'templates' folder.
+    /// Initializes a new instance of the <see cref="LocalTemplateStorage"/> class with a specified 'templates' folder.
     /// </summary>
     /// <param name="options">The options containing the folder path where template data is stored.</param>
     /// <param name="logger">An instance of <see cref="ILogger{LocalTemplateService}"/> for logging.</param>
-    public LocalTemplateService(IOptions<LocalTemplateServiceOptions> options, ILogger<LocalTemplateService> logger)
+    public LocalTemplateStorage(IOptions<LocalTemplateServiceOptions> options, ILogger<LocalTemplateStorage> logger)
     {
         _templatesFolderPath = options == null
             ? throw new ArgumentNullException(nameof(options))

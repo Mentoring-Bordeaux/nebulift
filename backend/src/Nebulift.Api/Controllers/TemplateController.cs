@@ -82,10 +82,9 @@ namespace Nebulift.Api.Controllers
                 return BadRequest("Invalid JSON object provided.");
             }
 
-            var templateIdentity = _storage.GetTemplateIdentity(id);
             var templateInputs = new TemplateInputs(contentObject);
 
-            var templateOutputs = await _executor.ExecuteTemplate(templateIdentity, templateInputs);
+            var templateOutputs = await _executor.ExecuteTemplate(id, templateInputs);
 
             if (templateOutputs == null)
             {

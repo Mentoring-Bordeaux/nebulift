@@ -14,17 +14,11 @@ public readonly struct TemplateIdentity : IEquatable<TemplateIdentity>
     /// Initializes a new instance of the <see cref="TemplateIdentity"/> struct.
     /// </summary>
     /// <param name="name">The name of the template identity.</param>
-    /// <param name="url">The GitHub URL of the repository containing the template.</param>
-    /// <param name="path">The path to the template within the repository (should contain the Pulumi code).</param>
-    /// <param name="branch">The branch of the repository to use for the template.</param>
     /// <param name="technologies">The list of technologies associated with the identity.</param>
     [JsonConstructor]
-    public TemplateIdentity(string name, string url, string path, string branch, IEnumerable<string> technologies)
+    public TemplateIdentity(string name, IEnumerable<string> technologies)
     {
         Name = name ?? throw new ArgumentNullException(nameof(name));
-        Url = url ?? throw new ArgumentNullException(nameof(url));
-        Path = path ?? throw new ArgumentNullException(nameof(path));
-        Branch = branch ?? throw new ArgumentNullException(nameof(branch));
         Technologies = technologies ?? throw new ArgumentNullException(nameof(technologies));
     }
 
@@ -33,24 +27,6 @@ public readonly struct TemplateIdentity : IEquatable<TemplateIdentity>
     /// </summary>
     [JsonPropertyName("name")]
     public string Name { get; }
-
-    /// <summary>
-    /// Gets the GitHub URL of the repository containing the template.
-    /// </summary>
-    [JsonPropertyName("url")]
-    public string Url { get; }
-
-    /// <summary>
-    /// Gets the path to the template within the repository (should contain the Pulumi code).
-    /// </summary>
-    [JsonPropertyName("path")]
-    public string Path { get; }
-
-    /// <summary>
-    /// Gets the branch of the repository to use for the template.
-    /// </summary>
-    [JsonPropertyName("branch")]
-    public string Branch { get; }
 
     /// <summary>
     /// Gets the list of technologies associated with the identity.
@@ -84,19 +60,10 @@ public readonly struct TemplateIdentity : IEquatable<TemplateIdentity>
         // Compare the Name properties
         bool nameEquals = string.Equals(Name, other.Name, StringComparison.Ordinal);
 
-        // Compare the Url properties
-        bool urlEquals = string.Equals(Url, other.Url, StringComparison.Ordinal);
-
-        // Compare the Path properties
-        bool pathEquals = string.Equals(Path, other.Path, StringComparison.Ordinal);
-
-        // Compare the Branch properties
-        bool branchEquals = string.Equals(Branch, other.Branch, StringComparison.Ordinal);
-
         // Compare the Technologies lists
         bool technologiesEquals = Enumerable.SequenceEqual(Technologies, other.Technologies);
 
-        return nameEquals && urlEquals && pathEquals && branchEquals && technologiesEquals;
+        return nameEquals && technologiesEquals;
     }
 
     /// <summary>
@@ -114,9 +81,6 @@ public readonly struct TemplateIdentity : IEquatable<TemplateIdentity>
     {
         // Use StringComparison.Ordinal for clarity and better performance
         int hash = Name?.GetHashCode(StringComparison.Ordinal) ?? 0;
-        hash = HashCode.Combine(hash, Url?.GetHashCode(StringComparison.Ordinal) ?? 0);
-        hash = HashCode.Combine(hash, Path?.GetHashCode(StringComparison.Ordinal) ?? 0);
-        hash = HashCode.Combine(hash, Branch?.GetHashCode(StringComparison.Ordinal) ?? 0);
 
         if (Technologies != null)
         {
@@ -139,6 +103,6 @@ public readonly struct TemplateIdentity : IEquatable<TemplateIdentity>
             ? string.Join(", ", Technologies)
             : string.Empty;
 
-        return $"Name: {Name}, URL: {Url}, Path: {Path}, Branch: {Branch}, Technologies: {technologies}";
+        return $"Name: {Name}, Technologies: {technologies}";
     }
 }

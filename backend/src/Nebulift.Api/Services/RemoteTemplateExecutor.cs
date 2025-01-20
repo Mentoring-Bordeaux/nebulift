@@ -15,6 +15,8 @@ public class RemoteTemplateExecutor : ITemplateExecutor
     private static readonly JsonSerializerOptions _serializerOptions = new () { WriteIndented = true };
     private readonly ILogger<RemoteTemplateExecutor> _logger;
 
+    private readonly Dictionary<string, TemplateCodeReference> _templatesRefs = new ();
+
     /// <summary>
     /// Initializes a new instance of the <see cref="RemoteTemplateExecutor"/> class.
     /// </summary>
@@ -27,14 +29,19 @@ public class RemoteTemplateExecutor : ITemplateExecutor
     /// <summary>
     /// Main method to execute a template, stored in a given GitHub repository.
     /// </summary>
-    /// <param name="identity">The identity of the template to execute.</param>
+    /// <param name="id">The id of the template to execute.</param>
     /// <param name="inputs">The inputs to the template.</param>
     /// <returns>
     /// The outputs of the template execution, or <c>null</c> if the execution failed.
     /// </returns>
-    public async Task<TemplateOutputs?> ExecuteTemplate(TemplateIdentity identity, TemplateInputs inputs)
+    public async Task<TemplateOutputs?> ExecuteTemplate(string id, TemplateInputs inputs)
     {
-        _logger.LogInformation("Executing template with ID: {TemplateName}", identity.Name);
+        _logger.LogInformation("Executing template with ID: {Id}", id);
+        if (_templatesRefs.TryGetValue(id, out TemplateCodeReference templateCodeReference))
+        {
+            throw new FileNotFoundException($"Inputs {id} not found");
+        }
+
         var inputNode = inputs.Content["templateData"]?["inputs"];
         var inputString = Serialize(inputNode);
 
@@ -52,12 +59,12 @@ public class RemoteTemplateExecutor : ITemplateExecutor
             return null;
         }
 
-        var stackName = $"{pulumiUser}/{identity.Name}/dev-{Guid.NewGuid().ToString("N")[..8]}";
+        var stackName = $"{pulumiUser}/{id}/dev-{Guid.NewGuid().ToString("N")[..8]}";
 
-        var stackArgs = new RemoteGitProgramArgs(stackName, identity.Url)
+        var stackArgs = new RemoteGitProgramArgs(stackName, templateCodeReference.Url.ToString())
         {
-            ProjectPath = identity.Path,
-            Branch = identity.Branch,
+            ProjectPath = templateCodeReference.Path,
+            Branch = templateCodeReference.Branch,
             Auth = new RemoteGitAuthArgs { PersonalAccessToken = githubToken },
             EnvironmentVariables = new Dictionary<string, EnvironmentVariableValue>
             {
