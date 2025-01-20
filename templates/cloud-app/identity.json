@@ -1,7 +1,4 @@
 {
     "name" : "cloud-app",
-    "url": "https://github.com/Mentoring-Bordeaux/nebulift.git",
-    "path": "templates/cloud-app",
-    "branch": "feature/template-execution",
     "technologies" : ["HTML", "GitHub", "Azure"]
 }
