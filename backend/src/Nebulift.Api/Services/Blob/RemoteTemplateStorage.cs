@@ -1,5 +1,6 @@
 namespace Nebulift.Api.Services.Blob;
 
+using System.Collections.Concurrent;
 using Types;
 using Configuration;
 using Microsoft.Extensions.Logging;
@@ -15,7 +16,7 @@ public sealed class RemoteTemplateStorage : ITemplateStorage, IDisposable
     private record TemplateData(TemplateIdentity identity, TemplateInputs inputs, TemplateCodeReference coderef);
 
     private readonly ILogger<RemoteTemplateStorage> _logger;
-    private readonly Dictionary<string, TemplateData> _templatesData = new ();
+    private readonly ConcurrentDictionary<string, TemplateData> _templatesData = new ();
     private readonly Uri _rootUrl;
     private readonly HttpClient _client = new ();
     private bool _disposed;
@@ -149,10 +150,15 @@ public sealed class RemoteTemplateStorage : ITemplateStorage, IDisposable
                 var identity = BlobFileReader.ParseIdentity(identityFile);
                 var inputs = BlobFileReader.ParseInputs(inputsFile);
                 var codeReference = BlobFileReader.ParseCodeReference(refFile);
-                _logger.LogInformation("Code ref is ${CodeReference}", codeReference);
 
-                _templatesData.Add(identity.Name, new TemplateData(identity, inputs, codeReference));
-                _logger.LogInformation("Storage : Successfully parsed template {TemplateId}", templateName);
+                if (!_templatesData.TryAdd(identity.Name, new TemplateData(identity, inputs, codeReference)))
+                {
+                    _logger.LogWarning("Storage : Template {TemplateId} already exists and was not overwritten.", identity.Name);
+                }
+                else
+                {
+                    _logger.LogInformation("Storage : Successfully loaded template {TemplateId}", templateName);
+                }
             }
             catch (FileNotFoundException e)
             {
