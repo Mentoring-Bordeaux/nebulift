@@ -1,12 +1,11 @@
 namespace Nebulift.Api.Services.Blob;
 
+using System.Collections.Concurrent;
 using Types;
 using Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.IO;
-using System.Text.Json;
-using System.Text.Json.Nodes;
 using System.Xml;
 
 /// <summary>
@@ -14,10 +13,10 @@ using System.Xml;
 /// </summary>
 public sealed class RemoteTemplateStorage : ITemplateStorage, IDisposable
 {
-    private record TemplateData(TemplateIdentity identity, TemplateInputs inputs);
+    private record TemplateData(TemplateIdentity identity, TemplateInputs inputs, TemplateCodeReference coderef);
 
     private readonly ILogger<RemoteTemplateStorage> _logger;
-    private readonly Dictionary<string, TemplateData> _templatesData = new ();
+    private readonly ConcurrentDictionary<string, TemplateData> _templatesData = new ();
     private readonly Uri _rootUrl;
     private readonly HttpClient _client = new ();
     private bool _disposed;
@@ -27,7 +26,7 @@ public sealed class RemoteTemplateStorage : ITemplateStorage, IDisposable
     /// </summary>
     /// <param name="options">The options containing the folder path where template data is stored.</param>
     /// <param name="logger">An instance of <see cref="ILogger{RemoteTemplateStorage}"/> for logging.</param>
-    public RemoteTemplateStorage(IOptions<RemoteTemplateStorageOptions> options, ILogger<RemoteTemplateStorage> logger)
+    public RemoteTemplateStorage(IOptions<RemoteTemplateServiceOptions> options, ILogger<RemoteTemplateStorage> logger)
     {
         string rootUrl = options == null
             ? throw new ArgumentNullException(nameof(options))
@@ -37,7 +36,35 @@ public sealed class RemoteTemplateStorage : ITemplateStorage, IDisposable
 
         // Fetch everything directly, avoid making multiple requests
         _logger.LogInformation("Fetching all template data from URL: {RootUrl}", _rootUrl);
-        InitData();
+
+        _ = InitData();
+    }
+
+    /// <summary>
+    /// Retrieves the coderef of a given template.
+    /// </summary>
+    /// <param name="id">The ID of the template.</param>
+    /// <returns>The coderef of the template as a <see cref="TemplateCodeReference"/>.</returns>
+    /// <exception cref="FileNotFoundException">
+    /// Thrown if any of the coderef file is not found at the expected paths.
+    /// </exception>
+    public TemplateCodeReference GetTemplateCodeReference(string id)
+    {
+        _logger.LogInformation("Try to get {Id} from {Coderef}", id, _templatesData);
+
+        if (!_templatesData.TryGetValue(id, out TemplateData? tdata))
+        {
+            _logger.LogError("Template data of {Id} not found", id);
+            throw new FileNotFoundException($"Template data of {id} not found");
+        }
+
+        if (tdata == null)
+        {
+            _logger.LogError("Template data of {Id} is null", id);
+            throw new FileNotFoundException($"Template data of {id} is null");
+        }
+
+        return tdata.coderef;
     }
 
     /// <summary>
@@ -98,49 +125,7 @@ public sealed class RemoteTemplateStorage : ITemplateStorage, IDisposable
         Dispose(true);
     }
 
-    private static TemplateIdentity ParseIdentity(JsonElement element)
-    {
-        var name = element.GetProperty("name").GetString() ?? throw new ArgumentNullException(nameof(element));
-        var technologies = element.GetProperty("technologies").EnumerateArray().Select(x => x.ToString()).ToList();
-
-        return new TemplateIdentity(name, technologies);
-    }
-
-    private static TemplateCodeReference ParseCodeReference(JsonElement element)
-    {
-        var url = element.GetProperty("url").GetString() ?? throw new ArgumentNullException(nameof(element));
-        var path = element.GetProperty("path").GetString() ?? throw new ArgumentNullException(nameof(element));
-        var branch = element.GetProperty("branch").GetString() ?? throw new ArgumentNullException(nameof(element));
-        return new TemplateCodeReference(new Uri(url), path, branch);
-    }
-
-    private static TemplateInputs ParseInputs(JsonElement element)
-    {
-        var jsonObject = JsonNode.Parse(element.GetRawText()) as JsonObject ??
-                         throw new ArgumentException("Invalid JSON element");
-        return new TemplateInputs(jsonObject);
-    }
-
-    private async Task<JsonElement> ParseFile(string templateName, string fileUrl)
-    {
-        var url = new Uri(_rootUrl, $"{_rootUrl.AbsolutePath.TrimEnd('/')}/{templateName}/{fileUrl}");
-        try
-        {
-            var response = await _client.GetAsync(url);
-            response.EnsureSuccessStatusCode();
-            var content = await response.Content.ReadAsStringAsync();
-
-            JsonDocument doc = JsonDocument.Parse(content);
-
-            return doc.RootElement;
-        }
-        catch (HttpRequestException)
-        {
-            throw new FileNotFoundException($"File {fileUrl} not found for template {templateName}");
-        }
-    }
-
-    private async void InitData()
+    private async Task InitData()
     {
         var listUri = new Uri(_rootUrl, $"{_rootUrl.AbsolutePath.TrimEnd('/')}/?comp=list&delimiter=/");
 
@@ -158,14 +143,22 @@ public sealed class RemoteTemplateStorage : ITemplateStorage, IDisposable
 
             try
             {
-                var identityFile = await ParseFile(templateName, "identity.json");
-                var inputsFile = await ParseFile(templateName, "inputs.json");
+                var identityFile = await BlobFileReader.ParseFile(templateName, _rootUrl, "identity.json");
+                var inputsFile = await BlobFileReader.ParseFile(templateName, _rootUrl, "inputs.json");
+                var refFile = await BlobFileReader.ParseFile(templateName, _rootUrl, "coderef.json");
 
-                var identity = ParseIdentity(identityFile);
-                var inputs = ParseInputs(inputsFile);
+                var identity = BlobFileReader.ParseIdentity(identityFile);
+                var inputs = BlobFileReader.ParseInputs(inputsFile);
+                var codeReference = BlobFileReader.ParseCodeReference(refFile);
 
-                _templatesData.Add(identity.Name, new TemplateData(identity, inputs));
-                _logger.LogInformation("Successfully parsed template {TemplateId}", templateName);
+                if (!_templatesData.TryAdd(identity.Name, new TemplateData(identity, inputs, codeReference)))
+                {
+                    _logger.LogWarning("Storage : Template {TemplateId} already exists and was not overwritten.", identity.Name);
+                }
+                else
+                {
+                    _logger.LogInformation("Storage : Successfully loaded template {TemplateId}", templateName);
+                }
             }
             catch (FileNotFoundException e)
             {

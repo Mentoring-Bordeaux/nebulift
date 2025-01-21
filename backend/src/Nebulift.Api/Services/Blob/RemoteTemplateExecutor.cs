@@ -12,20 +12,26 @@ using Templates;
 /// <summary>
 /// Runs templates remotely (using a GitHub repository) with Pulumi Automation.
 /// </summary>
-public class RemoteTemplateExecutor : ITemplateExecutor
+public class RemoteTemplateExecutor : ITemplateExecutor, IDisposable
 {
-    private static readonly JsonSerializerOptions _serializerOptions = new () { WriteIndented = true };
-    private readonly ILogger<RemoteTemplateExecutor> _logger;
+    private readonly RemoteTemplateStorage _templateStorage;
 
-    private readonly Dictionary<string, TemplateCodeReference> _templatesRefs = new ();
+    private static readonly JsonSerializerOptions _serializerOptions = new () { WriteIndented = true };
+
+    private readonly ILogger<RemoteTemplateExecutor> _logger;
+    private readonly HttpClient _client = new ();
+    private bool _disposed;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RemoteTemplateExecutor"/> class.
     /// </summary>
+    /// <param name="templateStorage"> A reference of the <see cref="ITemplateStorage"/> singleton.</param>
     /// <param name="logger"> An instance of type <see cref="ILogger{RemoteTemplateExecutor}"/> for logging.</param>
-    public RemoteTemplateExecutor(ILogger<RemoteTemplateExecutor> logger)
+    public RemoteTemplateExecutor(ITemplateStorage templateStorage, ILogger<RemoteTemplateExecutor> logger)
     {
+        _templateStorage = (RemoteTemplateStorage)templateStorage;
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _logger.LogInformation("Remote template executor initializing.");
     }
 
     /// <summary>
@@ -39,10 +45,7 @@ public class RemoteTemplateExecutor : ITemplateExecutor
     public async Task<TemplateOutputs?> ExecuteTemplate(string id, TemplateInputs inputs)
     {
         _logger.LogInformation("Executing template with ID: {Id}", id);
-        if (_templatesRefs.TryGetValue(id, out TemplateCodeReference templateCodeReference))
-        {
-            throw new FileNotFoundException($"Inputs {id} not found");
-        }
+        var templateCodeReference = _templateStorage.GetTemplateCodeReference(id);
 
         var inputNode = inputs.Content["templateData"]?["inputs"];
         var inputString = Serialize(inputNode);
@@ -86,7 +89,7 @@ public class RemoteTemplateExecutor : ITemplateExecutor
 
         if (upResult.Summary.Result != UpdateState.Succeeded)
         {
-            String errorMessage = "Error: Update failed. Full update result:\n" + Serialize(upResult);
+            string errorMessage = "Error: Update failed. Full update result:\n" + Serialize(upResult);
             throw new FailedTemplateExecutionException(errorMessage);
         }
 
@@ -103,5 +106,32 @@ public class RemoteTemplateExecutor : ITemplateExecutor
     private static string Serialize(object node)
     {
         return JsonSerializer.Serialize(node, _serializerOptions);
+    }
+
+    /// <summary>
+    /// Necessary for implementing the <see cref="IDisposable"/> interface.
+    /// </summary>
+    /// <param name="disposing">Whether the object is being disposed.</param>
+    private void Dispose(bool disposing)
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        if (disposing)
+        {
+            _client.Dispose();
+        }
+
+        _disposed = true;
+    }
+
+    /// <summary>
+    /// Cleans up the resources used by the <see cref="RemoteTemplateStorage"/>.
+    /// </summary>
+    public void Dispose()
+    {
+        Dispose(true);
     }
 }

@@ -1,12 +1,12 @@
 namespace Nebulift.Api.Configuration
 {
     /// <summary>
-    /// Options for the RemoteTemplateStorage class.
+    /// Options for the RemoteTemplateService class.
     /// </summary>
-    public class RemoteTemplateStorageOptions
+    public class RemoteTemplateServiceOptions
     {
         /// <summary>
-        /// Gets the url the RemoteTemplateStorage must use to fetch templates.
+        /// Gets the url the RemoteTemplateService must use to fetch templates.
         /// </summary>
         public string? TemplatesRootUrl { get; init; }
     }
