@@ -62,7 +62,7 @@ public class BlobCreator : Stack
         FilesLocation = Output.Format($"{listUrl}");
 
         // For every folder in current directory, if it contains a Pulumi.yaml file, upload json files to storage account
-        var toUpload = new[] { "inputs.json", "outputs.json", "identity.json" };
+        var toUpload = new[] { "inputs.json", "outputs.json", "identity.json", "coderef.json" };
         foreach (var folder in Directory.GetDirectories("."))
         {
             if (!File.Exists(Path.Combine(folder, "Pulumi.yaml")))
