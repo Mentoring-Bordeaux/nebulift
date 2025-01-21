@@ -91,5 +91,5 @@ public readonly struct TemplateCodeReference : IEquatable<TemplateCodeReference>
     /// Returns a string representation of the current <see cref="TemplateCodeReference"/>.
     /// </summary>
     /// <returns>A string representation of the <see cref="TemplateCodeReference"/>.</returns>
-    public override string ToString() => $"URL: {Url}, Path: {Path}, Branch: {Branch},";
+    public override string ToString() => $"URL: {Url}, Path: {Path}, Branch: {Branch}";
 }

@@ -12,7 +12,7 @@ using System.Xml;
 /// </summary>
 public sealed class RemoteTemplateStorage : ITemplateStorage, IDisposable
 {
-    private record TemplateData(TemplateIdentity identity, TemplateInputs inputs);
+    private record TemplateData(TemplateIdentity identity, TemplateInputs inputs, TemplateCodeReference coderef);
 
     private readonly ILogger<RemoteTemplateStorage> _logger;
     private readonly Dictionary<string, TemplateData> _templatesData = new ();
@@ -37,6 +37,33 @@ public sealed class RemoteTemplateStorage : ITemplateStorage, IDisposable
         _logger.LogInformation("Fetching all template data from URL: {RootUrl}", _rootUrl);
 
         _ = InitData();
+    }
+
+    /// <summary>
+    /// Retrieves the coderef of a given template.
+    /// </summary>
+    /// <param name="id">The ID of the template.</param>
+    /// <returns>The coderef of the template as a <see cref="TemplateCodeReference"/>.</returns>
+    /// <exception cref="FileNotFoundException">
+    /// Thrown if any of the coderef file is not found at the expected paths.
+    /// </exception>
+    public TemplateCodeReference GetTemplateCodeReference(string id)
+    {
+        _logger.LogInformation("Try to get {Id} from {Coderef}", id, _templatesData);
+
+        if (!_templatesData.TryGetValue(id, out TemplateData? tdata))
+        {
+            _logger.LogError("Template data of {Id} not found", id);
+            throw new FileNotFoundException($"Template data of {id} not found");
+        }
+
+        if (tdata == null)
+        {
+            _logger.LogError("Template data of {Id} is null", id);
+            throw new FileNotFoundException($"Template data of {id} is null");
+        }
+
+        return tdata.coderef;
     }
 
     /// <summary>
@@ -117,12 +144,15 @@ public sealed class RemoteTemplateStorage : ITemplateStorage, IDisposable
             {
                 var identityFile = await BlobFileReader.ParseFile(templateName, _rootUrl, "identity.json");
                 var inputsFile = await BlobFileReader.ParseFile(templateName, _rootUrl, "inputs.json");
+                var refFile = await BlobFileReader.ParseFile(templateName, _rootUrl, "coderef.json");
 
                 var identity = BlobFileReader.ParseIdentity(identityFile);
                 var inputs = BlobFileReader.ParseInputs(inputsFile);
+                var codeReference = BlobFileReader.ParseCodeReference(refFile);
+                _logger.LogInformation("Code ref is ${CodeReference}", codeReference);
 
-                _templatesData.Add(identity.Name, new TemplateData(identity, inputs));
-                _logger.LogInformation("Successfully parsed template {TemplateId}", templateName);
+                _templatesData.Add(identity.Name, new TemplateData(identity, inputs, codeReference));
+                _logger.LogInformation("Storage : Successfully parsed template {TemplateId}", templateName);
             }
             catch (FileNotFoundException e)
             {
