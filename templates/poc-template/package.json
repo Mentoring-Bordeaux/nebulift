@@ -1,0 +1,12 @@
+{
+    "name": "poc-template",
+    "main": "index.ts",
+    "devDependencies": {
+        "@types/node": "^18",
+        "typescript": "^5.0.0"
+    },
+    "dependencies": {
+        "@pulumi/github": "^6.3.2",
+        "@pulumi/pulumi": "^3.113.0"
+    }
+}
