@@ -8,7 +8,7 @@ using System.Text.Json.Serialization;
 /// <summary>
 /// Represents the identity of a template, including its name and associated technologies.
 /// </summary>
-public struct TemplateIdentity : IEquatable<TemplateIdentity>
+public readonly struct TemplateIdentity : IEquatable<TemplateIdentity>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="TemplateIdentity"/> struct.
@@ -103,6 +103,6 @@ public struct TemplateIdentity : IEquatable<TemplateIdentity>
             ? string.Join(", ", Technologies)
             : string.Empty;
 
-        return $"Name: {Name}, Technologies: [{technologies}]";
+        return $"Name: {Name}, Technologies: {technologies}";
     }
 }

@@ -43,9 +43,14 @@ namespace Nebulift.Api.Middleware
                 _logger.LogError("Not Found: {Message}", ex.Message);
                 await TryHandleAsync(context, ex, CancellationToken.None);
             }
-            catch (BadRequestException ex)
+            catch (FailedTemplateExecutionException ex)
             {
                 _logger.LogError("Bad Request: {Message}", ex.Message);
+                await TryHandleAsync(context, ex, CancellationToken.None);
+            }
+            catch (MissingInputsException ex)
+            {
+                _logger.LogError("Missing inputs: {Message}", ex.Message);
                 await TryHandleAsync(context, ex, CancellationToken.None);
             }
             catch (NotImplementedException ex)
@@ -81,8 +86,9 @@ namespace Nebulift.Api.Middleware
             httpContext.Response.StatusCode = exception switch
             {
                 NotFoundException => (int)HttpStatusCode.NotFound,
-                BadRequestException => (int)HttpStatusCode.BadRequest,
-                _ => (int)HttpStatusCode.InternalServerError
+                FailedTemplateExecutionException => (int)HttpStatusCode.InternalServerError,
+                MissingInputsException => (int)HttpStatusCode.BadRequest,
+                _ => (int)HttpStatusCode.InternalServerError,
             };
 
             // Log the exception

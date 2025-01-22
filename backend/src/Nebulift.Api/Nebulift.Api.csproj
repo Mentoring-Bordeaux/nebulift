@@ -10,6 +10,7 @@
 
 <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.10" />
+    <PackageReference Include="Pulumi.Automation" Version="3.71.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         <PrivateAssets>all</PrivateAssets>

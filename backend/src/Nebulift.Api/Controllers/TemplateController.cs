@@ -1,9 +1,13 @@
 namespace Nebulift.Api.Controllers;
 
 using System;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Nebulift.Api.Templates;
+using Services;
+using Templates;
+using Types;
 
 /// <summary>
 /// Controller to handle Nebulift template requests.
@@ -12,17 +16,20 @@ using Nebulift.Api.Templates;
 [Route("api/templates")]
 public class TemplateController : ControllerBase
 {
-    private readonly ITemplateService _templateService;
+    private readonly ITemplateExecutor _executor;
+    private readonly ITemplateStorage _storage;
     private readonly ILogger<TemplateController> _logger;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TemplateController"/> class.
     /// </summary>
-    /// <param name="templateService">An instance of <see cref="ITemplateService"/> to handle template data retrieval.</param>
+    /// <param name="executor">An instance of <see cref="ITemplateExecutor"/> to handle template execution.</param>
+    /// <param name="storage">An instance of <see cref="ITemplateStorage"/> to handle template data retrieval.</param>
     /// <param name="logger">An instance of <see cref="ILogger{TemplateController}"/> for logging.</param>
-    public TemplateController(ITemplateService templateService, ILogger<TemplateController> logger)
+    public TemplateController(ITemplateExecutor executor, ITemplateStorage storage, ILogger<TemplateController> logger)
     {
-        _templateService = templateService ?? throw new ArgumentNullException(nameof(templateService));
+        _executor = executor ?? throw new ArgumentNullException(nameof(executor));
+        _storage = storage ?? throw new ArgumentNullException(nameof(storage));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -35,7 +42,7 @@ public class TemplateController : ControllerBase
     [HttpGet]
     public IActionResult GetAllTemplates()
     {
-        var templates = _templateService.GetAllTemplateIdentities();
+        var templates = _storage.GetAllTemplateIdentities();
         _logger.LogInformation("Retrieving all template identities ({TemplateCount})", templates.Count);
         return Ok(templates);
     }
@@ -51,7 +58,7 @@ public class TemplateController : ControllerBase
     [HttpGet("{id}")]
     public IActionResult GetTemplateInputsSchemaById(string id)
     {
-        var templateInputsWrapped = _templateService.GetTemplateInputs(id);
+        var templateInputsWrapped = _storage.GetTemplateInputs(id);
         _logger.LogInformation("Retrieving template {TemplateId} input schema : {InputSchema}", id, templateInputsWrapped);
         return Ok(templateInputsWrapped.Content);
     }
@@ -65,9 +72,25 @@ public class TemplateController : ControllerBase
     /// The updated template object with the provided data.
     /// </returns>
     [HttpPost("{id}")]
-    public IActionResult ExecuteTemplateById(string id, [FromBody] object templateData)
+    public async Task<IActionResult> ExecuteTemplateById(string id, [FromBody] object templateData)
     {
-        _logger.LogError("Template execution not implemented yet");
-        return Problem("Template execution not implemented yet");
+        var contentJson = JsonSerializer.Serialize(templateData);
+
+        var contentObject = JsonSerializer.Deserialize<JsonObject>(contentJson);
+        if (contentObject == null)
+        {
+            return BadRequest("Invalid JSON object provided.");
+        }
+
+        var templateInputs = new TemplateInputs(contentObject);
+
+        var templateOutputs = await _executor.ExecuteTemplate(id, templateInputs);
+
+        if (templateOutputs == null)
+        {
+            return BadRequest("Failed to execute template.");
+        }
+
+        return Ok(templateOutputs.ToString());
     }
 }
