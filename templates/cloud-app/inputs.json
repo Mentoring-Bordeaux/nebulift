@@ -1,18 +1,18 @@
 {
-    "html": {
+    "project": {
         "type": "object",
-        "title": "HTML",
+        "title": "Project",
         "description": "",
         "properties": {
-            "url": {
+            "project_name": {
                 "type": "string",
-                "title": "URL",
-                "description": "Internet URL to copy the HTML from"
+                "title": "Project Name",
+                "description": "Name of the project to add to the README file"
             },
-            "path": {
+            "project_description": {
                 "type": "string",
-                "title": "Path",
-                "description": "Repository folder to put the HTML in"
+                "title": "Project Description",
+                "description": "Description of the project to add to the README file"
             }
         }
     },
