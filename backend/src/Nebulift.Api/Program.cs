@@ -46,10 +46,6 @@ public static class Program
 
         var app = builder.Build();
 
-<<<<<<< HEAD
-        app.UseSwagger();
-        app.UseSwaggerUI();
-=======
         // Forcing instantiation of template storage to run the first requests.
         try
         {
@@ -67,13 +63,9 @@ public static class Program
             app.UseSwagger();
             app.UseSwaggerUI();
         }
->>>>>>> f68ee7b6718d2210a90a1c714308a5bdc84c36b0
 
         app.UseHttpsRedirection();
         app.UseAuthorization();
-
-        // Use CORS middleware
-        // app.UseCors("AllowSpecificOrigin");
 
         app.UseHealthChecks("/api/health");
 
