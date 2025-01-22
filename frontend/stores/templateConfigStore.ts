@@ -15,7 +15,7 @@ export const useTemplateConfigStore = defineStore('templateConfig', () => {
     const fetchTemplateConfig = async (templateId: string) => {
         loading.value = true;
         error.value = null;
-        
+
         try {
             selectedTemplate.value = templateId;
             schema.value = await templateService.getTemplateConfig(templateId);
@@ -32,11 +32,9 @@ export const useTemplateConfigStore = defineStore('templateConfig', () => {
     const initializeFormData = () => {
         if (!schema.value) return;
 
-        formData.value = Object.keys(schema.value).reduce((acc, technology) => {
-            acc[technology] = Object.keys(schema.value![technology]).reduce((fields, fieldName) => {
-                fields[fieldName] = schema.value![technology][fieldName].value instanceof Array
-                    ? schema.value![technology][fieldName].value[0]
-                    : '';
+        formData.value = Object.keys(schema.value).reduce((acc, sectionKey) => {
+            acc[sectionKey] = Object.keys(schema.value![sectionKey].properties).reduce((fields, fieldName) => {
+                fields[fieldName] = '';
                 return fields;
             }, {} as Record<string, string>);
             return acc;
@@ -45,7 +43,7 @@ export const useTemplateConfigStore = defineStore('templateConfig', () => {
 
     const submitConfig = async () => {
         if (!selectedTemplate.value) return;
-        
+
         loading.value = true;
         error.value = null;
 

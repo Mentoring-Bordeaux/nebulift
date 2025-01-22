@@ -1,17 +1,24 @@
 
 export interface FieldConfig {
-    value: string | string[];
+    type: string;
+    title: string;
     description: string;
-  }
-  
-  export interface TechnologySectionSchema {  // Renamed from TechnologySection
-    [fieldKey: string]: FieldConfig;
-  }
-  
-  export interface TemplateSchema {
-    [technology: string]: TechnologySectionSchema;
-  }
-  
-  export interface FormData {
-    [technology: string]: Record<string, string>;
-  }
+    enum?: string[]
+}
+
+export interface SectionSchema {  // Renamed from TechnologySection
+    type: string; // "object"
+    title: string;
+    description: string;
+    properties: {
+        [fieldKey: string]: FieldConfig;
+    };
+}
+
+export interface TemplateSchema {
+    [sectionKey: string]: SectionSchema;
+}
+
+export interface FormData {
+    [sectionKey: string]: Record<string, string>;
+}

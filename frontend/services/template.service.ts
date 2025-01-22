@@ -12,7 +12,7 @@ class TemplateService {
      */
     async getTemplateConfig(id: string): Promise<TemplateSchema> {
         const { data, error } = await useFetch<TemplateSchema>(`${this.baseUrl}/${id}`);
-        
+
         if (error.value) {
             console.error('Error fetching template config:', error.value);
             throw error.value;
@@ -25,9 +25,10 @@ class TemplateService {
      * Submits template configuration data
      */
     async submitConfig(id: string, formData: FormData): Promise<void> {
+        console.log('Submitting form data:', JSON.stringify(formData, null, 2));
         const { error } = await useFetch(`${this.baseUrl}/${id}`, {
             method: 'POST',
-            body: formData
+            body: JSON.stringify(formData)
         });
 
         if (error.value) {
