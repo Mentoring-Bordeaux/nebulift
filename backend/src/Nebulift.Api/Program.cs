@@ -1,5 +1,6 @@
 namespace Nebulift.Api;
 
+using Middleware;
 using Nebulift.Api.Templates;
 using Nebulift.Api.Configuration;
 
@@ -22,6 +23,7 @@ public static class Program
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
+        builder.Services.AddTransient<ExceptionMiddleware>();
 
         // Add logging services (ILogger)
         builder.Services.AddLogging();
@@ -50,6 +52,9 @@ public static class Program
         // app.UseCors("AllowSpecificOrigin");
 
         app.UseHealthChecks("/api/health");
+
+        // Use custom exception middleware
+        app.UseMiddleware<ExceptionMiddleware>();
 
         app.MapControllers();
 
