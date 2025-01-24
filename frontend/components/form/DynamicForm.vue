@@ -37,6 +37,11 @@ const isSectionValid = computed(() => {
 
     return Object.keys(section.properties).every((fieldKey) => {
         const value = store.formData[sectionKey]?.[fieldKey];
+
+        if (Array.isArray(value)) {
+            return value.length > 0 && value.every((item) => item && item.trim() !== '');
+        }
+        
         return value && value.trim() !== '';
     });
 });
@@ -67,18 +72,17 @@ const validateSection = (): boolean => {
     Object.entries(section.properties).forEach(([fieldKey]) => {
         const value = store.formData[sectionKey]?.[fieldKey];
 
-        if (!value || value === '') {
+        if (Array.isArray(value)) {
+            if (value.length === 0 || value.some((item) => !item || item.trim() === '')) {
+                errors.value[sectionKey][fieldKey] = 'At least one item is required and all items must be filled';
+                hasErrors = true;
+            }
+        } else if (!value || value.trim() === '') {
             errors.value[sectionKey][fieldKey] = 'This field is required';
             hasErrors = true;
         }
     });
 
-    // if (!hasErrors) {
-    //     delete errors.value[sectionKey];
-    //     return true;
-    // }
-
-    // return false;
     return !hasErrors;
 };
 
@@ -97,7 +101,7 @@ const handleBack = () => {
 };
 
 // Type-safe form value update handler
-const handleFormUpdate = (sectionKey: string, value: Record<string, string>): void => {
+const handleFormUpdate = (sectionKey: string, value: Record<string, string | string[]>): void => {
     store.formData[sectionKey] = value;
 };
 
@@ -145,7 +149,7 @@ watch(() => store.schema, (newSchema) => {
                     :schema="store.schema[activeTab]"
                     :model-value="store.formData[activeTab] || {}" 
                     :errors="errors[activeTab]"
-                    @update:model-value="(value: Record<string, string>) => handleFormUpdate(activeTab, value)" />
+                    @update:model-value="(value: Record<string, string | string[]>) => handleFormUpdate(activeTab, value)" />
             </div>
 
             <!-- Navigation buttons -->

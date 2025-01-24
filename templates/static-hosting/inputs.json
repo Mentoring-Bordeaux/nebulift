@@ -40,6 +40,15 @@
                     "internal"
                 ],
                 "description": "Visibility of the GitHub repository"
+            },
+            "users": {
+                "type": "array",
+                "title": "Users",
+                "description": "The list of Github users to join the project",
+                "items": {
+                    "type": "string",
+                    "title": "User"
+                }
             }
         }
     },

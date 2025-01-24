@@ -5,7 +5,7 @@ import FormField from './FormField.vue';
 interface Props {
     sectionKey: string;
     schema: SectionSchema;
-    modelValue: Record<string, string>;
+    modelValue: Record<string, string | string[]>;
     errors?: Record<string, string>;
 }
 
@@ -14,10 +14,10 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-    (e: 'update:modelValue', value: Record<string, string>): void;
+    (e: 'update:modelValue', value: Record<string, string | string[]>): void;
 }>();
 
-const updateField = (field: string, value: string) => {
+const updateField = (field: string, value: string | string[]) => {
     emit('update:modelValue', {
         ...props.modelValue,
         [field]: value

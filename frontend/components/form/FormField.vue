@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { ref } from 'vue';
+
 interface Props {
     fieldKey: string;
     fieldConfig: {
@@ -6,8 +8,13 @@ interface Props {
         title: string;
         description: string;
         enum?: string[];
+        items?: {
+            type: string;
+            title: string;
+            uniqueItems?: boolean;
+        }
     };
-    modelValue: string;
+    modelValue: string | string[];
     error?: string;
 }
 
@@ -16,10 +23,28 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-    (e: 'update:modelValue', value: string): void;
+    (e: 'update:modelValue', value: string | string[]): void;
 }>();
 
 const isSelectField = props.fieldConfig.enum !== undefined;
+const isArrayField = props.fieldConfig.type === 'array';
+const arrayValues = ref<string[]>(Array.isArray(props.modelValue) ? props.modelValue : [props.modelValue || '']);
+
+const addArrayItem = () => {
+    arrayValues.value.push('');
+    emit('update:modelValue', arrayValues.value);
+};
+
+const deleteArrayItem = (index: number) => {
+    arrayValues.value.splice(index, 1);
+    emit('update:modelValue', arrayValues.value);
+};
+
+const updateArrayItem = (index: number, value: string) => {
+    arrayValues.value[index] = value;
+    emit('update:modelValue', arrayValues.value);
+};
+
 
 // Base classes for inputs
 const inputBaseClasses = `
@@ -44,29 +69,38 @@ const inputBaseClasses = `
         </div>
 
         <div class="relative">
-            <input 
-                v-if="!isSelectField" 
-                type="text"
-                :value="modelValue"
-                :class="inputBaseClasses" 
-                @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)" 
-            >
+            <!-- Field for array type -->
+            <div v-if="isArrayField">
+                <div v-for="(value, index) in arrayValues" :key="index" class="mb-2 flex flex-row gap-2">
+                    <input type="text" :value="value" :class="inputBaseClasses" :placeholder="`User ${index + 1}`"
+                        @input="updateArrayItem(index, ($event.target as HTMLInputElement).value)">
+                    <button v-if="index > 0" type="button"
+                        class="px-4 py-2 bg-red-500 text-white text-sm rounded-xl hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                        @click="deleteArrayItem(index)">
+                        Delete
+                    </button>
+                </div>
+                <div class="flex justify-end">
+                    <button type="button"
+                        class="mt-2 px-4 py-2 bg-gray-600 text-white rounded-xl hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                        @click="addArrayItem">
+                        Add {{ fieldConfig.items?.title || ''}}
+                    </button>
+                </div>
+            </div>
 
-            <select 
-                v-else :value="modelValue"
-                :class="inputBaseClasses"
-                @change="emit('update:modelValue', ($event.target as HTMLSelectElement).value)"
-            >
+            <!-- Select field -->
+            <select v-else-if="isSelectField" :value="modelValue" :class="inputBaseClasses"
+                @change="emit('update:modelValue', ($event.target as HTMLSelectElement).value)">
                 <option value="" disabled>Select an option</option>
-                <option 
-                    v-for="option in fieldConfig.enum" 
-                    :key="option" 
-                    :value="option" 
-                    class="text-gray-900"
-                >
+                <option v-for="option in fieldConfig.enum" :key="option" :value="option" class="text-gray-900">
                     {{ option }}
                 </option>
             </select>
+
+            <!-- Base field -->
+            <input v-else type="text" :value="modelValue" :class="inputBaseClasses"
+                @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)">
         </div>
 
         <span v-if="error" class="text-sm text-red-500 mt-1">{{ error }}</span>
