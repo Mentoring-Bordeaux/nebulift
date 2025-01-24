@@ -83,6 +83,7 @@ let fileContent = fs.readFileSync(sourcePath + "/index.html", "utf8");
 // Replace all macros in the file
 const regex = new RegExp(`@@@welcomeMessage@@@`, "g");
 fileContent = fileContent.replace(regex, welcomeMessage);
+console.log(fileContent);
 
 // Example: Uploading a sample index.html to $web container
 const indexHtml = new azure.storage.Blob("index.html", {
