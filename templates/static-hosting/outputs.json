@@ -1,0 +1,17 @@
+{
+    "staticEndpoint":{
+        "description": "The endpoint for the static hosting",
+        "title": "Static Endpoint",
+        "type": "string"
+    },
+    "indexUri":{
+        "description": "The URL of the index file",
+        "title": "Index URL",
+        "type": "string"
+    },
+    "repositoryUrl":{
+        "description": "The URL of the repository",
+        "title": "Repository URL",
+        "type": "string"
+    }
+}
