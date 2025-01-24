@@ -8,7 +8,6 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using Exceptions;
-using Templates;
 
 /// <summary>
 /// Runs templates remotely (using a GitHub repository) with Pulumi Automation.
@@ -42,7 +41,7 @@ public class RemoteTemplateExecutor : ITemplateExecutor, IDisposable
     /// <returns>
     /// The outputs of the template execution, or <c>null</c> if the execution failed.
     /// </returns>
-    public async Task<TemplateOutputs?> ExecuteTemplate(string id, TemplateInputs inputs)
+    public async Task<TemplateOutputs> ExecuteTemplate(string id, TemplateInputs inputs)
     {
         _logger.LogInformation("Executing template with ID: {Id}", id);
         var templateCodeReference = _templateStorage.GetTemplateCodeReference(id);

@@ -6,7 +6,6 @@ using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Services;
-using Templates;
 using Types;
 
 /// <summary>
@@ -86,13 +85,6 @@ public class TemplateController : ControllerBase
 
         var templateOutputs = await _executor.ExecuteTemplate(id, templateInputs);
 
-        if (templateOutputs == null)
-        {
-            return BadRequest("Failed to execute template.");
-        }
-
-        var templateOutputsJson = JsonSerializer.Deserialize<JsonObject>(templateOutputs.ToString());
-
-        return Ok(templateOutputsJson);
+        return Ok(templateOutputs.Content);
     }
 }
