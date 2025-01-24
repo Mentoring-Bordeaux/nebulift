@@ -14,7 +14,7 @@ const emit = defineEmits(['back', 'create'])
 </script>
 
 <template>
-    <div class="space-y-6">
+    <div class="space-y-6 text-black">
         <h2 class="text-xl font-semibold mb-4">Review your configuration</h2>
 
         <div v-for="(section, sectionKey) in props.formData" :key="sectionKey" class="mb-6">
