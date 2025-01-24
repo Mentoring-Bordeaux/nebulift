@@ -22,6 +22,7 @@
                 "description": "GitHub contributors to the repository",
                 "title": "Repository contributors",
                 "type": "array",
+                "minItems": 0,
                 "items": {
                     "type": "string"
                 }
