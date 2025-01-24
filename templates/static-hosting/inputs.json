@@ -13,7 +13,7 @@
                 "description": "Whether the repository is public or private",
                 "title": "Repository visibility",
                 "type": "string",
-                "value": [
+                "enum": [
                     "public",
                     "private"
                 ]
