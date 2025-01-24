@@ -15,6 +15,7 @@ jobs:
     environment: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'production' }}
     env:
       AZURE_WEBAPP_PACKAGE_PATH: './backend/'
+      DEV_NAMESPACE: dev
       
     steps:
       # Checkout repository
@@ -31,9 +32,9 @@ jobs:
       # Build Backend Docker Image
       - name: Build Backend Docker Image
         run: |
-          docker build -t ${{ vars.AZURE_REGISTRY_LOGIN_SERVER }}/nebulift-backend:${{ github.sha }} ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+          docker build -t ${{ vars.AZURE_REGISTRY_LOGIN_SERVER }}/${{ env.DEV_NAMESPACE }}/nebulift-backend:${{ github.sha }} ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
 
       # Push Backend Docker Image to Azure
       - name: Push Backend Docker Image
         run: |
-          docker push ${{ vars.AZURE_REGISTRY_LOGIN_SERVER }}/nebulift-backend:${{ github.sha }}
+          docker push ${{ vars.AZURE_REGISTRY_LOGIN_SERVER }}/${{ env.DEV_NAMESPACE }}/nebulift-backend:${{ github.sha }}

@@ -47,6 +47,11 @@
                 "description": "GitHub token to create the repository, should be allowed to create repositories",
                 "title": "GitHub token",
                 "type": "string"
+            },
+            "pulumiUser": {
+                "description": "Pulumi username to create the stack",
+                "title": "Pulumi username",
+                "type": "string"
             }
         }
     }

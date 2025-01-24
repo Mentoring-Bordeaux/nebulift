@@ -42,6 +42,8 @@ public static class Program
                     .AllowAnyMethod());
         });
 
+        builder.Services.AddHealthChecks();
+
         var app = builder.Build();
 
         // Forcing instantiation of template storage to run the first requests.
@@ -65,8 +67,7 @@ public static class Program
         app.UseHttpsRedirection();
         app.UseAuthorization();
 
-        // Use CORS middleware
-        app.UseCors("AllowSpecificOrigin");
+        app.UseHealthChecks("/api/health");
 
         // Use custom exception middleware
         app.UseMiddleware<ExceptionMiddleware>();

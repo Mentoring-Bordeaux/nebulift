@@ -18,10 +18,12 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    name: Build and Deploy
+    name: Docker pull from dev to prod registry
     environment: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || 'production' }}
     env:
       AZURE_WEBAPP_NAME: ${{ vars.AZURE_WEBAPP_NAME }}
+      DEV_NAMESPACE: dev
+      AZURE_REGISTRY_NAME: nebulift
 
     steps:
       - uses: actions/checkout@v4
@@ -34,19 +36,35 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      # Build the application
-      - name: Build the application
-        run: dotnet build --configuration Release
-        working-directory: backend/src/Nebulift.Api
+      # Log in to ACR
+      - name: Log in to Azure Container Registry
+        run: |
+          az acr login --name ${{ env.AZURE_REGISTRY_NAME }}
 
-      # Publish the application
-      - name: Publish the application
-        run: dotnet publish --configuration Release --output ./publish
-        working-directory: backend/src/Nebulift.Api
+      # Get the latest image tag from the dev namespace
+      - name: Get Latest Image Tag
+        id: get-latest-tag
+        run: |
+          LATEST_TAG=$(az acr repository show-tags \
+            --name ${{ env.AZURE_REGISTRY_NAME }} \
+            --repository ${{ env.DEV_NAMESPACE }}/nebulift-backend \
+            --orderby time_desc \
+            --output tsv \
+            --top 1)
+          echo "LATEST_TAG=${LATEST_TAG}" >> $GITHUB_ENV
 
-      # Deploy to Azure Web App
-      - name: Deploy backend to Azure Web App
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          package: ./backend/src/Nebulift.Api/publish
+      # Pull the latest image from the dev namespace
+      - name: Pull Latest Image from Dev
+        run: |
+          docker pull ${{ vars.AZURE_REGISTRY_LOGIN_SERVER }}/${{ env.DEV_NAMESPACE }}/nebulift-backend:${{ env.LATEST_TAG }}
+
+      # Tag the image for the prod namespace
+      - name: Tag Image for Prod
+        run: |
+          docker tag ${{ vars.AZURE_REGISTRY_LOGIN_SERVER }}/${{ env.DEV_NAMESPACE }}/nebulift-backend:${{ env.LATEST_TAG }} \
+          ${{ vars.AZURE_REGISTRY_LOGIN_SERVER }}/nebulift-backend:latest
+
+      # Push the image to the prod namespace (deploys automatically)
+      - name: Push Image to Prod
+        run: |
+          docker push ${{ vars.AZURE_REGISTRY_LOGIN_SERVER }}/nebulift-backend:latest
