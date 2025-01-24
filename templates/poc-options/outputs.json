@@ -1,0 +1,7 @@
+{
+	"repositoryUrl": {
+		"description": "The URL to the repository",
+		"title": "Repository URL",
+		"type": "string"
+	}
+}
