@@ -41,7 +41,6 @@ const isSectionValid = computed(() => {
         if (Array.isArray(value)) {
             const minItems = config.minItems === undefined ? 1 : config.minItems;
             const filledItemsCount = value.filter((item) => item && item.trim() !== '').length;
-
             return filledItemsCount >= minItems;
         }
         
@@ -77,9 +76,7 @@ const validateSection = (): boolean => {
 
         if (Array.isArray(value)) {
             const minItems = config.minItems === undefined ? 1 : config.minItems;
-            console.log("validate section: " + minItems);
             const filledItemsCount = value.filter((item) => item && item.trim() !== '').length;
-            console.log("filled: " + filledItemsCount);
             
             if (filledItemsCount < minItems) {
                 errors.value[sectionKey][fieldKey] = `At least ${minItems} item(s) must be filled`;
@@ -89,6 +86,14 @@ const validateSection = (): boolean => {
             errors.value[sectionKey][fieldKey] = 'This field is required';
             hasErrors = true;
         }
+    });
+
+    Object.keys(store.formData).forEach(sectionKey => {
+        Object.keys(store.formData[sectionKey]).forEach(fieldName => {
+            if (Array.isArray(store.formData[sectionKey][fieldName])) {
+                store.formData[sectionKey][fieldName] = store.formData[sectionKey][fieldName].filter((item: string) => item !== '');
+            }
+        });
     });
 
     return !hasErrors;

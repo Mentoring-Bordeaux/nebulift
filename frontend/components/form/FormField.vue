@@ -28,22 +28,34 @@ const emit = defineEmits<{
 
 const isSelectField = props.fieldConfig.enum !== undefined;
 const isArrayField = props.fieldConfig.type === 'array';
-const arrayValues = ref<string[]>(Array.isArray(props.modelValue) ? props.modelValue : [props.modelValue || '']);
 
 const addArrayItem = () => {
-    arrayValues.value.push('');
-    emit('update:modelValue', arrayValues.value);
+    const arrayValues = Array.isArray(props.modelValue) ? [...props.modelValue] : [];
+    arrayValues.push('');
+    emit('update:modelValue', arrayValues);
 };
 
 const deleteArrayItem = (index: number) => {
-    arrayValues.value.splice(index, 1);
-    emit('update:modelValue', arrayValues.value);
+    const arrayValues = Array.isArray(props.modelValue) ? [...props.modelValue] : [];
+    arrayValues.splice(index, 1);
+    emit('update:modelValue', arrayValues);
 };
 
 const updateArrayItem = (index: number, value: string) => {
-    arrayValues.value[index] = value;
-    emit('update:modelValue', arrayValues.value);
+    const arrayValues = Array.isArray(props.modelValue) ? [...props.modelValue] : [];
+    arrayValues[index] = value;
+    emit('update:modelValue', arrayValues);
 };
+
+const initializeArrayItems = () => {
+    if (isArrayField) {
+        if (!Array.isArray(props.modelValue) || props.modelValue.length === 0) {
+            emit('update:modelValue', ['']);
+        }
+    }
+};
+
+initializeArrayItems();
 </script>
 
 <template>
@@ -56,7 +68,7 @@ const updateArrayItem = (index: number, value: string) => {
         <div class="relative">
             <!-- Field for array type -->
             <div v-if="isArrayField">
-                <div v-for="(value, index) in arrayValues" :key="index" class="mb-2 flex flex-row gap-2">
+                <div v-for="(value, index) in (modelValue as string[])" :key="index" class="mb-2 flex flex-row gap-2">
                     <input type="text" :value="value" class="input-base" :placeholder="`User ${index + 1}`"
                         @input="updateArrayItem(index, ($event.target as HTMLInputElement).value)">
                     <button v-if="index > 0" type="button"
