@@ -1,7 +1,6 @@
 import * as github from "@pulumi/github";
 import * as nebulift from "./nebulift"; // We could make a module for this
 
-console.log(`Program arguments: ${process.argv}`);
 
 const inputs: nebulift.Inputs = nebulift.init();
 
@@ -15,10 +14,6 @@ const projectName = githubValues["project_name"];
 const projectDescription = githubValues["project_description"];
 const macros = { projectName, projectDescription };
 
-
-console.log(process.env);
-console.log(`Creating repository ${repoName}...`);
-console.log(`Visibility: ${visibility}`);
 
 // Create the GitHub repository first
 const repo = new github.Repository("repo", {
