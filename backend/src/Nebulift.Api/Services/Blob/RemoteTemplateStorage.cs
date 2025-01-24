@@ -50,8 +50,6 @@ public sealed class RemoteTemplateStorage : ITemplateStorage, IDisposable
     /// </exception>
     public TemplateCodeReference GetTemplateCodeReference(string id)
     {
-        _logger.LogInformation("Try to get {Id} from {Coderef}", id, _templatesData);
-
         if (!_templatesData.TryGetValue(id, out TemplateData? tdata))
         {
             _logger.LogError("Template data of {Id} not found", id);

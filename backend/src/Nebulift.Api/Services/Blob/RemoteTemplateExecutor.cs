@@ -85,8 +85,6 @@ public class RemoteTemplateExecutor : ITemplateExecutor, IDisposable
             }
         }
 
-        _logger.LogInformation("\n\n Environment variables: {EnvironmentVariables} \n\n", Serialize(environmentVariables));
-
         var stackArgs = new RemoteGitProgramArgs(stackName, templateCodeReference.Url.ToString())
         {
             ProjectPath = templateCodeReference.Path,
