@@ -22,5 +22,15 @@ RUN dotnet publish "Nebulift.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish
 
 FROM base AS final
 WORKDIR /app
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    curl ca-certificates && \
+    curl -fsSL https://get.pulumi.com | sh && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+ENV PATH="/root/.pulumi/bin:${PATH}"
+
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Nebulift.Api.dll"]
