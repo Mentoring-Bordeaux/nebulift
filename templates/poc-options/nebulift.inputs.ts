@@ -1,37 +1,26 @@
 export default class Inputs {
-  private macros: Record<string, any> = {}; // Meant to replace placeholders in the source code
-  private constants: Record<string, any> = {}; // Meant to be used as constants in the template's pulumi code
-  private env: Record<string, any> = {};
+  private blocks: Record<string, Record<string, any>> = {};
 
   constructor() {
     const rawInputs = process.env.NEBULIFT_INPUTS;
-    if (!rawInputs) throw new Error("NEBULIFT_INPUTS env var is required");
+    if (!rawInputs) throw new Error("NEBULIFT_INPUTS environment variable is required");
     const inputs = JSON.parse(rawInputs);
 
-	// inputs should be of type { macros: Record<string, any>, constants: Record<string, any>, env: Record<string, any> }
-	// If this code is kept, we might want to add a check for the type of inputs
-	console.log(inputs);
-    this.macros = inputs.macros;
-    this.constants = inputs.constants;
-    this.env = inputs.env;
+    console.log(inputs);
+    for (const key in inputs) {
+      this.blocks[key] = inputs[key];
+    }
+    console.log(this.blocks);
   }
 
-  getMacro(name: string): any {
-    if (this.macros[name] === undefined) throw new Error(`Macro ${name} not found`);
-    return this.macros[name];
+  getSectionDict(section: string): Record<string, any> {
+    if (this.blocks[section] === undefined) throw new Error(`Macro ${section} not found`);
+    return this.blocks[section];
   }
 
-  getMacroKeys(): string[] {
-    return Object.keys(this.macros);
-  }
-
-  getConstant(name: string): any {
-	if (this.constants[name] === undefined) throw new Error(`Constant ${name} not found`);
-    return this.constants[name];
-  }
-
-  getEnv(name: string): any {
-    if (this.env[name] == undefined) throw new Error(`Env var ${name} not found`);
-    return this.env[name];
+  getSectionValue(section: string, value: string): Record<string, any> {
+    if (this.blocks[section] === undefined) throw new Error(`Block ${section} not found`);
+    if (this.blocks[section][value] === undefined) throw new Error(`Value ${value} not found in block ${section}`);
+    return this.blocks[section][value];
   }
 }

@@ -16,7 +16,8 @@ export function init(): Inputs {
 // NOTE: This function does not handle .gitignore yet
 export function addSourceCode(
   repositoryName: string,
-  sourcePath: string
+  sourcePath: string,
+  macros: Record<string, string> = {}
 ): void {
   function readAndReplace(filePath: string): string {
     if (inputs == null) throw new Error("Inputs not initialized");
@@ -24,10 +25,9 @@ export function addSourceCode(
     let fileContent = fs.readFileSync(filePath, "utf8");
 
     // Replace all macros in the file
-    const macros = inputs.getMacroKeys();
-    for (const macro of macros) {
+    for (const macro in macros) {
       const regex = new RegExp(`@@@${macro}@@@`, "g");
-      fileContent = fileContent.replace(regex, inputs.getMacro(macro));
+      fileContent = fileContent.replace(regex, macros[macro]);
     }
     // TODO: Complete with @@@for (...)@@@, @@@if (...)@@@, etc without forgetting nested ones
 
@@ -45,7 +45,6 @@ export function addSourceCode(
     });
   }
 
-  // TODO: Ignore files depending on .gitignore
   function walkSync(dir: string) {
     fs.readdirSync(dir).forEach((file) => {
       const path = `${dir}/${file}`;
