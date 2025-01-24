@@ -5,6 +5,8 @@
       {{ name }}
     </div>
     <div class="name-underline border-b mb-4"></div>
+    <div class="description text-gray-600 mb-4">{{ description }}</div>
+    <div class="name-underline border-b mb-4"></div>
     <ul>
       <li v-for="technology in technologies" :key="technology" class="pl-4 text-black">{{ "• " + technology }}</li>
     </ul>
@@ -12,8 +14,6 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue';
-
 const props = defineProps({
   name: {
     type: String,
@@ -23,11 +23,15 @@ const props = defineProps({
     type: Array as () => string[],
     required: true,
   },
+  description: {
+    type: String,
+    required: true,
+  }
 });
 
 const emit = defineEmits(['click']);
 
 const handleClick = () => {
-  emit('click', { name: props.name, technologies: props.technologies });
+  emit('click', { name: props.name, technologies: props.technologies, description: props.description });
 };
 </script>

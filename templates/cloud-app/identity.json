@@ -1,4 +1,5 @@
 {
     "name" : "cloud-app",
-    "technologies" : ["nodejs", "GitHub", "Azure", "Pulumi"]
+    "technologies" : ["nodejs", "GitHub", "Azure", "Pulumi"],
+    "description" : "A simple cloud app that uses Azure Functions and Cosmos DB"
 }

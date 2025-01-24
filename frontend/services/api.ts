@@ -3,6 +3,7 @@ import { useFetch } from '#app';
 export interface Project {
     name: string;
     technologies: string[];
+    description: string;
 }
 
 const projectApi = {

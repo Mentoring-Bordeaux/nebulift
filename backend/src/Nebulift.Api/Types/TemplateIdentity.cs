@@ -16,11 +16,13 @@ public struct TemplateIdentity : IEquatable<TemplateIdentity>
     /// <param name="name">The name of the template identity.</param>
     /// <param name="technologies">The list of technologies associated with the identity.</param>
     [JsonConstructor]
-    public TemplateIdentity(string name, IEnumerable<string> technologies)
+    public TemplateIdentity(string name, IEnumerable<string> technologies,string description)
     {
         Name = name ?? throw new ArgumentNullException(nameof(name));
         Technologies = technologies ?? throw new ArgumentNullException(nameof(technologies));
+        Description = description;
     }
+    
 
     /// <summary>
     /// Gets the name of the identity.
@@ -33,6 +35,12 @@ public struct TemplateIdentity : IEquatable<TemplateIdentity>
     /// </summary>
     [JsonPropertyName("technologies")]
     public IEnumerable<string> Technologies { get; }
+
+     /// <summary>
+    /// Gets the description of the identity.
+    /// </summary>
+    [JsonPropertyName("description")]
+    public string Description { get; }
 
     /// <summary>
     /// Determines whether two <see cref="TemplateIdentity"/> instances are equal.
