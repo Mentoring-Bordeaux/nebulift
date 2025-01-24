@@ -7,7 +7,7 @@ const inputs: nebulift.Inputs = nebulift.init();
 
 const githubValues = inputs.getSectionDict("github");
 
-const repositoryName = githubValues["repository_name"];
+const repoName = githubValues["repository_name"];
 const visibility = githubValues["visibility"];
 const contributors = githubValues["contributors"];
 
@@ -17,12 +17,12 @@ const macros = { projectName, projectDescription };
 
 
 console.log(process.env);
-console.log(`Creating repository ${repositoryName}...`);
+console.log(`Creating repository ${repoName}...`);
 console.log(`Visibility: ${visibility}`);
 
 // Create the GitHub repository first
 const repo = new github.Repository("repo", {
-  name: repositoryName,
+  name: repoName,
   visibility: visibility,
   hasIssues: true,
   hasWiki: true,
@@ -32,9 +32,9 @@ const repo = new github.Repository("repo", {
 // Create files only after the repository is created
 // and replace all the placeholders with the actual values
 const sourcePath = "./code";
-console.log(`Adding source code from ${sourcePath} to repository ${repositoryName}...`);
+console.log(`Adding source code from ${sourcePath} to repository ${repoName}...`);
 repo.name.apply((name) => {
-  nebulift.addSourceCode(repositoryName, sourcePath, macros)
+  nebulift.addSourceCode(repoName, sourcePath, macros)
 
   for (const user of contributors) {
     new github.RepositoryCollaborator("repo_user" + user, {
@@ -44,4 +44,5 @@ repo.name.apply((name) => {
   }
 });
 
-export const repoName = repo.name;
+export const repositoryName = repo.name;
+export const repositoryUrl = repo.httpCloneUrl;
