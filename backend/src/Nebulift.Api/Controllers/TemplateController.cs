@@ -91,6 +91,8 @@ public class TemplateController : ControllerBase
             return BadRequest("Failed to execute template.");
         }
 
-        return Ok(templateOutputs.ToString());
+        var templateOutputsJson = JsonSerializer.Deserialize<JsonObject>(templateOutputs.ToString());
+
+        return Ok(templateOutputsJson);
     }
 }
