@@ -21,6 +21,19 @@ public static class BlobFileReader
                          throw new ArgumentException("Invalid JSON element");
         return new TemplateInputs(jsonObject);
     }
+    
+    /// <summary>
+    /// Parses a JSON element into a TemplateOutputs object.
+    /// </summary>
+    /// <param name="element">The JSON element to parse.</param>
+    /// <returns>A TemplateOutputs object created from the provided JSON.</returns>
+    /// <exception cref="ArgumentException">Thrown if the JSON is invalid or cannot be converted to a JsonObject.</exception>
+    public static TemplateOutputs ParseOutputs(JsonElement element)
+    {
+        var jsonObject = JsonNode.Parse(element.GetRawText()) as JsonObject ??
+                         throw new ArgumentException("Invalid JSON element");
+        return new TemplateOutputs(jsonObject);
+    }
 
     /// <summary>
     /// Parses a JSON element to create a TemplateCodeReference object.

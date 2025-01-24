@@ -13,7 +13,7 @@ using System.Xml;
 /// </summary>
 public sealed class RemoteTemplateStorage : ITemplateStorage, IDisposable
 {
-    private record TemplateData(TemplateIdentity identity, TemplateInputs inputs, TemplateCodeReference coderef);
+    private record TemplateData(TemplateIdentity identity, TemplateInputs inputs, TemplateCodeReference coderef, TemplateOutputs outputs);
 
     private readonly ILogger<RemoteTemplateStorage> _logger;
     private readonly ConcurrentDictionary<string, TemplateData> _templatesData = new ();
@@ -116,6 +116,23 @@ public sealed class RemoteTemplateStorage : ITemplateStorage, IDisposable
     }
 
     /// <summary>
+    /// Retrieves the outputs of a template by its ID.
+    /// </summary>
+    /// <param name="id">The ID of the template.</param>
+    /// <returns>The outputs of the template as a <see cref="TemplateOutputs"/>.</returns>
+    public TemplateOutputs GetTemplateOutputs(string id)
+    {
+        _logger.LogInformation("Retrieving template inputs for template ID: {TemplateId}", id);
+
+        if (!_templatesData.TryGetValue(id, out TemplateData? data))
+        {
+            throw new FileNotFoundException($"Inputs {id} not found");
+        }
+
+        return data.outputs;
+    }
+
+    /// <summary>
     /// Cleans up the resources used by the <see cref="RemoteTemplateStorage"/>.
     /// </summary>
     public void Dispose()
@@ -124,75 +141,77 @@ public sealed class RemoteTemplateStorage : ITemplateStorage, IDisposable
     }
 
     private async Task InitData()
-{
-    var listUri = new Uri(_rootUrl, $"{_rootUrl.AbsolutePath.TrimEnd('/')}/?comp=list&delimiter=/");
-
-    _logger.LogInformation("Fetching template list from URL: {ListUri}", listUri);
-    HttpResponseMessage response;
-    try
     {
-        response = await _client.GetAsync(listUri);
-        response.EnsureSuccessStatusCode();
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError(ex, "Error occurred while fetching templates list from {ListUri}", listUri);
-        throw;
-    }
+        var listUri = new Uri(_rootUrl, $"{_rootUrl.AbsolutePath.TrimEnd('/')}/?comp=list&delimiter=/");
 
-    var content = await response.Content.ReadAsStringAsync();
-    _logger.LogInformation("Received template list content: {Content}", content);
-
-    var doc = new XmlDocument();
-    try
-    {
-        doc.LoadXml(content);
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError(ex, "Error parsing XML content from {ListUri}", listUri);
-        throw;
-    }
-
-    XmlNodeList blobs = doc.GetElementsByTagName("Name");
-    foreach (XmlNode template in blobs)
-    {
-        string templateName = template.InnerText.TrimEnd('/');
-        _logger.LogInformation("Found template: {BlobName}", templateName);
-
+        _logger.LogInformation("Fetching template list from URL: {ListUri}", listUri);
+        HttpResponseMessage response;
         try
         {
-            var identityFile = await BlobFileReader.ParseFile(templateName, _rootUrl, "identity.json");
-            var inputsFile = await BlobFileReader.ParseFile(templateName, _rootUrl, "inputs.json");
-            var refFile = await BlobFileReader.ParseFile(templateName, _rootUrl, "coderef.json");
+            response = await _client.GetAsync(listUri);
+            response.EnsureSuccessStatusCode();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while fetching templates list from {ListUri}", listUri);
+            throw;
+        }
 
-            var identity = BlobFileReader.ParseIdentity(identityFile);
-            var inputs = BlobFileReader.ParseInputs(inputsFile);
-            var codeReference = BlobFileReader.ParseCodeReference(refFile);
+        var content = await response.Content.ReadAsStringAsync();
+        _logger.LogInformation("Received template list content: {Content}", content);
 
-            if (!_templatesData.TryAdd(identity.Name, new TemplateData(identity, inputs, codeReference)))
+        var doc = new XmlDocument();
+        try
+        {
+            doc.LoadXml(content);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error parsing XML content from {ListUri}", listUri);
+            throw;
+        }
+
+        XmlNodeList blobs = doc.GetElementsByTagName("Name");
+        foreach (XmlNode template in blobs)
+        {
+            string templateName = template.InnerText.TrimEnd('/');
+            _logger.LogInformation("Found template: {BlobName}", templateName);
+
+            try
             {
-                _logger.LogWarning("Storage: Template {TemplateId} already exists and was not overwritten.", identity.Name);
+                var identityFile = await BlobFileReader.ParseFile(templateName, _rootUrl, "identity.json");
+                var inputsFile = await BlobFileReader.ParseFile(templateName, _rootUrl, "inputs.json");
+                var refFile = await BlobFileReader.ParseFile(templateName, _rootUrl, "coderef.json");
+                var outputsFile = await BlobFileReader.ParseFile(templateName, _rootUrl, "outputs.json");
+
+                var identity = BlobFileReader.ParseIdentity(identityFile);
+                var inputs = BlobFileReader.ParseInputs(inputsFile);
+                var codeReference = BlobFileReader.ParseCodeReference(refFile);
+                var outputs = BlobFileReader.ParseOutputs(outputsFile);
+
+                if (!_templatesData.TryAdd(identity.Name, new TemplateData(identity, inputs, codeReference, outputs)))
+                {
+                    _logger.LogWarning("Storage: Template {TemplateId} already exists and was not overwritten.", identity.Name);
+                }
+                else
+                {
+                    _logger.LogInformation("Storage: Successfully loaded template {TemplateId}", templateName);
+                }
             }
-            else
+            catch (FileNotFoundException e)
             {
-                _logger.LogInformation("Storage: Successfully loaded template {TemplateId}", templateName);
+                _logger.LogWarning(e, "Template {TemplateId} does not have all required files", templateName);
             }
-        }
-        catch (FileNotFoundException e)
-        {
-            _logger.LogWarning(e, "Template {TemplateId} does not have all required files", templateName);
-        }
-        catch (ArgumentNullException e)
-        {
-            _logger.LogError(e, "Error parsing template {TemplateId}", templateName);
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Unexpected error while processing template {TemplateId}", templateName);
+            catch (ArgumentNullException e)
+            {
+                _logger.LogError(e, "Error parsing template {TemplateId}", templateName);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Unexpected error while processing template {TemplateId}", templateName);
+            }
         }
     }
-}
 
     /// <summary>
     /// Necessary for implementing the <see cref="IDisposable"/> interface.

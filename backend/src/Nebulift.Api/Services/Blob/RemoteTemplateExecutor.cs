@@ -15,10 +15,9 @@ using Templates;
 /// </summary>
 public class RemoteTemplateExecutor : ITemplateExecutor, IDisposable
 {
-    private readonly RemoteTemplateStorage _templateStorage;
-
     private static readonly JsonSerializerOptions _serializerOptions = new () { WriteIndented = true };
 
+    private readonly RemoteTemplateStorage _templateStorage;
     private readonly ILogger<RemoteTemplateExecutor> _logger;
     private readonly HttpClient _client = new ();
     private bool _disposed;
@@ -80,7 +79,8 @@ public class RemoteTemplateExecutor : ITemplateExecutor, IDisposable
         {
             foreach (var credential in credentialsNode.AsObject())
             {
-                bool isSecret = credential.Key.Contains("SECRET", StringComparison.OrdinalIgnoreCase) || credential.Key.Contains("TOKEN", StringComparison.OrdinalIgnoreCase);
+                bool isSecret = credential.Key.Contains("SECRET", StringComparison.OrdinalIgnoreCase) ||
+                                credential.Key.Contains("TOKEN", StringComparison.OrdinalIgnoreCase);
                 environmentVariables.Add(credential.Key, new EnvironmentVariableValue(credential.Value.ToString(), isSecret));
             }
         }
@@ -112,7 +112,10 @@ public class RemoteTemplateExecutor : ITemplateExecutor, IDisposable
             _logger.LogInformation("Output: {Key} = {Value}", output.Key, output.Value.Value);
         }
 
-        return new TemplateOutputs(outputDict);
+        TemplateOutputs outputs = _templateStorage.GetTemplateOutputs(id);
+        outputs.FillTemplateOutputs(outputDict);
+
+        return outputs;
     }
 
     private static string Serialize(object node)
