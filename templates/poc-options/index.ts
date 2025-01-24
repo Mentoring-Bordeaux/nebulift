@@ -7,12 +7,12 @@ const inputs: nebulift.Inputs = nebulift.init();
 
 const githubValues = inputs.getSectionDict("github");
 
-const repositoryName = githubValues["repositoryName"];
+const repositoryName = githubValues["repository_name"];
 const visibility = githubValues["visibility"];
 const contributors = githubValues["contributors"];
 
-const projectName = githubValues["projectName"];
-const projectDescription = githubValues["projectDescription"];
+const projectName = githubValues["project_name"];
+const projectDescription = githubValues["project_description"];
 const macros = { projectName, projectDescription };
 
 
