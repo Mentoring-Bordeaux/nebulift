@@ -35,7 +35,8 @@ jobs:
       # Build Backend Docker Image
       - name: Build Backend Docker Image
         run: |
-          docker build -t ${{ vars.AZURE_REGISTRY_LOGIN_SERVER }}/${{ env.DEV_NAMESPACE }}/nebulift-backend:${{ github.sha }} ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+          docker build -t ${{ vars.AZURE_REGISTRY_LOGIN_SERVER }}/${{ env.DEV_NAMESPACE }}/nebulift-backend:${{ github.sha }} ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/
+          --build-arg PULUMI_ACCESS_TOKEN_VALUE=${{ secrets.PULUMI_ACCESS_TOKEN }}
 
       # Push Backend Docker Image to Azure
       - name: Push Backend Docker Image
