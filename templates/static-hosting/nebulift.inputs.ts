@@ -6,11 +6,9 @@ export default class Inputs {
     if (!rawInputs) throw new Error("NEBULIFT_INPUTS environment variable is required");
     const inputs = JSON.parse(rawInputs);
 
-    console.log(inputs);
     for (const key in inputs) {
       this.blocks[key] = inputs[key];
     }
-    console.log(this.blocks);
   }
 
   getSectionDict(section: string): Record<string, any> {
