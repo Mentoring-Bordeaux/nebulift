@@ -5,13 +5,14 @@ import type { TemplateSchema, FormData } from '@/types/template';
  * Service for handling template-related API operations
  */
 class TemplateService {
-    private readonly baseUrl = 'http://localhost:5052/api/templates';
+    private readonly baseUrl: string = process.env.NODE_ENV === 'production' ? '/api/templates' : 'http://localhost:5052/api/templates';
 
     /**
      * Fetches template configuration schema by template ID
      */
     async getTemplateConfig(id: string): Promise<TemplateSchema> {
         const { data, error } = await useFetch<TemplateSchema>(`${this.baseUrl}/${id}`);
+        console.log(this.baseUrl);
 
         if (error.value) {
             console.error('Error fetching template config:', error.value);

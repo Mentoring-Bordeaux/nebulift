@@ -18,7 +18,6 @@ const links = computed(() => {
     return Object.keys(store.schema).map((sectionKey) => ({
         label: store.schema![sectionKey].title,
         value: sectionKey,
-        //click: () => (activeTab.value = sectionKey)
     }));
 });
 
