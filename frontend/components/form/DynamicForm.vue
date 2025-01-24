@@ -18,7 +18,6 @@ const links = computed(() => {
     return Object.keys(store.schema).map((sectionKey) => ({
         label: store.schema![sectionKey].title,
         value: sectionKey,
-        //click: () => (activeTab.value = sectionKey)
     }));
 });
 
@@ -37,9 +36,13 @@ const isSectionValid = computed(() => {
 
     return Object.keys(section.properties).every((fieldKey) => {
         const value = store.formData[sectionKey]?.[fieldKey];
+        const config = section.properties[fieldKey];
 
         if (Array.isArray(value)) {
-            return value.length > 0 && value.every((item) => item && item.trim() !== '');
+            const minItems = config.minItems === undefined ? 1 : config.minItems;
+            const filledItemsCount = value.filter((item) => item && item.trim() !== '').length;
+
+            return filledItemsCount >= minItems;
         }
         
         return value && value.trim() !== '';
@@ -69,12 +72,17 @@ const validateSection = (): boolean => {
 
     let hasErrors = false;
 
-    Object.entries(section.properties).forEach(([fieldKey]) => {
+    Object.entries(section.properties).forEach(([fieldKey, config]) => {
         const value = store.formData[sectionKey]?.[fieldKey];
 
         if (Array.isArray(value)) {
-            if (value.length === 0 || value.some((item) => !item || item.trim() === '')) {
-                errors.value[sectionKey][fieldKey] = 'At least one item is required and all items must be filled';
+            const minItems = config.minItems === undefined ? 1 : config.minItems;
+            console.log("validate section: " + minItems);
+            const filledItemsCount = value.filter((item) => item && item.trim() !== '').length;
+            console.log("filled: " + filledItemsCount);
+            
+            if (filledItemsCount < minItems) {
+                errors.value[sectionKey][fieldKey] = `At least ${minItems} item(s) must be filled`;
                 hasErrors = true;
             }
         } else if (!value || value.trim() === '') {

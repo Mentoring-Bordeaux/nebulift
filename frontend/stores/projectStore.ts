@@ -12,7 +12,8 @@ export const useProjectStore = defineStore('projects', () => {
       const fetchedProjects = await api.project.getAll();
       projects.value = fetchedProjects.map(item => ({
         name: item.name,
-        technologies: item.technologies
+        technologies: item.technologies,
+        description: item.description,
       }));
     } catch (err) {
       error.value = 'Error fetching projects';

@@ -3,6 +3,7 @@ import { useFetch } from '#app';
 export interface Project {
     name: string;
     technologies: string[];
+    description: string;
 }
 
 const projectApi = {
@@ -24,7 +25,9 @@ const projectApi = {
      * }
      */
     getAll: async (): Promise<Project[]> => {
-        const { data, error } = await useFetch<Project[]>('http://localhost:5052/api/templates');
+        const baseUrl: string = process.env.NODE_ENV === 'production' ? '/api/templates' : 'http://localhost:5052/api/templates';
+        const { data, error } = await useFetch<Project[]>(baseUrl);
+        console.log(baseUrl);
         if (error.value) {
             console.error('Error fetching projects:', error.value);
             throw error.value;
