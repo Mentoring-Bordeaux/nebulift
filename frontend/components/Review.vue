@@ -2,7 +2,6 @@
 import { useTemplateConfigStore } from '@/stores/templateConfigStore';
 import type { TemplateSchema, FormData } from '~/types/template';
 
-const store = useTemplateConfigStore();
 interface Props {
     formData: FormData;
     schema: TemplateSchema;

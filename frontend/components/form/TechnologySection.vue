@@ -27,13 +27,6 @@ const updateField = (field: string, value: string) => {
     });
 };
 
-// Create entries array with explicit typing
-const schemaEntries = Object.entries(props.schema).map(
-    ([key, config]) => ({
-        key: ensureString(key),
-        config
-    })
-);
 </script>
 
 <template>

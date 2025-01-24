@@ -7,7 +7,7 @@ export interface FieldConfig {
 }
 
 export interface SectionSchema {  // Renamed from TechnologySection
-    type: string; // "object"
+    type: string;
     title: string;
     description: string;
     properties: {
