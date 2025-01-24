@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useTemplateConfigStore } from '@/stores/templateConfigStore';
 import type { TemplateSchema, FormData } from '~/types/template';
 
 interface Props {
@@ -11,6 +10,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     errors: () => ({})
 });
+const emit = defineEmits(['back', 'create'])
 </script>
 
 <template>
@@ -29,18 +29,18 @@ const props = withDefaults(defineProps<Props>(), {
         <div class="flex justify-between mt-6">
             <button 
                 type="button" 
-                @click="$emit('back')" 
                 class="px-4 py-2 w-24 bg-gray-600 text-white rounded-xl hover:bg-gray-700 
-                   focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                        focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                @click="emit('back')" 
             >
                 Back
             </button>
             <button 
                 type="button" 
-                @click="$emit('create')" 
                 class="px-4 py-2 w-32 bg-orange-600 text-white rounded-2xl hover:bg-orange-500 
-                   focus:outline-none focus:ring-2 focus:ring-orange-700 focus:ring-offset-2 
-                   disabled:opacity-50 disabled:cursor-not-allowed font-bold"
+                        focus:outline-none focus:ring-2 focus:ring-orange-700 focus:ring-offset-2 
+                        disabled:opacity-50 disabled:cursor-not-allowed font-bold"
+                @click="emit('create')" 
             >
                 Create
             </button>

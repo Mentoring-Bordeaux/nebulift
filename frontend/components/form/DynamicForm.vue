@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import type { TemplateSchema, SectionSchema } from '@/types/template';
+import type { TemplateSchema } from '@/types/template';
 import { useTemplateConfigStore } from '@/stores/templateConfigStore';
 import TechnologySection from './TechnologySection.vue';
-import Review from '../Review.vue';
+import Review from '../ReviewConfiguration.vue';
 
 const store = useTemplateConfigStore();
 
@@ -29,6 +29,17 @@ const sections = computed(() => {
 const currentSectionIndex = computed(() => sections.value.indexOf(activeTab.value));
 const isFirstSection = computed(() => currentSectionIndex.value === 0);
 const isLastSection = computed(() => currentSectionIndex.value === sections.value.length - 1);
+const isSectionValid = computed(() => {
+    const sectionKey = activeTab.value;
+    const section = store.schema?.[sectionKey];
+
+    if (!section) return false;
+
+    return Object.keys(section.properties).every((fieldKey) => {
+        const value = store.formData[sectionKey]?.[fieldKey];
+        return value && value.trim() !== '';
+    });
+});
 
 const goToNextSection = () => {
     if (!isLastSection.value) {
@@ -53,7 +64,7 @@ const validateSection = (): boolean => {
 
     let hasErrors = false;
 
-    Object.entries(section.properties).forEach(([fieldKey, config]) => {
+    Object.entries(section.properties).forEach(([fieldKey]) => {
         const value = store.formData[sectionKey]?.[fieldKey];
 
         if (!value || value === '') {
@@ -62,12 +73,13 @@ const validateSection = (): boolean => {
         }
     });
 
-    if (!hasErrors) {
-        delete errors.value[sectionKey];
-        return true;
-    }
+    // if (!hasErrors) {
+    //     delete errors.value[sectionKey];
+    //     return true;
+    // }
 
-    return false;
+    // return false;
+    return !hasErrors;
 };
 
 const handleNext = () => {
@@ -115,8 +127,10 @@ watch(() => store.schema, (newSchema) => {
             <div class="mb-6">
                 <UHorizontalNavigation :links="links" class="border-b border-gray-200 dark:border-gray-800">
                     <template #default="{ link }">
-                        <span class="text-base relative"
-                            :class="activeTab === link.value ? 'text-orange-600 group-hover:text-orange-600' : 'group-hover:text-gray-500'">
+                        <span 
+                            class="text-base relative"
+                            :class="activeTab === link.value ? 'text-orange-600 group-hover:text-orange-600' : 'group-hover:text-gray-500'"
+                        >
                             {{ link.label }}
                         </span>
                     </template>
@@ -125,28 +139,47 @@ watch(() => store.schema, (newSchema) => {
 
             <!-- Active tab form -->
             <div v-if="store.schema">
-                <TechnologySection :key="activeTab" :section-key="activeTab" :schema="store.schema[activeTab]"
-                    :model-value="store.formData[activeTab] || {}" :errors="errors[activeTab]"
+                <TechnologySection 
+                    :key="activeTab" 
+                    :section-key="activeTab" 
+                    :schema="store.schema[activeTab]"
+                    :model-value="store.formData[activeTab] || {}" 
+                    :errors="errors[activeTab]"
                     @update:model-value="(value: Record<string, string>) => handleFormUpdate(activeTab, value)" />
             </div>
 
             <!-- Navigation buttons -->
             <div class="flex flex-row-reverse justify-between mt-6">
-                <button type="button" @click="handleNext" class="px-4 py-2 w-32 bg-orange-600 text-white rounded-2xl hover:bg-orange-500 
-                 focus:outline-none focus:ring-2 focus:ring-orange-700 focus:ring-offset-2
-                 disabled:opacity-50 disabled:cursor-not-allowed font-bold" :disabled="store.loading">
+                <button 
+                    type="button" 
+                    :class="{
+                        'px-4 py-2 w-32 text-white rounded-2xl focus:outline-none focus:ring-2 focus:ring-offset-2 font-bold': true,
+                        'bg-gray-600 hover:bg-gray-700 focus:ring-gray-500': !isSectionValid,
+                        'bg-orange-600 hover:bg-orange-500 focus:ring-orange-700': isSectionValid
+                    }" 
+                    :disabled="store.loading" 
+                    @click="handleNext"
+                >
                     {{ isLastSection ? 'Validate' : 'Next' }}
                 </button>
 
-                <button v-if="!isFirstSection" type="button" @click="handleBack" class="px-4 py-2 w-24 bg-gray-600 text-white rounded-xl hover:bg-gray-700 
-                 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                <button 
+                    v-if="!isFirstSection" 
+                    type="button" 
+                    class="px-4 py-2 w-24 bg-gray-600 text-white rounded-xl hover:bg-gray-700 
+                            focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"    
+                    @click="handleBack" 
+                >
                     Back
                 </button>
             </div>
         </template>
 
         <!-- Review Page -->
-        <Review v-else-if="showReview" :form-data="store.formData" :schema="store.schema as TemplateSchema"
+        <Review 
+            v-else-if="showReview" 
+            :form-data="store.formData" 
+            :schema="store.schema as TemplateSchema"
             @create="store.submitConfig" @back="showReview = false" />
     </div>
 </template>

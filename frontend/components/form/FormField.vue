@@ -46,16 +46,16 @@ const inputBaseClasses = `
         <div class="relative">
             <input 
                 v-if="!isSelectField" 
-                :value="modelValue"
-                @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)" 
                 type="text"
+                :value="modelValue"
                 :class="inputBaseClasses" 
-            />
+                @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)" 
+            >
 
             <select 
                 v-else :value="modelValue"
-                @change="emit('update:modelValue', ($event.target as HTMLSelectElement).value)"
                 :class="inputBaseClasses"
+                @change="emit('update:modelValue', ($event.target as HTMLSelectElement).value)"
             >
                 <option value="" disabled>Select an option</option>
                 <option 

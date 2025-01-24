@@ -87,8 +87,8 @@ const handleRetry = async () => {
           </h1>
           
           <button
-            @click="router.push('/')"
             class="text-gray-600 hover:text-gray-900"
+            @click="router.push('/')"
           >
             Back to Templates
           </button>
@@ -122,8 +122,8 @@ const handleRetry = async () => {
               {{ localError || templateConfigStore.error }}
             </p>
             <button
-              @click="handleRetry"
-              class="mt-2 text-sm text-red-700 hover:text-red-600 font-medium underline"
+                class="mt-2 text-sm text-red-700 hover:text-red-600 font-medium underline"
+                @click="handleRetry"
             >
               Retry
             </button>

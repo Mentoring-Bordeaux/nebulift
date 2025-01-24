@@ -17,9 +17,6 @@ const emit = defineEmits<{
     (e: 'update:modelValue', value: Record<string, string>): void;
 }>();
 
-// Helper function to ensure string keys
-const ensureString = (key: string | number): string => String(key);
-
 const updateField = (field: string, value: string) => {
     emit('update:modelValue', {
         ...props.modelValue,
@@ -42,8 +39,13 @@ const updateField = (field: string, value: string) => {
         
 
         <div class="space-y-4">
-            <FormField v-for="(config, field) in schema.properties" :key="field" :field-key="String(field)"
-                :field-config="config" :model-value="modelValue[field] ?? ''" :error="errors?.[field]"
+            <FormField 
+                v-for="(config, field) in schema.properties" 
+                :key="field" 
+                :field-key="String(field)"
+                :field-config="config" 
+                :model-value="modelValue[field] ?? ''" 
+                :error="errors?.[field]"
                 @update:model-value="updateField(String(field), $event)" />
         </div>
     </div>
