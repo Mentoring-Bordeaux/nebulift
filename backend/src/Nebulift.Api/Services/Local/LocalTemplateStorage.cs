@@ -1,7 +1,7 @@
-namespace Nebulift.Api.Templates;
+namespace Nebulift.Api.Services.Local;
 
 using Types;
-using Nebulift.Api.Configuration;
+using Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.IO;
@@ -11,21 +11,21 @@ using System.Text.Json.Nodes;
 /// <summary>
 /// A local template service implementation for accessing and running templates stored in the Nebulift project repository.
 /// </summary>
-public class LocalTemplateService : ITemplateService
+public class LocalTemplateStorage : ITemplateStorage
 {
     private readonly string _templatesFolderPath;
-    private readonly ILogger<LocalTemplateService> _logger;
+    private readonly ILogger<LocalTemplateStorage> _logger;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="LocalTemplateService"/> class with a specified templates folder.
+    /// Initializes a new instance of the <see cref="LocalTemplateStorage"/> class with a specified 'templates' folder.
     /// </summary>
     /// <param name="options">The options containing the folder path where template data is stored.</param>
     /// <param name="logger">An instance of <see cref="ILogger{LocalTemplateService}"/> for logging.</param>
-    public LocalTemplateService(IOptions<LocalTemplateServiceOptions> options, ILogger<LocalTemplateService> logger)
+    public LocalTemplateStorage(IOptions<LocalTemplateServiceOptions> options, ILogger<LocalTemplateStorage> logger)
     {
         _templatesFolderPath = options == null
-                                ? throw new ArgumentNullException(nameof(options))
-                                : options.Value.TemplatesFolderPath ?? throw new ArgumentNullException(nameof(options));
+            ? throw new ArgumentNullException(nameof(options))
+            : options.Value.TemplatesFolderPath ?? throw new ArgumentNullException(nameof(options));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -138,17 +138,17 @@ public class LocalTemplateService : ITemplateService
         }
     }
 
-    /// <summary>
-    /// Executes a specific template with parameters.
-    /// </summary>
-    /// <param name="id">The ID of the template to execute.</param>
-    /// <param name="inputs">The template inputs.</param>
-    /// <returns>The outputs of the template as a <see cref="TemplateOutputs"/>.</returns>
-    public TemplateOutputs ExecuteTemplate(string id, TemplateInputs inputs)
-    {
-        _logger.LogInformation("Executing template {TemplateId} with parameters {TemplateInputs}", id, inputs);
-
-        // Placeholder implementation
-        throw new NotImplementedException();
-    }
+    // /// <summary>
+    // /// Executes a specific template with parameters.
+    // /// </summary>
+    // /// <param name="identity">TemplateIdentity of the template to execute.</param>
+    // /// <param name="inputs">The template inputs.</param>
+    // /// <returns>The outputs of the template as a <see cref="TemplateOutputs"/>.</returns>
+    // public Task<TemplateOutputs?> ExecuteTemplate(TemplateIdentity identity, TemplateInputs inputs)
+    // {
+    //     _logger.LogInformation("Executing template {TemplateId} with parameters {TemplateInputs}", identity, inputs);
+    //
+    //     // Placeholder implementation
+    //     throw new NotImplementedException();
+    // }
 }

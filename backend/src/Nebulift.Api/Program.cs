@@ -1,7 +1,10 @@
 namespace Nebulift.Api;
-using Nebulift.Api.Templates;
-using Nebulift.Api.Configuration;
-using EnvironmentName = Microsoft.Extensions.Hosting.EnvironmentName;
+
+using Middleware;
+using Templates;
+using Configuration;
+using Services;
+using Services.Blob;
 
 /// <summary>
 /// Main program for Nebulift backend.
@@ -15,13 +18,16 @@ public static class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-        builder.Services.Configure<LocalTemplateServiceOptions>(builder.Configuration.GetSection("LocalTemplateServiceOptions"));
-        builder.Services.AddScoped<ITemplateService, LocalTemplateService>();
+        builder.Services.Configure<RemoteTemplateServiceOptions>(
+            builder.Configuration.GetSection("RemoteTemplateServiceOptions"));
+        builder.Services.AddSingleton<ITemplateStorage, RemoteTemplateStorage>();
+        builder.Services.AddScoped<ITemplateExecutor, RemoteTemplateExecutor>();
 
         // Add services to the container.
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
+        builder.Services.AddTransient<ExceptionMiddleware>();
 
         // Add logging services (ILogger)
         builder.Services.AddLogging();
@@ -31,12 +37,25 @@ public static class Program
         {
             options.AddPolicy(
                 "AllowSpecificOrigin",
-                builder => builder.WithOrigins("http://localhost:3000")
+                policy => policy.WithOrigins("http://localhost:3000")
                     .AllowAnyHeader()
                     .AllowAnyMethod());
         });
 
+        builder.Services.AddHealthChecks();
+
         var app = builder.Build();
+
+        // Forcing instantiation of template storage to run the first requests.
+        try
+        {
+            app.Services.GetRequiredService<ITemplateStorage>();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error while initializing template storage: " + e.Message);
+            return;
+        }
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
@@ -48,8 +67,10 @@ public static class Program
         app.UseHttpsRedirection();
         app.UseAuthorization();
 
-        // Use CORS middleware
-        app.UseCors("AllowSpecificOrigin");
+        app.UseHealthChecks("/api/health");
+
+        // Use custom exception middleware
+        app.UseMiddleware<ExceptionMiddleware>();
 
         app.MapControllers();
 

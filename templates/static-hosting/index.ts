@@ -18,7 +18,7 @@ const repo = new github.Repository("repo", {
 });
 
 // Create a new file in the GitHub repository from a string
-const helloWorldFile = new github.RepositoryFile("helloWorldFile", {
+new github.RepositoryFile("helloWorldFile", {
     repository: repo.name,
     file: "helloworld.txt",
     content: "Hello, World!",
@@ -27,17 +27,15 @@ const helloWorldFile = new github.RepositoryFile("helloWorldFile", {
 
 
 // Create a new file in the GitHub repository from a local file
-const indexHtmlFile = new github.RepositoryFile("indexHtmlFile", {
+new github.RepositoryFile("indexHtmlFile", {
     repository: repo.name,
     file: "index.html",
     commitMessage: "Add index.html",
     content: fs.readFileSync("./index.html", "utf-8"),
 });
 
-// Export the repository name and file path
-export const repoName = repo.name;
-export const filePath = helloWorldFile.file;
-
+// Export the repository URL
+export const repositoryUrl = repo.httpCloneUrl;
 
 // Create an Azure Resource Group
 const resourceGroup = new azure.resources.ResourceGroup("resourceGroup", {
@@ -55,7 +53,7 @@ const storageAccount = new azure.storage.StorageAccount("nebuliftstorage", {
 });
 
 // Enable static website hosting on the Storage Account
-const staticWebsite = new azure.storage.StorageAccountStaticWebsite(
+new azure.storage.StorageAccountStaticWebsite(
     "staticWebsite",
     {
         accountName: storageAccount.name,

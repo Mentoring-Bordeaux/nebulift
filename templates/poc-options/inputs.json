@@ -1,0 +1,15 @@
+{
+    "GitHub" : {
+        "Name" : {
+            "value" : "string",
+            "description" : "Name of the GitHub repository"
+        },
+        "Visibility" : {
+            "value" : ["public", "private", "internal"],
+            "description" : "Visibility of the GitHub repository"
+        },
+		"Contributors" : {
+			"value": "array"
+		}
+    }
+}
