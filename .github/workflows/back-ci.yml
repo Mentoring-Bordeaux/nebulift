@@ -1,6 +1,9 @@
 name: Back CI
 
 on:
+  push:
+    branches:
+      - delivery/*
   workflow_dispatch:
     inputs:
       environment:
