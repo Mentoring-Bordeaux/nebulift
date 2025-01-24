@@ -1,7 +1,6 @@
 namespace Nebulift.Api;
 
 using Middleware;
-using Templates;
 using Configuration;
 using Services;
 using Services.Blob;

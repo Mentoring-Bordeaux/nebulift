@@ -1,25 +1,25 @@
 namespace Nebulift.Api.Types;
 
-using System.Text.Json;
+using System.Text.Json.Nodes;
 
 /// <summary>
-/// Represents the outputs of a template.
+/// Represents the inputs of a template.
 /// </summary>
 public readonly struct TemplateOutputs : IEquatable<TemplateOutputs>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="TemplateOutputs"/> struct.
     /// </summary>
-    /// <param name="dictionary">The content of the template inputs.</param>
-    public TemplateOutputs(Dictionary<string, string> dictionary)
+    /// <param name="content">The content of the template inputs.</param>
+    public TemplateOutputs(JsonObject content)
     {
-        Content = dictionary ?? throw new ArgumentNullException(nameof(dictionary));
+        Content = content ?? throw new ArgumentNullException(nameof(content));
     }
 
     /// <summary>
     /// Gets the content of the template inputs.
     /// </summary>
-    public Dictionary<string, string> Content { get; }
+    public JsonObject Content { get; }
 
     /// <summary>
     /// Determines whether two <see cref="TemplateOutputs"/> instances are equal.
@@ -61,5 +61,21 @@ public readonly struct TemplateOutputs : IEquatable<TemplateOutputs>
     /// Returns a string representation of the current <see cref="TemplateOutputs"/>.
     /// </summary>
     /// <returns>A string representation of the <see cref="TemplateOutputs"/>.</returns>
-    public override string ToString() => JsonSerializer.Serialize(Content);
+    public override string ToString() => $"Content: {Content}";
+
+    /// <summary>
+    /// Fill the template outputs JSON object with the given content. Adds a "value" property to every node.
+    /// </summary>
+    /// <param name="content">Key / Value pairs.</param>
+    public void FillTemplateOutputs(Dictionary<string, string> content)
+    {
+        ArgumentNullException.ThrowIfNull(content);
+
+        foreach (var property in content)
+        {
+            var node = Content[property.Key];
+            ArgumentNullException.ThrowIfNull(node);
+            node["value"] = property.Value;
+        }
+    }
 }

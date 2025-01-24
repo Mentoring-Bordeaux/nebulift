@@ -29,4 +29,11 @@ public interface ITemplateStorage
     /// <param name="id">The ID of the template.</param>
     /// <returns>The inputs of the template as a <see cref="TemplateInputs"/>.</returns>
     public TemplateInputs GetTemplateInputs(string id);
+
+    /// <summary>
+    /// Retrieves the outputs of a template by its ID.
+    /// </summary>
+    /// <param name="id">The ID of the template.</param>
+    /// <returns>The outputs of the template as a <see cref="TemplateOutputs"/>.</returns>
+    public TemplateOutputs GetTemplateOutputs(string id);
 }

@@ -1,36 +1,81 @@
 {
-    "HTML" : {
-        "URL" : {
-            "value" : "string",
-            "description" : "Internet URL to copy the HTML from"
-        },
-        "Path" : {
-            "value" : "string",
-            "description" : "Repository folder to put the HTML in"
+    "github": {
+        "description": "GitHub repository options",
+        "title": "GitHub",
+        "type": "object",
+        "properties": {
+            "repository_name": {
+                "description": "Name of the GitHub repository",
+                "title": "Repository name",
+                "type": "string"
+            },
+            "visibility": {
+                "description": "Whether the repository is public or private",
+                "title": "Repository visibility",
+                "type": "string",
+                "enum": [
+                    "public",
+                    "private"
+                ]
+            },
+            "contributors": {
+                "description": "GitHub contributors to the repository",
+                "title": "Repository contributors",
+                "type": "array",
+                "minItems": 0,
+                "items": {
+                    "type": "string"
+                }
+            }
         }
     },
-    "GitHub" : {
-        "Name" : {
-            "value" : "string",
-            "description" : "Name of the GitHub repository"
-        },
-        "Description" : {
-            "value" : "string",
-            "description" : "Description of the GitHub repository"
-        },
-        "Visibility" : {
-            "value" : ["public", "private", "internal"],
-            "description" : "Visibility of the GitHub repository"
+    "azure": {
+        "description": "Azure options",
+        "title": "Azure",
+        "type": "object",
+        "properties": {
+            "welcome_message": {
+                "description": "Message shown on web page",
+                "title": "Welcome message",
+                "type": "string"
+            }
         }
     },
-    "Azure" : {
-        "Account name": {
-            "value" : "string",
-            "description" : "Name of the Azure account creating the resource"
-        },
-        "Resource group": {
-            "value" : "string",
-            "description" : "Name of the resource group used to store the static site"
+    "credentials": {
+        "type": "object",
+        "title": "Credentials",
+        "description": "",
+        "properties": {
+            "githubToken": {
+                "type": "string",
+                "title": "GitHub Token",
+                "description": "GitHub token to create the repository, should be allowed to create repositories"
+            },
+            "pulumiUser": {
+                "type": "string",
+                "title": "Pulumi User",
+                "description": "Pulumi user to create the stack"
+            },
+            "ARM_CLIENT_ID": {
+                "type": "string",
+                "title": "ARM Client ID",
+                "description": "Azure client ID to authenticate with Azure"
+            },
+            "ARM_CLIENT_SECRET": {
+                "type": "string",
+                "title": "ARM Client Secret",
+                "description": "Azure client secret to authenticate with Azure"
+            },
+            "ARM_SUBSCRIPTION_ID": {
+                "type": "string",
+                "title": "ARM Subscription ID",
+                "description": "Azure subscription ID to authenticate with Azure"
+            },
+            "ARM_TENANT_ID": {
+                "type": "string",
+                "title": "ARM Tenant ID",
+                "description": "Azure tenant ID to authenticate with Azure"
+            }
         }
     }
 }

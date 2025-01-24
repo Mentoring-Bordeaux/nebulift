@@ -5,19 +5,18 @@ using Pulumi.Automation;
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using Exceptions;
-using Templates;
 
 /// <summary>
 /// Runs templates remotely (using a GitHub repository) with Pulumi Automation.
 /// </summary>
 public class RemoteTemplateExecutor : ITemplateExecutor, IDisposable
 {
-    private readonly RemoteTemplateStorage _templateStorage;
-
     private static readonly JsonSerializerOptions _serializerOptions = new () { WriteIndented = true };
 
+    private readonly RemoteTemplateStorage _templateStorage;
     private readonly ILogger<RemoteTemplateExecutor> _logger;
     private readonly HttpClient _client = new ();
     private bool _disposed;
@@ -42,21 +41,25 @@ public class RemoteTemplateExecutor : ITemplateExecutor, IDisposable
     /// <returns>
     /// The outputs of the template execution, or <c>null</c> if the execution failed.
     /// </returns>
-    public async Task<TemplateOutputs?> ExecuteTemplate(string id, TemplateInputs inputs)
+    public async Task<TemplateOutputs> ExecuteTemplate(string id, TemplateInputs inputs)
     {
         _logger.LogInformation("Executing template with ID: {Id}", id);
         var templateCodeReference = _templateStorage.GetTemplateCodeReference(id);
 
-        var inputNode = inputs.Content["templateData"]?["inputs"];
+        var inputNode = new JsonObject();
+        foreach (var property in inputs.Content)
+        {
+            if (property.Key != "credentials")
+            {
+                inputNode[property.Key] = property.Value?.DeepClone();
+            }
+        }
+
         var inputString = Serialize(inputNode);
 
-        var authNode = inputs.Content["templateData"]?["auth"];
-        var pulumiUser = authNode?["pulumiUser"]?.ToString();
-        var githubToken = authNode?["githubToken"]?.ToString();
-        var azureClientId = authNode?["azureClientId"]?.ToString();
-        var azureClientSecret = authNode?["azureClientSecret"]?.ToString();
-        var azureSubscriptionId = authNode?["azureSubscriptionId"]?.ToString();
-        var azureTenantId = authNode?["azureTenantId"]?.ToString();
+        var credentialsNode = inputs.Content["credentials"];
+        var pulumiUser = credentialsNode?["pulumiUser"]?.ToString();
+        var githubToken = credentialsNode?["githubToken"]?.ToString();
 
         if (pulumiUser == null || githubToken == null)
         {
@@ -65,20 +68,28 @@ public class RemoteTemplateExecutor : ITemplateExecutor, IDisposable
 
         var stackName = $"{pulumiUser}/{id}/dev-{Guid.NewGuid().ToString("N")[..8]}";
 
+        var environmentVariables = new Dictionary<string, EnvironmentVariableValue>
+        {
+            { "NODE_OPTIONS", new EnvironmentVariableValue("--max-old-space-size=1000000") },
+            { "NEBULIFT_INPUTS", new EnvironmentVariableValue(inputString) },
+        };
+
+        if (credentialsNode != null)
+        {
+            foreach (var credential in credentialsNode.AsObject())
+            {
+                bool isSecret = credential.Key.Contains("SECRET", StringComparison.OrdinalIgnoreCase) ||
+                                credential.Key.Contains("TOKEN", StringComparison.OrdinalIgnoreCase);
+                environmentVariables.Add(credential.Key, new EnvironmentVariableValue(credential.Value.ToString(), isSecret));
+            }
+        }
+
         var stackArgs = new RemoteGitProgramArgs(stackName, templateCodeReference.Url.ToString())
         {
             ProjectPath = templateCodeReference.Path,
             Branch = templateCodeReference.Branch,
             Auth = new RemoteGitAuthArgs { PersonalAccessToken = githubToken },
-            EnvironmentVariables = new Dictionary<string, EnvironmentVariableValue>
-            {
-                { "NODE_OPTIONS", new EnvironmentVariableValue("--max-old-space-size=1000000") },
-                { "NEBULIFT_INPUTS", new EnvironmentVariableValue(inputString) },
-                { "ARM_CLIENT_ID", new EnvironmentVariableValue(azureClientId) },
-                { "ARM_CLIENT_SECRET", new EnvironmentVariableValue(azureClientSecret, true) },
-                { "ARM_SUBSCRIPTION_ID", new EnvironmentVariableValue(azureSubscriptionId) },
-                { "ARM_TENANT_ID", new EnvironmentVariableValue(azureTenantId) },
-            },
+            EnvironmentVariables = environmentVariables,
         };
 
         var stack = await RemoteWorkspace.CreateStackAsync(stackArgs);
@@ -100,7 +111,10 @@ public class RemoteTemplateExecutor : ITemplateExecutor, IDisposable
             _logger.LogInformation("Output: {Key} = {Value}", output.Key, output.Value.Value);
         }
 
-        return new TemplateOutputs(outputDict);
+        TemplateOutputs outputs = _templateStorage.GetTemplateOutputs(id);
+        outputs.FillTemplateOutputs(outputDict);
+
+        return outputs;
     }
 
     private static string Serialize(object node)

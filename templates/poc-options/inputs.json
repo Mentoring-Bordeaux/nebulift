@@ -1,15 +1,59 @@
 {
-    "GitHub" : {
-        "Name" : {
-            "value" : "string",
-            "description" : "Name of the GitHub repository"
-        },
-        "Visibility" : {
-            "value" : ["public", "private", "internal"],
-            "description" : "Visibility of the GitHub repository"
-        },
-		"Contributors" : {
-			"value": "array"
-		}
+    "github": {
+        "description": "GitHub repository options",
+        "title": "GitHub",
+        "type": "object",
+        "properties": {
+            "repository_name": {
+                "description": "Name of the GitHub repository",
+                "title": "Repository name",
+                "type": "string"
+            },
+            "visibility": {
+                "description": "Whether the repository is public or private",
+                "title": "Repository visibility",
+                "type": "string",
+                "enum": [
+                    "public",
+                    "private"
+                ]
+            },
+            "contributors": {
+                "description": "GitHub contributors to the repository",
+                "title": "Repository contributors",
+                "type": "array",
+                "minItems": 0,
+                "items": {
+                    "type": "string"
+                }
+            },
+            "project_name": {
+                "description": "Name of the GitHub project, to be replaced in README.md",
+                "title": "Project name",
+                "type": "string"
+            },
+            "project_description": {
+                "description": "Description of the GitHub project, to be replaced in README.md",
+                "title": "Project description",
+                "type": "string"
+            }
+        }
+    },
+    "credentials": {
+        "description": "Required credentials to create the project",
+        "title": "Credentials",
+        "type": "object",
+        "properties": {
+            "githubToken": {
+                "description": "GitHub token to create the repository, should be allowed to create repositories",
+                "title": "GitHub token",
+                "type": "string"
+            },
+            "pulumiUser": {
+                "description": "Pulumi username to create the stack",
+                "title": "Pulumi username",
+                "type": "string"
+            }
+        }
     }
 }

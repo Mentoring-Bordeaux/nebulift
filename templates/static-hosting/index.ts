@@ -2,37 +2,45 @@ import * as pulumi from "@pulumi/pulumi";
 import * as github from "@pulumi/github";
 import * as azure from "@pulumi/azure-native";
 import * as fs from "fs";
+import * as nebulift from "./nebulift";
 
-// Define the repository and branch where the file will be uploaded
-const repositoryName = "static-hosting";
+
+const inputs: nebulift.Inputs = nebulift.init();
+
+const githubValues = inputs.getSectionDict("github");
+
+const repoName = githubValues["repository_name"];
+const visibility = githubValues["visibility"];
+const contributors = githubValues["contributors"];
+
+const welcomeMessage = inputs.getSectionValue("azure", "welcome_message");
+
+
 
 // Create a new GitHub repository
 const repo = new github.Repository("repo", {
-    name: repositoryName,
-    description: "A new repository created with Pulumi",
-    visibility: "public",
+    name: repoName,
+    description: "Repository created by Pulumi",
+    visibility: visibility,
     autoInit: true,
     hasIssues: true,
     hasWiki: true,
     hasProjects: true,
 });
 
-// Create a new file in the GitHub repository from a string
-new github.RepositoryFile("helloWorldFile", {
-    repository: repo.name,
-    file: "helloworld.txt",
-    content: "Hello, World!",
-    commitMessage: "Add helloworld.txt",
+const sourcePath = "./code";
+console.log(`Adding source code from ${sourcePath} to repository ${repoName}...`);
+repo.name.apply((name) => {
+  nebulift.addSourceCode(repoName, sourcePath, {welcomeMessage})
+
+  for (const user of contributors) {
+    new github.RepositoryCollaborator("repo_user" + user, {
+      repository: repo.name,
+      username: user,
+    });
+  }
 });
 
-
-// Create a new file in the GitHub repository from a local file
-new github.RepositoryFile("indexHtmlFile", {
-    repository: repo.name,
-    file: "index.html",
-    commitMessage: "Add index.html",
-    content: fs.readFileSync("./index.html", "utf-8"),
-});
 
 // Export the repository URL
 export const repositoryUrl = repo.httpCloneUrl;
@@ -70,13 +78,21 @@ const webContainer = new azure.storage.BlobContainer("$web", {
     publicAccess: azure.storage.PublicAccess.Blob, // Allow public access to blobs
 });
 
+let fileContent = fs.readFileSync(sourcePath + "/index.html", "utf8");
+
+// Replace all macros in the file
+const regex = new RegExp(`@@@welcomeMessage@@@`, "g");
+fileContent = fileContent.replace(regex, welcomeMessage);
+console.log(fileContent);
+
 // Example: Uploading a sample index.html to $web container
 const indexHtml = new azure.storage.Blob("index.html", {
     resourceGroupName: resourceGroup.name,
     accountName: storageAccount.name,
     containerName: webContainer.name,
-    source: new pulumi.asset.FileAsset("index.html"), // Assumes index.html is in the same directory
+    source: new pulumi.asset.StringAsset(fileContent), // Assumes index.html is in the same directory
     contentType: "text/html",
+    blobName: "index.html"
 });
 
 export const staticEndpoint = storageAccount.primaryEndpoints.web;

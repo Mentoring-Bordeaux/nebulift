@@ -1,4 +1,5 @@
 {
     "name" : "poc-options",
-    "technologies" : ["HTML", "GitHub", "Azure"]
+    "technologies" : ["GitHub"],
+    "description" : "A simple GitHub repository creation template"
 }

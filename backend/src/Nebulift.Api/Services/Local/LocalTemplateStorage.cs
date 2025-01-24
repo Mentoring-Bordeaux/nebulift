@@ -138,17 +138,38 @@ public class LocalTemplateStorage : ITemplateStorage
         }
     }
 
-    // /// <summary>
-    // /// Executes a specific template with parameters.
-    // /// </summary>
-    // /// <param name="identity">TemplateIdentity of the template to execute.</param>
-    // /// <param name="inputs">The template inputs.</param>
-    // /// <returns>The outputs of the template as a <see cref="TemplateOutputs"/>.</returns>
-    // public Task<TemplateOutputs?> ExecuteTemplate(TemplateIdentity identity, TemplateInputs inputs)
-    // {
-    //     _logger.LogInformation("Executing template {TemplateId} with parameters {TemplateInputs}", identity, inputs);
-    //
-    //     // Placeholder implementation
-    //     throw new NotImplementedException();
-    // }
+    /// <summary>
+    /// Retrieves the outputs of a template by its ID.
+    /// </summary>
+    /// <param name="id">The ID of the template.</param>
+    /// <returns>The outputs of the template as a <see cref="TemplateOutputs"/>.</returns>
+    public TemplateOutputs GetTemplateOutputs(string id)
+    {
+        var outputsFilePath = Path.Combine(_templatesFolderPath, id, "outputs.json");
+        _logger.LogInformation("Fetching template outputs for template ID: {TemplateId} from path: {OutputsFilePath}", id, outputsFilePath);
+
+        try
+        {
+            if (!File.Exists(outputsFilePath))
+            {
+                _logger.LogWarning("Outputs file not found for template ID {TemplateId} at path: {OutputsFilePath}", id, outputsFilePath);
+                throw new FileNotFoundException($"Outputs file not found at path: {outputsFilePath}");
+            }
+
+            var jsonContent = JsonNode.Parse(File.ReadAllText(outputsFilePath));
+            if (jsonContent == null)
+            {
+                throw new IOException($"An error occurred while parsing {jsonContent} to output schema");
+            }
+
+            var outputs = new TemplateOutputs(jsonContent.AsObject());
+            _logger.LogInformation("Successfully retrieved outputs {Outputs}", outputs);
+            return outputs;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred while fetching template outputs for template ID: {TemplateId}", id);
+            throw new IOException($"An error occurred while fetching template outputs for template ID: {id}.", ex);
+        }
+    }
 }
