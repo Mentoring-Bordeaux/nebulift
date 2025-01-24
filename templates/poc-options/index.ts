@@ -34,7 +34,7 @@ const repo = new github.Repository("repo", {
 const sourcePath = "./code";
 console.log(`Adding source code from ${sourcePath} to repository ${repositoryName}...`);
 repo.name.apply((name) => {
-  nebulift.addSourceCode(repositoryName, 'sourcePath', macros)
+  nebulift.addSourceCode(repositoryName, sourcePath, macros)
 
   for (const user of contributors) {
     new github.RepositoryCollaborator("repo_user" + user, {
