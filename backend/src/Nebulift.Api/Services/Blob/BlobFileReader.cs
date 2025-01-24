@@ -21,7 +21,7 @@ public static class BlobFileReader
                          throw new ArgumentException("Invalid JSON element");
         return new TemplateInputs(jsonObject);
     }
-    
+
     /// <summary>
     /// Parses a JSON element into a TemplateOutputs object.
     /// </summary>
@@ -59,8 +59,9 @@ public static class BlobFileReader
     {
         var name = element.GetProperty("name").GetString() ?? throw new ArgumentNullException(nameof(element));
         var technologies = element.GetProperty("technologies").EnumerateArray().Select(x => x.ToString()).ToList();
+        var description = element.GetProperty("description").GetString() ?? string.Empty;
 
-        return new TemplateIdentity(name, technologies);
+        return new TemplateIdentity(name, technologies, description);
     }
 
     /// <summary>
@@ -79,7 +80,8 @@ public static class BlobFileReader
 
         using (HttpClient client = new ())
         {
-            try {
+            try
+            {
                 var url = new Uri(rootUrl, $"{rootUrl.AbsolutePath.TrimEnd('/')}/{templateName}/{fileUrl}");
 
                 // Send an HTTP GET request to download the file
