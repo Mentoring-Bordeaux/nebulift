@@ -39,5 +39,4 @@ repo.name.apply((name) => {
   }
 });
 
-export const repositoryName = repo.name;
 export const repositoryUrl = repo.httpCloneUrl;
