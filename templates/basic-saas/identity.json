@@ -1,0 +1,5 @@
+{
+    "name" : "basic-saas",
+    "technologies" : ["Nuxt", ".NET", "Azure"],
+    "description" : "A basic SaaS template with a linked back (.NET) and front end (Nuxt)."
+}

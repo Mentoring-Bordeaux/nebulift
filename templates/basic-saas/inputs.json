@@ -1,0 +1,46 @@
+{
+    "azure": {
+        "description": "Azure options",
+        "title": "Azure",
+        "type": "object",
+        "properties": {
+            "welcome_message": {
+                "description": "Message shown on web page",
+                "title": "Welcome message",
+                "type": "string"
+            }
+        }
+    },
+    "credentials": {
+        "type": "object",
+        "title": "Credentials",
+        "description": "",
+        "properties": {
+            "pulumiUser": {
+                "type": "string",
+                "title": "Pulumi User",
+                "description": "Pulumi user to create the stack"
+            },
+            "ARM_CLIENT_ID": {
+                "type": "string",
+                "title": "ARM Client ID",
+                "description": "Azure client ID to authenticate with Azure"
+            },
+            "ARM_CLIENT_SECRET": {
+                "type": "string",
+                "title": "ARM Client Secret",
+                "description": "Azure client secret to authenticate with Azure"
+            },
+            "ARM_SUBSCRIPTION_ID": {
+                "type": "string",
+                "title": "ARM Subscription ID",
+                "description": "Azure subscription ID to authenticate with Azure"
+            },
+            "ARM_TENANT_ID": {
+                "type": "string",
+                "title": "ARM Tenant ID",
+                "description": "Azure tenant ID to authenticate with Azure"
+            }
+        }
+    }
+}
