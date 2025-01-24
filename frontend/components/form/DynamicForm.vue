@@ -40,7 +40,7 @@ const isSectionValid = computed(() => {
         const config = section.properties[fieldKey];
 
         if (Array.isArray(value)) {
-            const minItems = config.minItems === undefined ? 0 : config.minItems;
+            const minItems = config.minItems === undefined ? 1 : config.minItems;
             const filledItemsCount = value.filter((item) => item && item.trim() !== '').length;
 
             return filledItemsCount >= minItems;
@@ -77,7 +77,7 @@ const validateSection = (): boolean => {
         const value = store.formData[sectionKey]?.[fieldKey];
 
         if (Array.isArray(value)) {
-            const minItems = config.minItems === undefined ? 0 : config.minItems;
+            const minItems = config.minItems === undefined ? 1 : config.minItems;
             console.log("validate section: " + minItems);
             const filledItemsCount = value.filter((item) => item && item.trim() !== '').length;
             console.log("filled: " + filledItemsCount);

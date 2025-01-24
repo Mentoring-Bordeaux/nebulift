@@ -4,6 +4,7 @@
       v-for="(project, index) in projects"
       :key="index"
       :name="project.name"
+      :description="project.description"
       :technologies="project.technologies"
       @click="handleCardClick(project)"
     />
@@ -11,21 +12,16 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps } from 'vue';
-import { useRouter } from 'vue-router';
-import ProjectCard from "@/components/ProjectCard.vue";
-
 const props = defineProps({
   projects: {
-    type: Array as () => { name: string; technologies: string[] }[],
+    type: Array as () => { name: string; technologies: string[]; description: string }[],
     required: true,
   },
 });
 
 const router = useRouter();
 
-const handleCardClick = (project: { name: string; technologies: string[] }) => {
-  console.log("Project techno:", project.technologies);
+const handleCardClick = (project: { name: string; technologies: string[]; description: string }) => {
   router.push({
     path: `/projects/${project.name}`
   });
