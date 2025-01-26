@@ -4,6 +4,8 @@ EXPOSE 5052
 EXPOSE 7109
 ENV ASPNETCORE_URLS="http://+:5052"
 ENV DOTNET_LAUNCH_PROFILE="http"
+ARG PULUMI_ACCESS_TOKEN_VALUE
+ENV PULUMI_ACCESS_TOKEN=${PULUMI_ACCESS_TOKEN_VALUE}
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
@@ -20,5 +22,15 @@ RUN dotnet publish "Nebulift.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish
 
 FROM base AS final
 WORKDIR /app
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    curl ca-certificates && \
+    curl -fsSL https://get.pulumi.com | sh && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+ENV PATH="/root/.pulumi/bin:${PATH}"
+
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Nebulift.Api.dll"]

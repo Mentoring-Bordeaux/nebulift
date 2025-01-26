@@ -3,7 +3,7 @@ name: Back CD
 on:
   push:
     branches:
-      - feature/*
+      - delivery/*
   workflow_dispatch:
     inputs:
       environment:
