@@ -19,17 +19,27 @@ const route = useRoute();
 const executionStore = useTemplateExecutionStore();
 
 const handleCreate = async () => {
- try {
-   const templateId = route.params.name as string;
-   await executionStore.handleTemplateExecution(templateId, props.formData);
-   router.push(`/projects/execution/${templateId}`);
- } catch (error) {
-   console.error('Execution error:', error);
- }
+  try {
+    const templateId = route.params.name as string;
+    executionStore.isExecuting = true; 
+    await executionStore.handleTemplateExecution(templateId, props.formData);
+    router.push(`/projects/execution/${templateId}`);
+  } catch (error) {
+    console.error('Execution error:', error);
+  } finally {
+    executionStore.isExecuting = false; 
+  }
 };
 </script>
 
 <template>
+  <div v-if="executionStore.isExecuting" class="flex items-center justify-center min-h-screen">
+    <div class="text-center">
+      <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-orange-500 border-solid mb-4"></div>
+      <p class="text-gray-600">Creating your project...</p>
+    </div>
+  </div>
+
    <div class="space-y-6 text-black">
        <h2 class="text-xl font-semibold mb-4">Review your configuration</h2>
 
