@@ -55,10 +55,9 @@ const handleSubmitSuccess = async () => {
     isSubmitting.value = true;
     await templateConfigStore.submitConfig();
     
-    // Navigate to success state or next step
+    // Navigate to execution results page
     router.push({
-      path: '/success',
-      query: { template: templateName.value }
+      path: `/projects/execution/${templateName.value}`,
     });
   } catch (error) {
     localError.value = 'Failed to submit configuration';

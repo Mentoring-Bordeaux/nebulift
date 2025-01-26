@@ -1,5 +1,5 @@
 import { useFetch } from '#app';
-import type { TemplateSchema, FormData } from '@/types/template';
+import type { TemplateSchema, FormData , TemplateOutput} from '@/types/template';
 
 /**
  * Service for handling template-related API operations
@@ -23,11 +23,11 @@ class TemplateService {
     }
 
     /**
-     * Submits template configuration data
+     * Submits template configuration data and returns execution output
      */
-    async submitConfig(id: string, formData: FormData): Promise<void> {
+    async submitConfig(id: string, formData: FormData): Promise<TemplateOutput> {
         console.log('Submitting form data:', JSON.stringify(formData, null, 2));
-        const { error } = await useFetch(`${this.baseUrl}/${id}`, {
+        const { data, error } = await useFetch<TemplateOutput>(`${this.baseUrl}/${id}`, {
             method: 'POST',
             body: JSON.stringify(formData)
         });
@@ -36,6 +36,8 @@ class TemplateService {
             console.error('Error submitting template config:', error.value);
             throw error.value;
         }
+
+        return data.value as TemplateOutput;
     }
 }
 

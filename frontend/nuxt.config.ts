@@ -10,7 +10,10 @@ export default defineNuxtConfig({
   routeRules: {
     '/api': {
       proxy: 'http://localhost:5052',
-    },
+    },'/projects/execution/:id': {
+      ssr: true
+    }
+
   },
   compatibilityDate: '2024-04-03',
   nitro: {

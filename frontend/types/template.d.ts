@@ -28,3 +28,21 @@ export interface TemplateSchema {
 export interface FormData {
     [sectionKey: string]: Record<string, string | string[]>;
 }
+
+export interface OutputField {
+    description: string;
+    title: string;
+    type: string;
+    value: string;
+}
+
+export interface TemplateOutput {
+    [key: string]: OutputField;
+}
+
+export interface ExecutionState {
+    isExecuting: boolean;
+    output: TemplateOutput | null;
+    error: string | null;
+    templateId: string | null;
+}
