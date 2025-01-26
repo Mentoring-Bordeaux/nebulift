@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
-import type { TemplateSchema, FormData } from '~/types/template';
+import { useRoute, useRouter } from 'vue-router';
 import { useTemplateExecutionStore } from '@/stores/templateExecutionStore';
+import type { TemplateSchema, FormData } from '~/types/template';
 
 interface Props {
    formData: FormData;
@@ -15,15 +15,14 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits(['back']);
 const router = useRouter();
+const route = useRoute();
 const executionStore = useTemplateExecutionStore();
 
 const handleCreate = async () => {
  try {
-   await executionStore.handleTemplateExecution(
-     Object.keys(props.schema)[0], // Get first section key as template ID
-     props.formData
-   );
-   router.push(`/projects/execution/${Object.keys(props.schema)[0]}`);
+   const templateId = route.params.name as string;
+   await executionStore.handleTemplateExecution(templateId, props.formData);
+   router.push(`/projects/execution/${templateId}`);
  } catch (error) {
    console.error('Execution error:', error);
  }
