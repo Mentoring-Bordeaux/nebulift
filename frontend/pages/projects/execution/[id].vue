@@ -17,7 +17,9 @@ const isLoading = ref(false);
 const localError = ref<string | null>(null);
 
 const errorMessage = computed((): string => {
-  return localError.value || executionStore.error || 'An unexpected error occurred';
+  return (
+    localError.value || executionStore.error || 'An unexpected error occurred'
+  );
 });
 
 onMounted(async () => {
@@ -53,13 +55,10 @@ const handleRetry = async () => {
 <template>
   <div class="min-h-screen bg-gray-50">
     <Header />
-    
+
     <main class="container mx-auto py-8 px-4">
       <div class="max-w-4xl mx-auto">
-        <ExecutionStatus
-          v-if="isLoading"
-          status="loading"
-        />
+        <ExecutionStatus v-if="isLoading" status="loading" />
 
         <ExecutionStatus
           v-else-if="localError || executionStore.error"

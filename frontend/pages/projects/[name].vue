@@ -18,8 +18,8 @@ const localError = ref<string | null>(null);
 
 // Computed Properties
 const templateName = computed(() => route.params.name as string);
-const selectedTemplate = computed(() => 
-  projectStore.projects.find(p => p.name === templateName.value)
+const selectedTemplate = computed(() =>
+  projectStore.projects.find((p) => p.name === templateName.value)
 );
 
 const pageTitle = computed(() => {
@@ -33,7 +33,7 @@ onMounted(async () => {
     // Verify template exists in project store
     if (!selectedTemplate.value) {
       await projectStore.fetchProjects();
-      
+
       if (!selectedTemplate.value) {
         localError.value = 'Template not found';
         router.push('/');
@@ -54,7 +54,7 @@ const handleSubmitSuccess = async () => {
   try {
     isSubmitting.value = true;
     await templateConfigStore.submitConfig();
-    
+
     // Navigate to execution results page
     router.push({
       path: `/projects/execution/${templateName.value}`,
@@ -76,7 +76,7 @@ const handleRetry = async () => {
 <template>
   <div class="min-h-screen bg-gray-50">
     <Header />
-    
+
     <main class="container mx-auto px-4 py-8 max-w-7xl">
       <!-- Page Header -->
       <div class="mb-8">
@@ -84,7 +84,7 @@ const handleRetry = async () => {
           <h1 class="text-2xl font-bold text-gray-900">
             {{ pageTitle }}
           </h1>
-          
+
           <button
             class="text-gray-600 hover:text-gray-900"
             @click="router.push('/')"
@@ -108,11 +108,18 @@ const handleRetry = async () => {
         <div class="flex items-start">
           <div class="flex-shrink-0">
             <!-- Error Icon -->
-            <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" />
+            <svg
+              class="h-5 w-5 text-red-400"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+              />
             </svg>
           </div>
-          
+
           <div class="ml-3">
             <h3 class="text-sm font-medium text-red-800">
               Configuration Error
@@ -121,8 +128,8 @@ const handleRetry = async () => {
               {{ localError || templateConfigStore.error }}
             </p>
             <button
-                class="mt-2 text-sm text-red-700 hover:text-red-600 font-medium underline"
-                @click="handleRetry"
+              class="mt-2 text-sm text-red-700 hover:text-red-600 font-medium underline"
+              @click="handleRetry"
             >
               Retry
             </button>
@@ -135,8 +142,12 @@ const handleRetry = async () => {
         v-if="templateConfigStore.loading"
         class="flex justify-center items-center py-12"
       >
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <span class="ml-3 text-gray-600">Loading template configuration...</span>
+        <div
+          class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"
+        ></div>
+        <span class="ml-3 text-gray-600"
+          >Loading template configuration...</span
+        >
       </div>
 
       <!-- Form Content -->

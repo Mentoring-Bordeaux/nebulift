@@ -21,16 +21,18 @@ const isUrl = computed(() => {
   <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
     <div class="flex justify-between items-start mb-2">
       <h3 class="text-lg font-semibold text-gray-900">{{ field.title }}</h3>
-      <span class="px-2 py-1 text-xs font-medium bg-gray-100 rounded-full text-gray-600">
+      <span
+        class="px-2 py-1 text-xs font-medium bg-gray-100 rounded-full text-gray-600"
+      >
         {{ field.type }}
       </span>
     </div>
-    
+
     <p class="text-sm text-gray-600 mb-3">{{ field.description }}</p>
-    
+
     <div class="mt-2">
       <template v-if="isUrl">
-        <a 
+        <a
           :href="field.value"
           target="_blank"
           rel="noopener noreferrer"
@@ -40,7 +42,9 @@ const isUrl = computed(() => {
         </a>
       </template>
       <template v-else>
-        <code class="px-2 py-1 bg-gray-50 rounded text-sm font-mono break-all text-black">
+        <code
+          class="px-2 py-1 bg-gray-50 rounded text-sm font-mono break-all text-black"
+        >
           {{ field.value }}
         </code>
       </template>

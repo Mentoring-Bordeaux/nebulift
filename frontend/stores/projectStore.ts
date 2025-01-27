@@ -10,7 +10,7 @@ export const useProjectStore = defineStore('projects', () => {
   const fetchProjects = async () => {
     try {
       const fetchedProjects = await api.project.getAll();
-      projects.value = fetchedProjects.map(item => ({
+      projects.value = fetchedProjects.map((item) => ({
         name: item.name,
         technologies: item.technologies,
         description: item.description,

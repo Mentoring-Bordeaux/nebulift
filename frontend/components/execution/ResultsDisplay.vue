@@ -8,19 +8,17 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const outputEntries = computed(() => 
+const outputEntries = computed(() =>
   Object.entries(props.output).map(([key, field]) => ({
     key,
-    field
+    field,
   }))
 );
 </script>
 
 <template>
   <div class="space-y-6">
-    <h2 class="text-2xl font-bold text-gray-900 mb-6">
-      Execution Results
-    </h2>
+    <h2 class="text-2xl font-bold text-gray-900 mb-6">Execution Results</h2>
 
     <div class="grid gap-6 md:grid-cols-2">
       <OutputField
@@ -38,7 +36,7 @@ const outputEntries = computed(() =>
       >
         Back to Templates
       </button>
-      
+
       <button
         @click="$router.push(`/projects/${$route.params.id}`)"
         class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
