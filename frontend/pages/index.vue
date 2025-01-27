@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import Header from "@/components/Header.vue";
-import ProjectGrid from "@/components/ProjectGrid.vue";
+import Header from '@/components/Header.vue';
+import ProjectGrid from '@/components/ProjectGrid.vue';
 import { useProjectStore } from '@/stores/projectStore';
 import { storeToRefs } from 'pinia';
 import { onMounted } from 'vue';
@@ -12,7 +12,7 @@ onMounted(async () => {
   await projectStore.fetchProjects();
 });
 
-console.log("Initial project value:", projects.value);
+console.log('Initial project value:', projects.value);
 </script>
 
 <template>
@@ -35,7 +35,8 @@ console.log("Initial project value:", projects.value);
 </template>
 
 <style scoped>
-html, body {
+html,
+body {
   @apply m-0 p-0 w-full h-full bg-white;
 }
 </style>

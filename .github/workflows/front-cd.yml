@@ -1,6 +1,9 @@
 name: Front CD
 
 on:
+  push:
+    branches:
+      - delivery/*
   workflow_dispatch:
     inputs:
       environment:
