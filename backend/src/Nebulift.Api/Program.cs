@@ -44,6 +44,7 @@ public static class Program
         builder.Services.AddHealthChecks();
 
         var app = builder.Build();
+        app.UseCors("AllowSpecificOrigin");
 
         // Forcing instantiation of template storage to run the first requests.
         try
