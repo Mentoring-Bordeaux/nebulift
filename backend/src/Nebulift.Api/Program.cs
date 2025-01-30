@@ -35,7 +35,7 @@ public static class Program
         builder.Services.AddCors(options =>
         {
             options.AddPolicy(
-                "AllowSpecificOrigin",
+                "AllowDevelopmentOrigin",
                 policy => policy.WithOrigins("http://localhost:3000")
                     .AllowAnyHeader()
                     .AllowAnyMethod());
@@ -64,6 +64,7 @@ public static class Program
         }
 
         app.UseHttpsRedirection();
+        app.UseCors("AllowDevelopmentOrigin");
         app.UseAuthorization();
 
         app.UseHealthChecks("/api/health");
