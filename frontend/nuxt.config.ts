@@ -26,4 +26,10 @@ export default defineNuxtConfig({
   typescript: {
     typeCheck: true,
   },
+  postcss: {
+    plugins: {
+      'tailwindcss': {},
+      'autoprefixer': {},
+    },
+  }
 });
