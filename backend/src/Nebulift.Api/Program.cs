@@ -17,6 +17,10 @@ public static class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+
+        // Add service defaults & Aspire client integration
+        builder.AddServiceDefaults();
+
         builder.Services.Configure<RemoteTemplateServiceOptions>(
             builder.Configuration.GetSection("RemoteTemplateServiceOptions"));
         builder.Services.AddSingleton<ITemplateStorage, RemoteTemplateStorage>();
@@ -41,8 +45,6 @@ public static class Program
                     .AllowAnyMethod());
         });
 
-        builder.Services.AddHealthChecks();
-
         var app = builder.Build();
 
         // Forcing instantiation of template storage to run the first requests.
@@ -61,18 +63,17 @@ public static class Program
         {
             app.UseSwagger();
             app.UseSwaggerUI();
+            app.UseCors("AllowDevelopmentOrigin");
         }
 
         app.UseHttpsRedirection();
-        app.UseCors("AllowDevelopmentOrigin");
         app.UseAuthorization();
-
-        app.UseHealthChecks("/api/health");
 
         // Use custom exception middleware
         app.UseMiddleware<ExceptionMiddleware>();
 
         app.MapControllers();
+        app.MapDefaultEndpoints();
 
         app.Run();
     }
